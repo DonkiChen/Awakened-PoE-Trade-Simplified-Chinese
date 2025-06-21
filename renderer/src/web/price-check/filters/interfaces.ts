@@ -125,6 +125,7 @@ export interface StatFilter {
     tradeInvert?: boolean
     dp: boolean
     isNegated: boolean
+    goodness?: number
   }
   option?: {
     value: number // NOTE: mutable in UI

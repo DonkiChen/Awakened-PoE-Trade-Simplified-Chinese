@@ -1,4 +1,5 @@
 import { promises as fs, watchFile, unwatchFile } from 'fs'
+import path from 'path'
 import { app } from 'electron'
 import { guessFileLocation } from './utils'
 import { ServerEvents } from '../server'
@@ -11,9 +12,10 @@ const POSSIBLE_PATH =
     'C:\\Program Files (x86)\\Epic Games\\PathOfExile\\logs\\Client.txt',
     'C:\\Program Files (x86)\\WeGameApps\\流放之路\\logs\\Client.txt'
   ] : (process.platform === 'linux') ? [
-    // TODO
+    path.join(app.getPath('home'), '.wine/drive_c/Program Files (x86)/Grinding Gear Games/Path of Exile/logs/Client.txt'),
+    path.join(app.getPath('home'), '.local/share/Steam/steamapps/common/Path of Exile/logs/Client.txt')
   ] : (process.platform === 'darwin') ? [
-    `${app.getPath('home')}/Library/Caches/com.GGG.PathOfExile/Logs/Client.txt`
+    path.join(app.getPath('home'), 'Library/Caches/com.GGG.PathOfExile/Logs/Client.txt')
   ] : []
 
 export class GameLogWatcher {

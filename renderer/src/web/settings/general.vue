@@ -75,12 +75,15 @@
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
 import { useI18nNs } from '@/web/i18n'
+import UiRadio from '@/web/ui/UiRadio.vue'
+import UiCheckbox from '@/web/ui/UiCheckbox.vue'
 import { configModelValue, configProp } from './utils'
 import { AppConfig } from '@/web/Config'
 import { SaleType } from '@/web/price-check/filters/interfaces'
 
 export default defineComponent({
   name: 'settings.general',
+  components: { UiRadio, UiCheckbox },
   props: configProp(),
   setup (props) {
     const { t } = useI18nNs('settings')
