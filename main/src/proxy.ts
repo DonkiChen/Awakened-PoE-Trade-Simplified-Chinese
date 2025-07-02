@@ -13,7 +13,7 @@ export const PROXY_HOSTS = [
   { host: 'poe.game.qq.com', official: true },
   { host: 'www.poelab.com', official: false },
   { host: 'pub-feb51ef2e03741399e6a3d2d09a07601.r2.dev', official: false },
-  { host: 'gitee.com', official: false }
+  { host: 'gitee.com', official: false}
 ]
 
 export class HttpProxy {
@@ -33,13 +33,14 @@ export class HttpProxy {
       if (this.realm === 'pc-tencent' && host === 'poe.game.qq.com') {
         this.doTencentRequest(logger, host, req, res)
       } else {
-        this.doOfficialRequest(logger, req, res)
+        this.doOfficialRequest(logger, host, req, res)
       }
     })
   }
 
   private doOfficialRequest(
     logger: Logger,
+    host: string,
     req: IncomingMessage,
     res: ServerResponse<IncomingMessage>
   ) {
