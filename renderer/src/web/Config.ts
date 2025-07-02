@@ -129,7 +129,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 17,
+  configVersion: 18,
   overlayKey: 'Shift + Space',
   overlayBackground: 'rgba(129, 139, 149, 0.15)',
   overlayBackgroundClose: true,
