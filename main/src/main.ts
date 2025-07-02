@@ -33,7 +33,7 @@ app.on('ready', async () => {
   const gameConfig = new GameConfig(eventPipe, logger)
   const poeWindow = new GameWindow()
   const appUpdater = new AppUpdater(eventPipe)
-  const _httpProxy = new HttpProxy(server, logger)
+  const httpProxy = new HttpProxy(server, logger)
 
   setTimeout(
     async () => {
@@ -41,6 +41,7 @@ app.on('ready', async () => {
       new OverlayVisibility(eventPipe, overlay, gameConfig)
       const shortcuts = await Shortcuts.create(logger, overlay, poeWindow, gameConfig, eventPipe)
       eventPipe.onEventAnyClient('CLIENT->MAIN::update-host-config', (cfg) => {
+        httpProxy.updateCookies(cfg.cookies, cfg.realm)
         overlay.updateOpts(cfg.overlayKey, cfg.windowTitle)
         shortcuts.updateActions(cfg.shortcuts, cfg.stashScroll, cfg.logKeys, cfg.restoreClipboard, cfg.language)
         gameLogWatcher.restart(cfg.clientLog ?? '')
