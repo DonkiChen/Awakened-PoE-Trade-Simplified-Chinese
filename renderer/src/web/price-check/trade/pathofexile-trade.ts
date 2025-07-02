@@ -596,7 +596,9 @@ export async function requestResults (
     if (_data.error) {
       throw new Error(_data.error.message)
     } else {
-      data = _data.result.filter(res => res != null && !res.item.note?.endsWith('.'))
+      data = _data.result
+        .filter(res => res != null)
+        .filter(res => !res.item.note?.endsWith('.'))
     }
 
     cache.set<FetchResult[]>(resultIds, data, Cache.deriveTtl(...RATE_LIMIT_RULES.SEARCH, ...RATE_LIMIT_RULES.FETCH))
