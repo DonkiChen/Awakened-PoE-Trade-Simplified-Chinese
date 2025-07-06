@@ -7179,3 +7179,4 @@
 {"ref":"Zealotry has #% increased Aura Effect","better":1,"matchers":[{"string":"열광의 오라 효과 #% 증가"},{"string":"열광의 오라 효과 #% 감소","negate":true}],"trade":{"ids":{"explicit":["explicit.stat_4096052153"],"implicit":["implicit.stat_4096052153"],"fractured":["fractured.stat_4096052153"]}}}
 {"ref":"Zealotry has #% increased Mana Reservation Efficiency","better":1,"matchers":[{"string":"열광의 마나 점유 효율 #% 증가"},{"string":"열광의 마나 점유 효율 #% 감소","negate":true}],"trade":{"ids":{"explicit":["explicit.stat_168308685","explicit.stat_4216444167"],"enchant":["enchant.stat_168308685","enchant.stat_4216444167"]}}}
 {"ref":"Zealotry has no Reservation","better":1,"matchers":[{"string":"열광으로 인한 점유 없음"}],"trade":{"ids":{"explicit":["explicit.stat_1741242318"]}}}
+{"ref":"Area is Influenced by the Originator's Memories","better":1,"matchers":[{"string":"Area is Influenced by the Originator's Memories"}],"trade":{"ids":{"implicit":["implicit.stat_2696470877"]}}}
