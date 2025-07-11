@@ -41,6 +41,7 @@ export interface ItemFilters {
   mirrored?: {
     disabled: boolean
   }
+  memoryStrands?: FilterNumeric
   foil?: {
     disabled: boolean
   }

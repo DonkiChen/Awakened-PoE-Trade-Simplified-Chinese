@@ -23,6 +23,7 @@ export default {
   ELEMENTAL_DAMAGE: 'Elemental Damage: ',
   CRIT_CHANCE: 'Critical Strike Chance: ',
   ATTACK_SPEED: 'Attacks per Second: ',
+  MEMORY_STRANDS: 'Memory Strands: ',
   ARMOUR: 'Armour: ',
   EVASION: 'Evasion Rating: ',
   ENERGY_SHIELD: 'Energy Shield: ',

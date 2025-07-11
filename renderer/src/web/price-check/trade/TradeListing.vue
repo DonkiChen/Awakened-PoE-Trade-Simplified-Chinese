@@ -33,6 +33,9 @@
             <th v-if="filters.quality || item.category === 'Gem'" class="trade-table-heading">
               <div class="px-2" style="width: max-content;">{{ t(':quality') }}</div>
             </th>
+            <th v-if="filters.memoryStrands" class="trade-table-heading">
+              <div class="px-2" style="width: max-content;">{{ t(':memory_strands') }}</div>
+            </th>
             <th class="trade-table-heading" :class="{ 'w-full': !showSeller }">
               <div class="pr-2 pl-4">
                 <span class="ml-1" style="padding-left: 0.375rem; width: max-content;">{{ t(':listed') }}</span>
@@ -55,6 +58,7 @@
               <td v-if="filters.itemLevel" class="px-2 whitespace-nowrap text-right">{{ result.itemLevel }}</td>
               <td v-if="item.category === 'Gem'" class="pl-2 whitespace-nowrap">{{ result.level }}</td>
               <td v-if="filters.quality || item.category === 'Gem'" class="px-2 whitespace-nowrap text-blue-400 text-right">{{ result.quality }}</td>
+              <td v-if="filters.memoryStrands" class="px-2 whitespace-nowrap text-blue-400 text-right">{{ result.memoryStrands }}</td>
               <td class="pr-2 pl-4 whitespace-nowrap">
                 <div class="inline-flex items-center">
                   <div class="account-status" :class="result.accountStatus"></div>

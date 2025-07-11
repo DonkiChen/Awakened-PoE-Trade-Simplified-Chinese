@@ -23,6 +23,7 @@ export default {
   ELEMENTAL_DAMAGE: '원소 피해: ',
   CRIT_CHANCE: '치명타 확률: ',
   ATTACK_SPEED: '초당 공격 횟수: ',
+  MEMORY_STRANDS: 'Memory Strands: ',
   ARMOUR: '방어도: ',
   EVASION: '회피: ',
   ENERGY_SHIELD: '에너지 보호막: ',

@@ -23,6 +23,7 @@ export default {
   ELEMENTAL_DAMAGE: 'Урон от стихий: ',
   CRIT_CHANCE: 'Шанс критического удара: ',
   ATTACK_SPEED: 'Атак в секунду: ',
+  MEMORY_STRANDS: 'Memory Strands: ',
   ARMOUR: 'Броня: ',
   EVASION: 'Уклонение: ',
   ENERGY_SHIELD: 'Энерг. щит: ',
