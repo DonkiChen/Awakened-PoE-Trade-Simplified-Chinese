@@ -71,6 +71,7 @@
     "quality": "Quality: {0}",
     "gem_level": "Level: {0}",
     "memory_strands": "Memory strands: {0}",
+    "stored_experience": "Stored Experience: {0}",
     "sentinel_charge": "Charge: {0}",
     "find_in_stash": "Find in Stash",
     "parse_error": "An error occurred while parsing the item",

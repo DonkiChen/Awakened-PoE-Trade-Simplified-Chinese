@@ -24,6 +24,7 @@ export default {
   CRIT_CHANCE: 'Critical Strike Chance: ',
   ATTACK_SPEED: 'Attacks per Second: ',
   MEMORY_STRANDS: 'Memory Strands: ',
+  STORED_EXPERIENCE: 'Stored Experience: ',
   ARMOUR: 'Armour: ',
   EVASION: 'Evasion Rating: ',
   ENERGY_SHIELD: 'Energy Shield: ',

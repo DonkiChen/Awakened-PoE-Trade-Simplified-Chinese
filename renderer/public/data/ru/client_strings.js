@@ -24,6 +24,7 @@ export default {
   CRIT_CHANCE: 'Шанс критического удара: ',
   ATTACK_SPEED: 'Атак в секунду: ',
   MEMORY_STRANDS: 'Memory Strands: ',
+  STORED_EXPERIENCE: 'Stored Experience: ',
   ARMOUR: 'Броня: ',
   EVASION: 'Уклонение: ',
   ENERGY_SHIELD: 'Энерг. щит: ',

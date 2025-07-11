@@ -42,6 +42,7 @@ export interface ItemFilters {
     disabled: boolean
   }
   memoryStrands?: FilterNumeric
+  storedExperience?: FilterNumeric
   foil?: {
     disabled: boolean
   }

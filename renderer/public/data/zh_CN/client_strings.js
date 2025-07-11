@@ -24,6 +24,7 @@ export default {
   CRIT_CHANCE: '攻击暴击率: ',
   ATTACK_SPEED: '每秒攻击次数: ',
   MEMORY_STRANDS: '回忆束丝: ',
+  STORED_EXPERIENCE: '储存的精华：',
   ARMOUR: '护甲: ',
   EVASION: '闪避值: ',
   ENERGY_SHIELD: '能量护盾: ',

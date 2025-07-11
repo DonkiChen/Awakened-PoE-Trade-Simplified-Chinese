@@ -34,6 +34,8 @@
         :filter="filters.blueSockets" :name="t('item.blue_sockets')" />
       <filter-btn-numeric v-if="filters.memoryStrands"
         :filter="filters.memoryStrands" :name="t('item.memory_strands')" />
+      <filter-btn-numeric v-if="filters.storedExperience"
+        :filter="filters.storedExperience" :name="t('item.stored_experience')" />
       <filter-btn-numeric v-if="filters.gemLevel"
         :filter="filters.gemLevel" :name="t('item.gem_level')" />
       <filter-btn-numeric v-if="filters.quality"

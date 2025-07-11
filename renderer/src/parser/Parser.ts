@@ -69,6 +69,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
   parseModifiers, // scourge
   parseModifiers, // implicit
   parseModifiers, // explicit
+  parseLens,
   { virtual: transformToLegacyModifiers },
   { virtual: parseFractured },
   { virtual: parseBlightedMap },
@@ -361,7 +362,8 @@ function parseNamePlate (section: string[]) {
     info: undefined!,
     infoVariants: undefined!,
     rawText: undefined!,
-    memoryStrands: 0
+    memoryStrands: 0,
+    storedExperience: 0
   }
 
   switch (rarityText) {
@@ -671,6 +673,16 @@ function parseLogbookArea (section: string[], item: ParsedItem) {
   }
 
   return 'SECTION_PARSED'
+}
+
+function parseLens (section: string[], item: ParsedItem) {
+  for (const line of section) {
+    if (line.startsWith(_$.STORED_EXPERIENCE)) {
+      item.storedExperience = parseInt(line.slice(_$.STORED_EXPERIENCE.length).replace(/,/g, ''), 10)
+      return 'SECTION_PARSED'
+    }
+  }
+  return 'PARSER_SKIPPED'
 }
 
 function parseMemoryStrand (section: string[], item: ParsedItem): 'PARSER_SKIPPED' {

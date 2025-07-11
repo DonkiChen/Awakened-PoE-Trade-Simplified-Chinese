@@ -85,6 +85,7 @@
     "quality": "Качество: {0}",
     "gem_level": "Уровень: {0}",
     "memory_strands": "Memory strands: {0}",
+    "stored_experience": "Stored Experience: {0}",
     "sentinel_charge": "Заряд: {0}",
     "find_in_stash": "Найти в тайнике",
     "parse_error": "Произошла ошибка при парсинге предмета",
