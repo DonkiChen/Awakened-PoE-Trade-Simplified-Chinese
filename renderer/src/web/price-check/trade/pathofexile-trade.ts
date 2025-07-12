@@ -240,8 +240,8 @@ export interface PricingResult {
   corrupted?: boolean
   quality?: string
   level?: string
-  memoryStrands?: number
-  storedExperience?: number
+  memoryStrands?: string
+  storedExperience?: string
   relativeDate: string
   priceAmount: number
   priceCurrency: string
