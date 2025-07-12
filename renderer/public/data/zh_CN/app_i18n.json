@@ -169,7 +169,7 @@
     "heistequipment_heistweapon": "夺宝装置",
     "heistequipment_heistutility": "夺宝斗篷",
     "accessory_trinket": "饰品",
-    "azmeri_tincture": "酊剂",
+    "tincture": "酊剂",
     "azmeri_charm": "咒符"
   },
   "filters": {
@@ -309,13 +309,14 @@
     "stack": "堆叠"
   },
   "settings": {
-    "title": "设置 - Awakened PoE Trade Simplified Chinese By 红尘渡者",
+    "title": "设置 - Awakened PoE Trade Simplified Chinese By 红尘渡者 and DonkiChen",
     "language": "语言",
     "private_league": "或私人赛季",
     "account_name": "帐号(仅仅用来检测查价结果卖家是否为自己)",
     "last_char_name": "最近角色名称",
     "chat_cmd_add": "增加命令",
     "chat_cmd_send": "按回车(Enter)",
+    "chat_restore_last_chat": "恢复最近一条发言(会导致多次输入回车)",
     "no_key": "未设置",
     "clear_hotkey": "你可以使用Backspace(回退键)来清除快捷键",
     "overlay" :"Overlay",

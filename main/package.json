@@ -1,6 +1,6 @@
 {
   "name": "Awakened-PoE-Trade-Simplified-Chinese",
-  "version": "3.24.10006",
+  "version": "3.26.100",
   "private": true,
   "scripts": {
     "dev": "node build/script.mjs",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/DonkiChen/Awakened-PoE-Trade-Simplified-Chinese.git"
+    "url": "https://github.com/Traveller-hongchen/Awakened-PoE-Trade-Simplified-Chinese.git"
   },
   "main": "dist/main.js",
   "dependencies": {
@@ -25,15 +25,12 @@
     "@types/ws": "^8.5.3",
     "@wokwi/bmp-ts": "^3.0.0",
     "comlink": "^4.3.1",
-    "electron": "30.0.1",
-    "electron-builder": "24.13.3",
-    "electron-updater": "^6.1.0",
-    "esbuild": "^0.20.0",
-    "ini": "^4.0.0",
-    "typescript": "5.4.x",
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8",
+    "electron-updater": "^6.3.0",
+    "esbuild": "^0.24.0",
+    "ini": "^5.0.0",
+    "typescript": "5.6.x",
     "ws": "^8.16.0"
-  },
-  "engines": {
-    "node": ">=16"
   }
 }

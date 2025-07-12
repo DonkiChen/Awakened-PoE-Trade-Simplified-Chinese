@@ -40,7 +40,7 @@ export function createFilters (
   if (item.category === ItemCategory.CapturedBeast) {
     filters.searchExact = {
       baseType: item.info.name,
-      baseTypeTrade: item.info.refName // NOTE: always English on trade
+      baseTypeTrade: item.info.name // NOTE: 已经更改为现有名称 2024.8.5
     }
     return filters
   }
@@ -172,12 +172,14 @@ export function createFilters (
     }
     if (item.category && CATEGORY_TO_TRADE_ID.has(item.category)) {
       let disabled = opts.exact
-      if (item.category === ItemCategory.ClusterJewel) {
+      if (
+        item.category === ItemCategory.ClusterJewel ||
+        item.category === ItemCategory.Idol
+      ) {
         disabled = true
       } else if (
         item.category === ItemCategory.SanctumRelic ||
-        item.category === ItemCategory.Charm ||
-        item.category === ItemCategory.Tincture
+        item.category === ItemCategory.Charm
       ) {
         disabled = false
       }
@@ -196,7 +198,7 @@ export function createFilters (
   }
 
   if (item.quality && item.quality >= 20) {
-    if (item.category === ItemCategory.Flask) {
+    if (item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture) {
       filters.quality = {
         value: item.quality,
         disabled: (item.quality <= 20)
@@ -298,8 +300,8 @@ export function createFilters (
       item.category !== ItemCategory.HeistContract &&
       item.category !== ItemCategory.MemoryLine &&
       item.category !== ItemCategory.SanctumRelic &&
-      item.category !== ItemCategory.Tincture &&
       item.category !== ItemCategory.Charm &&
+      item.category !== ItemCategory.Idol &&
       item.info.refName !== 'Expedition Logbook'
     ) {
       if (item.category === ItemCategory.ClusterJewel) {
@@ -312,7 +314,7 @@ export function createFilters (
         // TODO limit level by item type
         filters.itemLevel = {
           value: Math.min(item.itemLevel, 86),
-          disabled: (!opts.exact || item.category === ItemCategory.Flask)
+          disabled: (!opts.exact || item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture)
         }
       }
     }

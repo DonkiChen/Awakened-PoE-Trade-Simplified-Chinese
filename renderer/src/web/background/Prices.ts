@@ -72,7 +72,7 @@ export const usePoeninja = createGlobalState(() => {
           case '永久':
             jsonurl = 'pub-feb51ef2e03741399e6a3d2d09a07601.r2.dev/price1.txt'
             break
-          case 'S25赛季':
+          case 'S26赛季':
             jsonurl = 'pub-feb51ef2e03741399e6a3d2d09a07601.r2.dev/price2.txt'
             break
           default:

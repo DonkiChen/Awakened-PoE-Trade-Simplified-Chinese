@@ -97,6 +97,7 @@
 <script lang="ts">
 import { defineComponent, watch, shallowRef, shallowReactive, computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
+import UiToggle from '@/web/ui/UiToggle.vue'
 import FilterModifier from './FilterModifier.vue'
 import FilterBtnNumeric from './FilterBtnNumeric.vue'
 import FilterBtnLogical from './FilterBtnLogical.vue'
@@ -111,7 +112,8 @@ export default defineComponent({
     FilterModifier,
     FilterBtnNumeric,
     FilterBtnLogical,
-    UnknownModifier
+    UnknownModifier,
+    UiToggle
   },
   props: {
     presets: {

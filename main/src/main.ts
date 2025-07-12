@@ -19,7 +19,9 @@ if (!app.requestSingleInstanceLock()) {
   app.exit()
 }
 
-app.disableHardwareAcceleration()
+if (process.platform !== 'darwin') {
+  app.disableHardwareAcceleration()
+}
 app.enableSandbox()
 
 let tray: AppTray
@@ -35,7 +37,7 @@ app.on('ready', async () => {
 
   setTimeout(
     async () => {
-      const overlay = new OverlayWindow(eventPipe, logger, poeWindow, httpProxy)
+      const overlay = new OverlayWindow(eventPipe, logger, poeWindow)
       new OverlayVisibility(eventPipe, overlay, gameConfig)
       const shortcuts = await Shortcuts.create(logger, overlay, poeWindow, gameConfig, eventPipe)
       eventPipe.onEventAnyClient('CLIENT->MAIN::update-host-config', (cfg) => {

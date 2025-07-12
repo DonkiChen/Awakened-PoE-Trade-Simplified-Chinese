@@ -235,7 +235,7 @@ function findInDatabase (item: ParserState) {
       info = info.filter(info => info.unique!.base === item.baseType)
     } else {
       const baseInfo: BaseType[] | undefined = ITEM_BY_TRANSLATED('ITEM', item.baseType ?? item.name)
-      if ((info[0].unique.base !== 'Silk Gloves' && info[0].unique.base !== 'Fingerless Silk Gloves') || AppConfig().realm !== 'pc-tencent') {
+      if ((info[0].unique.base !== 'Silk Gloves' && info[0].unique.base !== 'Fingerless Silk Gloves' && info[0].unique.base !== 'Velvet Gloves') || AppConfig().realm !== 'pc-tencent') {
         info = info.filter(info => info.unique!.base === baseInfo![0].refName)
       }
     }
