@@ -23,6 +23,8 @@ export default {
   ELEMENTAL_DAMAGE: '元素傷害: ',
   CRIT_CHANCE: '暴擊率: ',
   ATTACK_SPEED: '每秒攻擊次數: ',
+  MEMORY_STRANDS: 'Memory Strands: ',
+  STORED_EXPERIENCE: 'Stored Experience: ',
   ARMOUR: '護甲: ',
   EVASION: '閃避值: ',
   ENERGY_SHIELD: '能量護盾: ',
