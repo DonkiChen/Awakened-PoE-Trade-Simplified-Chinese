@@ -4386,9 +4386,9 @@
 {"ref":"Left ring slot: #% increased Effect of Curses on you","better":1,"matchers":[{"string":"左边的戒指栏位：你受到的诅咒效果增强#%"},{"string":"左边的戒指栏位：你受到的诅咒效果减弱#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_496053892"]}}}
 {"ref":"Left ring slot: #% increased Mana Regeneration Rate","better":1,"matchers":[{"string":"左戒指栏位：魔力回复速度加快 #%"}],"trade":{"ids":{"explicit":["explicit.stat_195090426"]}}}
 {"ref":"Left ring slot: #% increased Skill Effect Duration","better":1,"matchers":[{"string":"左边的戒指栏位：技能效果的持续时间增加#%"},{"string":"左边的戒指栏位：技能效果的持续时间减少#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_3320868777"]}}}
-{"ref":"Left ring slot: #% of Cold Damage from Hits taken as Fire Damage","better":1,"matchers":[{"string":"左边的戒指栏位：受到的冰霜伤害的#%转化为火焰伤害"}],"trade":{"ids":{"implicit":["implicit.stat_1323927995"]}}}
-{"ref":"Left ring slot: #% of Fire Damage from Hits taken as Lightning Damage","better":1,"matchers":[{"string":"左边的戒指栏位：受到的火焰伤害的#%转化为闪电伤害"}],"trade":{"ids":{"implicit":["implicit.stat_17730902"]}}}
-{"ref":"Left ring slot: #% of Lightning Damage from Hits taken as Cold Damage","better":1,"matchers":[{"string":"左边的戒指栏位：受到的闪电伤害的#%转化为冰霜伤害"}],"trade":{"ids":{"implicit":["implicit.stat_450178102"]}}}
+{"ref":"Left ring slot: #% of Cold Damage from Hits taken as Fire Damage","better":1,"matchers":[{"string":"左戒指栏位：受到冰霜伤害的 #% 视作火焰伤害"}],"trade":{"ids":{"implicit":["implicit.stat_1323927995"]}}}
+{"ref":"Left ring slot: #% of Fire Damage from Hits taken as Lightning Damage","better":1,"matchers":[{"string":"左戒指栏位：受到火焰伤害的 #% 视作闪电伤害"}],"trade":{"ids":{"implicit":["implicit.stat_17730902"]}}}
+{"ref":"Left ring slot: #% of Lightning Damage from Hits taken as Cold Damage","better":1,"matchers":[{"string":"左戒指栏位：受到闪电伤害的 #% 视作冰霜伤害"}],"trade":{"ids":{"implicit":["implicit.stat_450178102"]}}}
 {"ref":"Left ring slot: +# to maximum Energy Shield","better":1,"matchers":[{"string":"左戒指栏位：# 最大能量护盾"}],"trade":{"ids":{"explicit":["explicit.stat_1497601437"]}}}
 {"ref":"Left Ring slot: Cover Enemies in Ash for # seconds when you Ignite them","better":1,"matchers":[{"string":"左戒指栏位：你点燃敌人时在接下来 # 秒使其被灰烬缠身"}],"trade":{"ids":{"explicit":["explicit.stat_2533512212"]}}}
 {"ref":"Left ring slot: Minions take #% increased Damage","better":1,"matchers":[{"string":"左边的戒指栏位：召唤生物受到的伤害增加#%"},{"string":"左边的戒指栏位：召唤生物受到的伤害降低#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_1916904011"]}}}
@@ -5149,9 +5149,9 @@
 {"ref":"Right ring slot: #% increased Duration of Ailments on You","better":1,"matchers":[{"string":"右边的戒指栏位：你处于异常状态的时间增加#%"},{"string":"右边的戒指栏位：你处于异常状态的时间减少#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_2457848738"]}}}
 {"ref":"Right ring slot: #% increased Effect of Curses on you","better":1,"matchers":[{"string":"右边的戒指栏位：你受到的诅咒效果增强#%"},{"string":"右边的戒指栏位：你受到的诅咒效果减弱#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_4279053153"]}}}
 {"ref":"Right ring slot: #% increased Skill Effect Duration","better":1,"matchers":[{"string":"右边的戒指栏位：技能效果持续时间增加#%"},{"string":"右边的戒指栏位：技能效果持续时间减少#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_2239667237"]}}}
-{"ref":"Right ring slot: #% of Cold Damage from Hits taken as Lightning Damage","better":1,"matchers":[{"string":"右边的戒指栏位：受到的冰霜伤害的#%转化为闪电伤害"}],"trade":{"ids":{"implicit":["implicit.stat_744858137"]}}}
-{"ref":"Right ring slot: #% of Fire Damage from Hits taken as Cold Damage","better":1,"matchers":[{"string":"右边的戒指栏位：受到的火焰伤害的#%转化为冰霜伤害"}],"trade":{"ids":{"implicit":["implicit.stat_2478238773"]}}}
-{"ref":"Right ring slot: #% of Lightning Damage from Hits taken as Fire Damage","better":1,"matchers":[{"string":"右边的戒指栏位：受到的闪电伤害的#%转化为火焰伤害"}],"trade":{"ids":{"implicit":["implicit.stat_1905512385"]}}}
+{"ref":"Right ring slot: #% of Cold Damage from Hits taken as Lightning Damage","better":1,"matchers":[{"string":"右戒指栏位：受到冰霜伤害的 #% 视作闪电伤害"}],"trade":{"ids":{"implicit":["implicit.stat_744858137"]}}}
+{"ref":"Right ring slot: #% of Fire Damage from Hits taken as Cold Damage","better":1,"matchers":[{"string":"右戒指栏位：受到火焰伤害的 #% 视作冰霜伤害"}],"trade":{"ids":{"implicit":["implicit.stat_2478238773"]}}}
+{"ref":"Right ring slot: #% of Lightning Damage from Hits taken as Fire Damage","better":1,"matchers":[{"string":"右戒指栏位：受到闪电伤害的 #% 视作火焰伤害"}],"trade":{"ids":{"implicit":["implicit.stat_1905512385"]}}}
 {"ref":"Right ring slot: +# to maximum Mana","better":1,"matchers":[{"string":"右戒指栏位：# 最大魔力"}],"trade":{"ids":{"explicit":["explicit.stat_417509375"]}}}
 {"ref":"Right Ring slot: Cover Enemies in Frost for # seconds when you Freeze them","better":1,"matchers":[{"string":"右戒指栏位：你冻结敌人时在接下来 # 秒使其被冰霜缠身"}],"trade":{"ids":{"explicit":["explicit.stat_3536082205"]}}}
 {"ref":"Right ring slot: Minions take #% increased Damage","better":1,"matchers":[{"string":"右边的戒指栏位：召唤生物受到的伤害提高#%"},{"string":"右边的戒指栏位：召唤生物受到的伤害降低#%","negate":true}],"trade":{"ids":{"implicit":["implicit.stat_1069618951"]}}}
