@@ -112,7 +112,6 @@ export interface TranslationDict {
   CRIT_CHANCE: string
   ATTACK_SPEED: string
   MEMORY_STRANDS: string
-  STORED_EXPERIENCE: string
   ARMOUR: string
   EVASION: string
   ENERGY_SHIELD: string

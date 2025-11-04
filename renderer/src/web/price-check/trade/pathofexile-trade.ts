@@ -217,8 +217,7 @@ interface FetchResult {
       30 | // Spawns a Level %0 Monster when Harvested
       6 | // Quality
       5 | // Level
-      99 | // Memory strands
-      31 // Stored experience
+      99 // Memory strands
     }>
     note?: string
   }
@@ -240,8 +239,7 @@ export interface PricingResult {
   corrupted?: boolean
   quality?: string
   level?: string
-  memoryStrands?: string
-  storedExperience?: string
+  memoryStrands?: number
   relativeDate: string
   priceAmount: number
   priceCurrency: string
@@ -412,10 +410,6 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
 
   if (filters.memoryStrands && !filters.memoryStrands.disabled) {
     propSet(query.filters, 'misc_filters.filters.memory_level.min', filters.memoryStrands.value)
-  }
-
-  if (filters.storedExperience && !filters.storedExperience.disabled) {
-    propSet(query.filters, 'misc_filters.filters.stored_experience.min', filters.storedExperience.value)
   }
 
   for (const stat of stats) {
@@ -625,7 +619,6 @@ export async function requestResults (
       quality: result.item.properties?.find(prop => prop.type === 6)?.values[0][0],
       level: result.item.properties?.find(prop => prop.type === 5)?.values[0][0],
       memoryStrands: result.item.properties?.find(prop => prop.type === 99)?.values[0][0],
-      storedExperience: result.item.properties?.find(prop => prop.type === 31)?.values[0][0],
       relativeDate: DateTime.fromISO(result.listing.indexed).toRelative({ style: 'short' }) ?? '',
       priceAmount: result.listing.price?.amount ?? 0,
       priceCurrency: result.listing.price?.currency ?? 'no price',
