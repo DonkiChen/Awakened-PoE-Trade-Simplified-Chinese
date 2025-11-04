@@ -241,13 +241,6 @@ export function createFilters (
     }
   }
 
-  if (item.memoryStrands) {
-    filters.memoryStrands = {
-      value: item.memoryStrands,
-      disabled: false
-    }
-  }
-
   const forAdornedJewel = (
     item.rarity === ItemRarity.Magic &&
     // item.isCorrupted && -- let the buyer corrupt

@@ -23,7 +23,6 @@ export default {
   ELEMENTAL_DAMAGE: '火焰，冰霜，闪电伤害: ',
   CRIT_CHANCE: '攻击暴击率: ',
   ATTACK_SPEED: '每秒攻击次数: ',
-  MEMORY_STRANDS: '回忆束丝: ',
   ARMOUR: '护甲: ',
   EVASION: '闪避值: ',
   ENERGY_SHIELD: '能量护盾: ',

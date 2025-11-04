@@ -32,7 +32,6 @@ export interface ParsedItem {
   weaponAS?: number
   weaponPHYSICAL?: number
   weaponELEMENTAL?: number
-  memoryStrands: number
   mapBlighted?: 'Blighted' | 'Blight-ravaged'
   mapTier?: number
   mapReward?: string
@@ -85,7 +84,6 @@ export function createVirtualItem (
 ): ParsedItem {
   return {
     ...props,
-    memoryStrands: props.memoryStrands ?? 0,
     isUnidentified: props.isUnidentified ?? false,
     isCorrupted: props.isCorrupted ?? false,
     newMods: props.newMods ?? [],
