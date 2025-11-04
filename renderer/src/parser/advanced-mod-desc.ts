@@ -9,6 +9,7 @@ export const IMPLICIT_LINE = ' (implicit)'
 const CRAFTED_LINE = ' (crafted)'
 const FRACTURED_LINE = ' (fractured)'
 export const CRUCIBLE_LINE = ' (crucible)'
+const FOULBORN_LINE = ' (mutated)'
 
 export interface ParsedModifier {
   info: ModifierInfo
@@ -17,7 +18,7 @@ export interface ParsedModifier {
 
 export interface ModifierInfo {
   type: ModifierType
-  generation?: 'suffix' | 'prefix' | 'corrupted' | 'eldritch'
+  generation?: 'suffix' | 'prefix' | 'corrupted' | 'eldritch' | 'foulborn'
   name?: string
   tier?: number
   rank?: number
@@ -66,6 +67,8 @@ export function parseModInfoLine (line: string, type: ModifierType): ModifierInf
         generation = 'suffix'; break
       case _$.CORRUPTED_IMPLICIT:
         generation = 'corrupted'; break
+      case _$.FOULBORN_MODIFIER:
+        generation = 'foulborn'; break
     }
 
     name = match.groups!.name || undefined
@@ -141,6 +144,9 @@ export function parseModType (lines: string[]): { modType: ModifierType, lines: 
   } else if (lines.some(line => line.endsWith(CRUCIBLE_LINE))) {
     modType = ModifierType.Crucible
     lines = removeLinesEnding(lines, CRUCIBLE_LINE)
+  } else if (lines.some(line => line.endsWith(FOULBORN_LINE))) {
+    modType = ModifierType.Explicit
+    lines = removeLinesEnding(lines, FOULBORN_LINE)
   } else {
     modType = ModifierType.Explicit
   }

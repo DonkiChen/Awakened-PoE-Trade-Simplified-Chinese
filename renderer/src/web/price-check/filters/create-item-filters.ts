@@ -27,6 +27,7 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
+      merchantOnly: false,
       listed: undefined,
       currency: opts.currency,
       league: opts.league,
@@ -198,7 +199,10 @@ export function createFilters (
   }
 
   if (item.quality && item.quality >= 20) {
-    if (item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture) {
+    if (
+      item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture ||
+      opts.exact // for Weapons & Armour
+    ) {
       filters.quality = {
         value: item.quality,
         disabled: (item.quality <= 20)
@@ -364,6 +368,12 @@ export function createFilters (
       if (filters.itemLevel) {
         filters.itemLevel.disabled = false
       }
+    }
+  }
+
+  if (item.rarity === ItemRarity.Unique) {
+    filters.foulborn = {
+      value: Boolean(item.isFoulborn)
     }
   }
 

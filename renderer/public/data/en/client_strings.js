@@ -19,6 +19,7 @@ export default {
   STACK_SIZE: 'Stack Size: ',
   SOCKETS: 'Sockets: ',
   QUALITY: 'Quality: ',
+  MEMORY_STRANDS: 'Memory Strands: ',
   PHYSICAL_DAMAGE: 'Physical Damage: ',
   ELEMENTAL_DAMAGE: 'Elemental Damage: ',
   CRIT_CHANCE: 'Critical Strike Chance: ',
@@ -95,6 +96,8 @@ export default {
   INCURSION_MODS: ["Guatelitzi's", "Xopec's", "Topotante's", "Tacati's", "Matatl's", 'of Matatl', "Citaqualotl's", 'of Citaqualotl', 'of Tacati', 'of Guatelitzi', 'of Puhuarte'],
   FOIL_UNIQUE: 'Foil Unique',
   UNMODIFIABLE: 'Unmodifiable',
+  FOULBORN_NAME: /^Foulborn (.*)$/,
+  FOULBORN_MODIFIER: 'Foulborn Unique Modifier',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

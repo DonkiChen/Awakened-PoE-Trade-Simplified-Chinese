@@ -38,6 +38,7 @@ export interface ParsedItem {
   gemLevel?: number
   areaLevel?: number
   talismanTier?: number
+  memoryStrands?: number
   quality?: number
   sockets?: {
     linked?: number // only 5 or 6
@@ -58,6 +59,7 @@ export interface ParsedItem {
   isFractured?: boolean
   isVeiled?: boolean
   isFoil?: boolean
+  isFoulborn?: boolean
   statsByType: StatCalculated[]
   newMods: ParsedModifier[]
   unknownModifiers: Array<{

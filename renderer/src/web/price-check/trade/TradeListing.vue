@@ -6,7 +6,7 @@
         <span v-if="!list" class="text-gray-600">...</span>
         <span v-else>{{ list.total }}{{ list.inexact ? '+' : '' }}</span>
       </div>
-      <online-filter v-if="list" :by-time="true" :filters="filters" />
+      <online-filter v-if="list" :by-time="true" :filters="filters" api="trade" />
       <div class="flex-1"></div>
       <trade-links v-if="list"
         :get-link="makeTradeLink" />
@@ -15,31 +15,31 @@
       <table class="table-stripped w-full">
         <thead>
           <tr class="text-left">
-            <th class="trade-table-heading">
-              <div class="px-2" style="width: max-content;">{{ t(':price') }}</div>
+            <th :class="$style.tableHeading">
+              <div class="px-2">{{ t(':price') }}</div>
             </th>
-            <th v-if="realm === 'pc-tencent'" class="trade-table-heading">
-              <div class="px-2" style="width: max-content;">{{ t('精准') }}</div>
+            <th v-if="realm === 'pc-tencent'" :class="$style.tableHeading">
+              <div class="px-2">{{ t('精准') }}</div>
             </th>
-            <th v-if="item.stackSize" class="trade-table-heading">
-              <div class="px-2" style="width: max-content;">{{ t(':stock') }}</div>
+            <th v-if="item.stackSize" :class="$style.tableHeading">
+              <div class="px-2">{{ t(':stock') }}</div>
             </th>
-            <th v-if="filters.itemLevel" class="trade-table-heading">
-              <div class="px-2" style="width: max-content;">{{ t(':item_level') }}</div>
+            <th v-if="filters.itemLevel" :class="$style.tableHeading">
+              <div class="px-2">{{ t(':item_level') }}</div>
             </th>
-            <th v-if="item.category === 'Gem'" class="trade-table-heading">
-              <div class="px-2" style="width: max-content;">{{ t(':gem_level') }}</div>
+            <th v-if="item.category === 'Gem'" :class="$style.tableHeading">
+              <div class="px-2">{{ t(':gem_level') }}</div>
             </th>
-            <th v-if="filters.quality || item.category === 'Gem'" class="trade-table-heading">
-              <div class="px-2" style="width: max-content;">{{ t(':quality') }}</div>
+            <th v-if="filters.quality || item.category === 'Gem'" :class="$style.tableHeading">
+              <div class="px-2">{{ t(':quality') }}</div>
             </th>
-            <th class="trade-table-heading" :class="{ 'w-full': !showSeller }">
+            <th :class="[$style.tableHeading, { 'w-full': !showSeller }]">
               <div class="pr-2 pl-4">
-                <span class="ml-1" style="padding-left: 0.375rem; width: max-content;">{{ t(':listed') }}</span>
+                <span class="ml-1" style="padding-left: 0.375rem;">{{ t(':listed') }}</span>
               </div>
             </th>
-            <th v-if="showSeller" class="trade-table-heading w-full">
-              <div class="px-2" style="width: max-content;">{{ t(':seller') }}</div>
+            <th v-if="showSeller" class="w-full" :class="$style.tableHeading">
+              <div class="px-2">{{ t(':seller') }}</div>
             </th>
           </tr>
         </thead>
@@ -49,7 +49,14 @@
               <td colspan="100" class="text-transparent">***</td>
             </tr>
             <tr v-else :key="result.id">
-              <td class="px-2 whitespace-nowrap"><span :class="{ 'line-through': result.priceCurrency === 'exalted' }">{{ result.priceAmount }} {{ result.priceCurrency }}</span> <span v-if="result.listedTimes > 2" class="rounded px-1 text-gray-800 bg-gray-400 -mr-2"><span class="font-sans">×</span> {{ result.listedTimes }}</span><i v-else-if="!result.hasNote" class="fas fa-question" /></td>
+              <td class="px-2 whitespace-nowrap">
+                <span :class="{ 'line-through': result.priceCurrency === 'exalted' }">{{ result.priceAmount }} {{ result.priceCurrency }}</span>
+                <span v-if="result.listedTimes > 2" class="rounded px-1 text-gray-800 bg-gray-400 ml-1 -mr-2"><span class="font-sans">×</span> {{ result.listedTimes }}</span>
+                <span v-else-if="!result.hasFee" :class="$style.stashListing">
+                  <img :class="$style.stashIcon" src="/images/stash.png">
+                  <i v-if="!result.hasNote" class="fas fa-question" />
+                </span>
+              </td>
               <td v-if="realm === 'pc-tencent'" class="px-2 whitespace-nowrap text-right">{{result.priceType === '=a/b/o' ? '是' : '否'}}</td>
               <td v-if="item.stackSize" class="px-2 text-right">{{ result.stackSize }}</td>
               <td v-if="filters.itemLevel" class="px-2 whitespace-nowrap text-right">{{ result.itemLevel }}</td>
@@ -57,7 +64,7 @@
               <td v-if="filters.quality || item.category === 'Gem'" class="px-2 whitespace-nowrap text-blue-400 text-right">{{ result.quality }}</td>
               <td class="pr-2 pl-4 whitespace-nowrap">
                 <div class="inline-flex items-center">
-                  <div class="account-status" :class="result.accountStatus"></div>
+                  <div :class="[$style.accountStatus, $style[result.accountStatus]]"></div>
                   <div class="ml-1 font-sans text-xs">{{ result.relativeDate }}</div>
                 </div>
                 <span v-if="!showSeller && result.isMine" class="rounded px-1 text-gray-800 bg-gray-400 ml-1">{{ t('You') }}</span>
@@ -260,28 +267,48 @@ export default defineComponent({
 })
 </script>
 
-<style lang="postcss">
-.trade-table-heading {
+<style lang="postcss" module>
+.tableHeading {
   @apply sticky top-0;
   @apply bg-gray-800;
   @apply p-0 m-0;
+  white-space: nowrap;
 
   & > div {
     @apply border-b border-gray-700;
   }
 }
 
-.account-status {
+.accountStatus {
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 100%;
 
-  &.online { /* */ }
-  &.offline {
-    @apply bg-red-600;
+  /* &.online {} */
+  &.offline { @apply bg-red-600; }
+  &.afk { @apply bg-orange-500; }
+}
+
+.stashListing {
+  position: relative;
+  display: inline-block;
+  @apply ml-1 -mr-1;
+
+  & > i {
+    position: absolute;
+    line-height: inherit;
+    left: 0;
+    right: 0;
+    text-align: center;
+    text-shadow: 1px 1px 1px black;
   }
-  &.afk {
-    @apply bg-orange-500;
-  }
+}
+
+.stashIcon {
+  filter: grayscale(1) opacity(0.5);
+  display: inline-block;
+  max-width: none;
+  height: 1.25rem;
+  vertical-align: bottom;
 }
 </style>
