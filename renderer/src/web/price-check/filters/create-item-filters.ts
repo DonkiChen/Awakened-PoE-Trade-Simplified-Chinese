@@ -4,6 +4,7 @@ import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
+import { PERMANENT_SC } from '../../background/Leagues'
 import { AppConfig } from '@/web/Config'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
@@ -27,7 +28,7 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
-      merchantOnly: false,
+      merchantOnly: !PERMANENT_SC.includes(opts.league),
       listed: undefined,
       currency: opts.currency,
       league: opts.league,
@@ -45,7 +46,7 @@ export function createFilters (
     }
     return filters
   }
-  if (item.stackSize || tradeTag(item)) {
+  if (item.stackSize || tradeTag(item) || item.info.exchangeable) {
     filters.stackSize = {
       value: item.stackSize?.value || 1,
       disabled: !(item.stackSize && item.stackSize.value > 1 && opts.activateStockFilter)
@@ -84,15 +85,16 @@ export function createFilters (
         disabled: false
       }
     }
-    if (item.info.refName === 'Mirrored Tablet' || item.info.refName === 'Forbidden Tome') {
+    if (item.info.refName === 'Mirrored Tablet') {
       filters.areaLevel = {
         value: item.areaLevel!,
         disabled: false
       }
     }
-    if (item.info.refName === 'Filled Coffin') {
+    // Incubators, Wombgifts, Forbidden Tome
+    if (item.itemLevel) {
       filters.itemLevel = {
-        value: item.itemLevel!,
+        value: item.itemLevel,
         disabled: false
       }
     }
@@ -175,7 +177,8 @@ export function createFilters (
       let disabled = opts.exact
       if (
         item.category === ItemCategory.ClusterJewel ||
-        item.category === ItemCategory.Idol
+        item.category === ItemCategory.Idol ||
+        item.category === ItemCategory.Graft
       ) {
         disabled = true
       } else if (

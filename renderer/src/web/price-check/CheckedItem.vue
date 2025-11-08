@@ -116,7 +116,7 @@ export default defineComponent({
         activateStockFilter: widget.value.activateStockFilter,
         searchStatRange: widget.value.searchStatRange,
         offline: widget.value.offline,
-        useEn: ((AppConfig().language === 'cmn-Hant' || AppConfig().language === 'zh_CN') && AppConfig().realm === 'pc-ggg'),
+        useEn: AppConfig().useIntlSite,
         currency: widget.value.rememberCurrency || (prevItem &&
           item.info.namespace === prevItem.info.namespace &&
           item.info.refName === prevItem.info.refName

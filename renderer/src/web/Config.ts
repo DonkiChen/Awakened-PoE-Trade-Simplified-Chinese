@@ -86,16 +86,15 @@ export async function initConfig () {
 }
 
 export function poeWebApi () {
-  const { language, realm } = AppConfig()
+  const { language, useIntlSite } = AppConfig()
+  if (useIntlSite) {
+    return 'www.pathofexile.com'
+  }
   switch (language) {
     case 'en': return 'www.pathofexile.com'
     case 'ru': return 'ru.pathofexile.com'
-    case 'cmn-Hant': return (realm === 'pc-garena')
-      ? 'pathofexile.tw'
-      : 'www.pathofexile.com'
-    case 'zh_CN': return (realm === 'pc-tencent')
-      ? 'poe.game.qq.com'
-      : 'www.pathofexile.com'
+    case 'cmn-Hant': return 'pathofexile.tw'
+    case 'zh_CN': return 'poe.game.qq.com'
     case 'ko': return 'poe.game.daum.net'
   }
 }
@@ -121,7 +120,8 @@ export interface Config {
   accountName: string
   stashScroll: boolean
   language: 'en' | 'ru' | 'cmn-Hant' | 'zh_CN' | 'ko'
-  realm: 'pc-ggg' | 'pc-garena' | 'pc-tencent' | 'ko'
+  realm: 'pc-ggg' | 'pc-garena' | 'pc-tencent'
+  useIntlSite: boolean
   widgets: widget.Widget[]
   fontSize: number
   showAttachNotification: boolean
@@ -129,7 +129,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 18,
+  configVersion: 19,
   overlayKey: 'Shift + Space',
   overlayBackground: 'rgba(129, 139, 149, 0.15)',
   overlayBackgroundClose: true,
@@ -175,6 +175,7 @@ export const defaultConfig = (): Config => ({
   language: 'zh_CN',
   cookies: '',
   realm: 'pc-ggg',
+  useIntlSite: false,
   defaultSaleType: SaleType.ANY,
   fontSize: 16,
   widgets: widgetRegistry.widgets.reduce<widget.Widget[]>((widgets, { widget }) => {
@@ -384,14 +385,11 @@ function upgradeConfig (_config: Config): Config {
 
     config.configVersion = 15
   }
+
   if (config.configVersion < 16) {
     config.widgets.find(w => w.wmType === 'price-check')!
       .offline = false
 
-    config.configVersion = 16
-  }
-
-  if (config.configVersion < 16) {
     const delve = config.widgets.find(w => w.wmType === 'delve-grid') as widget.DelveGridWidget
     delve.toggleKey = (config as any).delveGridKey
 
@@ -452,6 +450,12 @@ function upgradeConfig (_config: Config): Config {
     })
 
     config.configVersion = 18
+  }
+
+  if (config.configVersion < 19) {
+    config.useIntlSite = ((config.language === 'cmn-Hant' || config.language === 'zh_CN') && config.realm === 'pc-ggg')
+
+    config.configVersion = 19
   }
 
   return config as unknown as Config

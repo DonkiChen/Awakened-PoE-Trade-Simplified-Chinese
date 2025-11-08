@@ -138,7 +138,8 @@
     "sanctum_relic": "Sanctum Relic",
     "tincture": "Tincture",
     "azmeri_charm": "Charm",
-    "idol": "Idol"
+    "idol": "Idol",
+    "graft": "Graft"
   },
   "filters": {
     "selected_some": "{0} of {1}, stats",
@@ -278,7 +279,8 @@
     "getting_price": "Getting price {0}",
     "getting_price_from": "from poe.ninja \u2026",
     "you_have": "You have",
-    "stack": "Stack"
+    "stack": "Stack",
+    "legacy_bulk_xchg_msg": "Please use the in-game Currency Exchange Market for this item."
   },
   "settings": {
     "title": "Settings - Awakened PoE Trade Simplified Chinese",
@@ -309,7 +311,8 @@
     "poe_cfg_file" :"PoE config file",
     "restore_clipboard" :"Restore clipboard",
     "show_overlay_ready" :"Show a notification when the Overlay detects a PoE window",
-    "debug_hotkeys": "Record all key presses"
+    "debug_hotkeys": "Record all key presses",
+    "use_intl_site": "Force the English version of the site"
   },
   "price_check": {
     "name": "Price check",

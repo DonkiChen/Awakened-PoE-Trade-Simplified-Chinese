@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-md p-2">
-    <div class="mb-4">
+    <div class="mb-2">
       <div class="flex-1 mb-1">{{ t(':language') }}</div>
       <select v-model="language" class="p-1 rounded bg-gray-700 w-24">
         <option value="en">English</option>
@@ -10,13 +10,17 @@
         <option value="zh_CN">简体中文</option>
       </select>
     </div>
-    <div class="mb-4" v-if="language === 'cmn-Hant'">
+    <div class="mb-2" v-if="language === 'cmn-Hant'">
       <div class="flex-1 mb-1">{{ t('realm') }}</div>
       <div class="flex gap-x-4">
         <ui-radio v-model="realm" value="pc-ggg">{{ t('realm_intl') }}</ui-radio>
         <ui-radio v-model="realm" value="pc-garena">{{ t('Hotcool') }}</ui-radio>
       </div>
     </div>
+    <ui-checkbox class="mb-4" v-if="language !== 'en' && realm === 'pc-ggg'"
+      v-model="useIntlSite" :disabled="forcedIntlSite"
+      :class="{ 'text-gray-500': forcedIntlSite }">{{ t(':use_intl_site') }} <span class="bg-gray-200 text-gray-900 rounded px-1">www.pathofexile.com</span></ui-checkbox>
+    <div class="mb-4 mt-4">
     <div class="mb-4" v-if="language === 'zh_CN'">
       <div class="flex-1 mb-1">{{ t('Realm') }}</div>
       <div class="flex gap-x-4">
@@ -103,10 +107,19 @@ export default defineComponent({
           if (value !== 'cmn-Hant' && value !== 'zh_CN') {
             props.config.realm = 'pc-ggg'
           }
+          props.config.useIntlSite = (props.config.realm === 'pc-ggg' && (value === 'cmn-Hant' || value === 'zh_CN'))
         }
       }),
-      realm: configModelValue(() => props.config, 'realm'),
+      realm: computed<typeof props.config.realm>({
+        get () { return props.config.realm },
+        set (value) {
+          props.config.realm = value
+          props.config.useIntlSite = (value === 'pc-ggg' && props.config.language === 'cmn-Hant')
+        }
+      }),
       cookies: configModelValue(() => props.config, 'cookies'),
+      useIntlSite: configModelValue(() => props.config, 'useIntlSite'),
+      forcedIntlSite: computed(() => props.config.realm === 'pc-ggg' && (props.config.language === 'cmn-Hant' || props.config.language === 'zh_CN')),
       restoreClipboard: configModelValue(() => props.config, 'restoreClipboard'),
       showAttachNotification: configModelValue(() => props.config, 'showAttachNotification'),
       windowTitle: configModelValue(() => props.config, 'windowTitle'),
