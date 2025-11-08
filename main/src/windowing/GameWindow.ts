@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 import { EventEmitter } from 'events'
-import { OverlayController, AttachEvent } from 'electron-overlay-window'
+import { OverlayController, AttachEvent } from '@donkichen/electron-overlay-window'
 
 export interface GameWindow {
   on: (event: 'active-change', listener: (isActive: boolean) => void) => this
@@ -34,7 +34,9 @@ export class GameWindow extends EventEmitter {
     if (!this._isTracking) {
       OverlayController.events.on('focus', () => { this.isActive = true })
       OverlayController.events.on('blur', () => { this.isActive = false })
-      OverlayController.attachByTitle(window, title, { hasTitleBarOnMac: true })
+      // 简单起见, 直接用 ; 间隔吧
+      const titles = title.split(';')
+      OverlayController.attachByTitles(window, titles, { hasTitleBarOnMac: true })
       this._isTracking = true
     }
   }

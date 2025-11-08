@@ -16,7 +16,7 @@
   },
   "main": "dist/main.js",
   "dependencies": {
-    "electron-overlay-window": "3.3.1",
+    "@donkichen/electron-overlay-window": "1.0.0",
     "uiohook-napi": "1.5.x"
   },
   "devDependencies": {

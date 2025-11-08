@@ -454,7 +454,7 @@ function upgradeConfig (_config: Config): Config {
 
   if (config.configVersion < 19) {
     config.useIntlSite = ((config.language === 'cmn-Hant' || config.language === 'zh_CN') && config.realm === 'pc-ggg')
-
+    config.windowTitle = 'Path of Exile;流放之路'
     config.configVersion = 19
   }
 

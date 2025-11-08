@@ -1,6 +1,6 @@
 import path from 'path'
 import { BrowserWindow, dialog, shell, Menu, WebContents } from 'electron'
-import { OverlayController, OVERLAY_WINDOW_OPTS } from 'electron-overlay-window'
+import { OverlayController, OVERLAY_WINDOW_OPTS } from '@donkichen/electron-overlay-window'
 import type { ServerEvents } from '../server'
 import type { Logger } from '../RemoteLogger'
 import type { GameWindow } from './GameWindow'
