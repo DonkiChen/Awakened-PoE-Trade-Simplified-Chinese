@@ -18,9 +18,6 @@
             <th :class="$style.tableHeading">
               <div class="px-2">{{ t(':price') }}</div>
             </th>
-            <th v-if="realm === 'pc-tencent'" :class="$style.tableHeading">
-              <div class="px-2">{{ t('精准') }}</div>
-            </th>
             <th v-if="item.stackSize" :class="$style.tableHeading">
               <div class="px-2">{{ t(':stock') }}</div>
             </th>
@@ -57,7 +54,6 @@
                   <i v-if="!result.hasNote" class="fas fa-question" />
                 </span>
               </td>
-              <td v-if="realm === 'pc-tencent'" class="px-2 whitespace-nowrap text-right">{{result.priceType === '=a/b/o' ? '是' : '否'}}</td>
               <td v-if="item.stackSize" class="px-2 text-right">{{ result.stackSize }}</td>
               <td v-if="filters.itemLevel" class="px-2 whitespace-nowrap text-right">{{ result.itemLevel }}</td>
               <td v-if="item.category === 'Gem'" class="pl-2 whitespace-nowrap">{{ result.level }}</td>
