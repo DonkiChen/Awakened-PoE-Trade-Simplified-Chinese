@@ -1,5 +1,5 @@
 import { ItemInfluence, ItemCategory, ParsedItem, ItemRarity } from '@/parser'
-import { ItemFilters, StatFilter, INTERNAL_TRADE_IDS, InternalTradeId, SaleType } from '../filters/interfaces'
+import { ItemFilters, StatFilter, INTERNAL_TRADE_IDS, InternalTradeId } from '../filters/interfaces'
 import { setProperty as propSet } from 'dot-prop'
 import { DateTime } from 'luxon'
 import { Host } from '@/web/background/IPC'
@@ -8,7 +8,6 @@ import { stat, STAT_BY_REF_V2, pseudoStatByRef } from '@/assets/data'
 import { RateLimiter } from './RateLimiter'
 import { ModifierType } from '@/parser/modifiers'
 import { Cache } from './Cache'
-import { AppConfig } from '@/web/Config'
 
 export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Map, 'map'],
@@ -195,7 +194,6 @@ interface TradeRequest { /* eslint-disable camelcase */
           collapse?: FilterBoolean
           indexed?: { option?: string }
           price?: FilterRange | { option?: string }
-          sale_type?: { option?: string }
         }
       }
     }
@@ -277,11 +275,6 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
     }
   }
   const { query } = body
-
-  if (AppConfig().realm === 'pc-tencent') {
-    const saleType = AppConfig().defaultSaleType ?? SaleType.ANY
-    propSet(query.filters, 'trade_filters.filters.sale_type.option', saleType)
-  }
 
   if (filters.trade.currency) {
     propSet(query.filters, 'trade_filters.filters.price.option', filters.trade.currency)

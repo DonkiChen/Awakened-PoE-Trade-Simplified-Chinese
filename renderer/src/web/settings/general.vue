@@ -32,14 +32,6 @@
       v-model="useIntlSite" :disabled="forcedIntlSite"
       :class="{ 'text-gray-500': forcedIntlSite }">{{ t(':use_intl_site') }} <span class="bg-gray-200 text-gray-900 rounded px-1">www.pathofexile.com</span></ui-checkbox>
     <div class="mb-4 mt-4">
-      <div class="mb-4" v-if="language === 'zh_CN'">
-        <div class="flex-1 mt-2" v-show="realm === 'pc-tencent'">{{ t('sale_type') }}</div>
-        <div class="flex gap-x-4" v-show="realm === 'pc-tencent'">
-          <ui-radio v-model="saleType" value="any">{{ t('sale_type_any') }}</ui-radio>
-          <ui-radio v-model="saleType" value="strict_auto_buyout">{{ t('sale_type_strict_auto_buyout') }}</ui-radio>
-        </div>
-      </div>
-
       <div class="mb-4">
         <div class="flex-1 mb-1">{{ t(':font_size') }}</div>
         <div class="flex gap-1">
@@ -86,7 +78,6 @@ import UiRadio from '@/web/ui/UiRadio.vue'
 import UiCheckbox from '@/web/ui/UiCheckbox.vue'
 import { configModelValue, configProp } from './utils'
 import { AppConfig } from '@/web/Config'
-import { SaleType } from '@/web/price-check/filters/interfaces'
 
 export default defineComponent({
   name: 'settings.general',
@@ -126,29 +117,6 @@ export default defineComponent({
       restoreClipboard: configModelValue(() => props.config, 'restoreClipboard'),
       showAttachNotification: configModelValue(() => props.config, 'showAttachNotification'),
       windowTitle: configModelValue(() => props.config, 'windowTitle'),
-      saleType: computed<String>({
-        get () {
-          if (!props.config.defaultSaleType) {
-            props.config.defaultSaleType = SaleType.ANY
-          }
-          return props.config.defaultSaleType
-        },
-        set (v: String) {
-          let defaultSaleType: SaleType
-          switch (v) {
-            case 'any':
-              defaultSaleType = SaleType.ANY
-              break
-            case 'strict_auto_buyout':
-              defaultSaleType = SaleType.STRICT_AUTO_BUYOUT
-              break
-            default:
-              defaultSaleType = SaleType.ANY
-              break
-          }
-          props.config.defaultSaleType = defaultSaleType
-        }
-      })
     }
   }
 })

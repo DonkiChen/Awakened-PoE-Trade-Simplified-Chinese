@@ -79,7 +79,6 @@ export interface ItemFilters {
     currency: string | undefined
     league: string
     collapseListings: 'api' | 'app'
-    saleType?: SaleType
   }
 }
 

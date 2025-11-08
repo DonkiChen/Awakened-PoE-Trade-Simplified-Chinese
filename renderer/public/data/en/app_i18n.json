@@ -7,9 +7,6 @@
   "league": "League",
   "realm": "Realm",
   "realm_intl": "International",
-  "sale_type": "SaleType",
-  "sale_type_any": "Any",
-  "sale_type_strict_auto_buyout": "Strict Auto Buyout",
 
   "app": {
     "leagues_loading": "Loading leagues\u2026",

@@ -10,9 +10,6 @@
   "realm_intl": "国际服",
   "realm_garena": "台服",
   "realm_tencent": "国服",
-  "sale_type": "交易类型",
-  "sale_type_any": "任意",
-  "sale_type_strict_auto_buyout": "精确一口价",
 
   "Log level": "日志级别",
   "itemName": "物品名称",
