@@ -837,8 +837,9 @@ function parseSuperior (item: ParserState) {
 function parseFoulborn (item: ParserState) {
   if (item.rarity !== ItemRarity.Unique || item.isUnidentified) return
 
-  if (_$REF.FOULBORN_NAME.test(item.name)) {
-    item.name = _$REF.FOULBORN_NAME.exec(item.name)![1]
+  const regex = (AppConfig().realm === 'pc-ggg' ? _$REF : _$).FOULBORN_NAME
+  if (regex.test(item.name)) {
+    item.name = regex.exec(item.name)![1]
     item.isFoulborn = true
   }
 }
