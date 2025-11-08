@@ -211,6 +211,7 @@
   "online_filter": {
     "offline_toggle": "在线&离线",
     "in_league_toggle": "赛季",
+    "merchant_toggle": "仅立即购买",
     "listed_any_time": "列出:任意时间",
     "listed_1day": "1天内",
     "listed_3days": "3天内",
