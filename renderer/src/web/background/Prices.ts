@@ -144,35 +144,36 @@ export const usePoeninja = createGlobalState(() => {
         }
       }
     } else {
-      const qualities = new Map([
-        ['anomalous', _$.QUALITY_ANOMALOUS.toString().slice(2, 5)],
-        ['divergent', _$.QUALITY_DIVERGENT.toString().slice(2, 5)],
-        ['phantasmal', _$.QUALITY_PHANTASMAL.toString().slice(2, 5)]
-      ])
-
-      let itemName: string
-      let isVariantGem: boolean = false
-      itemName = query.name
-      if (query.ns === 'GEM' && query.variant === '1') {
-        itemName = query.name.split(' ').slice(1).join(' ')
-        isVariantGem = true
-      }
-      const item = ITEM_BY_REF(query.ns as BaseType['namespace'], itemName)![0]
-
-      for (const { name, calculated, searchCode, history } of PRICES_DB_CN) {
-        if (name === (isVariantGem ? qualities.get(query.name.split(' ')![0].toLowerCase()) as string + item.name : item.name)) {
-          const info: NinjaDenseInfo = {
-            chaos: calculated,
-            graph: Array.from(history, e => e ? (e - calculated) / calculated : null),
-            name,
-            variant: query.variant
-          }
-          return {
-            ...info,
-            url: `${searchCode}`
-          }
-        }
-      }
+      // FIXME: 这段代码会导致无法查宝石, 暂时注释
+      // const qualities = new Map([
+      //   ['anomalous', _$.QUALITY_ANOMALOUS.toString().slice(2, 5)],
+      //   ['divergent', _$.QUALITY_DIVERGENT.toString().slice(2, 5)],
+      //   ['phantasmal', _$.QUALITY_PHANTASMAL.toString().slice(2, 5)]
+      // ])
+      //
+      // let itemName: string
+      // let isVariantGem: boolean = false
+      // itemName = query.name
+      // if (query.ns === 'GEM' && query.variant === '1') {
+      //   itemName = query.name.split(' ').slice(1).join(' ')
+      //   isVariantGem = true
+      // }
+      // const item = ITEM_BY_REF(query.ns as BaseType['namespace'], itemName)![0]
+      //
+      // for (const { name, calculated, searchCode, history } of PRICES_DB_CN) {
+      //   if (name === (isVariantGem ? qualities.get(query.name.split(' ')![0].toLowerCase()) as string + item.name : item.name)) {
+      //     const info: NinjaDenseInfo = {
+      //       chaos: calculated,
+      //       graph: Array.from(history, e => e ? (e - calculated) / calculated : null),
+      //       name,
+      //       variant: query.variant
+      //     }
+      //     return {
+      //       ...info,
+      //       url: `${searchCode}`
+      //     }
+      //   }
+      // }
     }
     return null
   }
