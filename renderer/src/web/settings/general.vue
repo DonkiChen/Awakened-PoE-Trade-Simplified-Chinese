@@ -116,7 +116,7 @@ export default defineComponent({
       forcedIntlSite: computed(() => props.config.realm === 'pc-ggg' && (props.config.language === 'cmn-Hant' || props.config.language === 'zh_CN')),
       restoreClipboard: configModelValue(() => props.config, 'restoreClipboard'),
       showAttachNotification: configModelValue(() => props.config, 'showAttachNotification'),
-      windowTitle: configModelValue(() => props.config, 'windowTitle'),
+      windowTitle: configModelValue(() => props.config, 'windowTitle')
     }
   }
 })

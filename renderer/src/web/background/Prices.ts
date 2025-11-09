@@ -2,7 +2,7 @@ import { shallowRef, watch, readonly } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { Host } from '@/web/background/IPC'
 import { useLeagues } from './Leagues'
-import { BaseType, CLIENT_STRINGS as _$, ITEM_BY_REF } from '@/assets/data'
+// import { BaseType, CLIENT_STRINGS as _$, ITEM_BY_REF } from '@/assets/data'
 import pako from 'pako'
 import { Buffer } from 'buffer'
 
