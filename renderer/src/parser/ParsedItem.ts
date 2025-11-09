@@ -32,14 +32,13 @@ export interface ParsedItem {
   weaponAS?: number
   weaponPHYSICAL?: number
   weaponELEMENTAL?: number
-  memoryStrands: number
-  storedExperience: number
   mapBlighted?: 'Blighted' | 'Blight-ravaged'
   mapTier?: number
   mapReward?: string
   gemLevel?: number
   areaLevel?: number
   talismanTier?: number
+  memoryStrands?: number
   quality?: number
   sockets?: {
     linked?: number // only 5 or 6
@@ -60,6 +59,7 @@ export interface ParsedItem {
   isFractured?: boolean
   isVeiled?: boolean
   isFoil?: boolean
+  isFoulborn?: boolean
   statsByType: StatCalculated[]
   newMods: ParsedModifier[]
   unknownModifiers: Array<{
@@ -86,8 +86,6 @@ export function createVirtualItem (
 ): ParsedItem {
   return {
     ...props,
-    storedExperience: props.storedExperience ?? 0,
-    memoryStrands: props.memoryStrands ?? 0,
     isUnidentified: props.isUnidentified ?? false,
     isCorrupted: props.isCorrupted ?? false,
     newMods: props.newMods ?? [],

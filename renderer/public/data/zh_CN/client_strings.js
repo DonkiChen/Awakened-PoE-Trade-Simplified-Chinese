@@ -23,8 +23,6 @@ export default {
   ELEMENTAL_DAMAGE: '火焰，冰霜，闪电伤害: ',
   CRIT_CHANCE: '攻击暴击率: ',
   ATTACK_SPEED: '每秒攻击次数: ',
-  MEMORY_STRANDS: '回忆束丝: ',
-  STORED_EXPERIENCE: '储存的精华：',
   ARMOUR: '护甲: ',
   EVASION: '闪避值: ',
   ENERGY_SHIELD: '能量护盾: ',
@@ -97,6 +95,8 @@ export default {
   INCURSION_MODS: ['古铁雷兹的', '肖佩克的', '托钵塔特的', '塔卡提的', '马塔特尔的', '马塔特尔之', '奇塔夸雷特的', '奇塔夸雷特之', '塔卡提之', '古铁雷兹之', '普华特之'],
   FOIL_UNIQUE: '古藏传奇',
   UNMODIFIABLE: '基底词缀不能改变',
+  FOULBORN_NAME: /^秽生(.*)$/,
+  FOULBORN_MODIFIER: '秽生传奇词缀',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

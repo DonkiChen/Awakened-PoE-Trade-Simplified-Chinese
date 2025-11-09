@@ -41,10 +41,11 @@ export interface ItemFilters {
   mirrored?: {
     disabled: boolean
   }
-  memoryStrands?: FilterNumeric
-  storedExperience?: FilterNumeric
   foil?: {
     disabled: boolean
+  }
+  foulborn?: {
+    value: boolean
   }
   influences?: Array<{
     value: ItemInfluence
@@ -73,11 +74,11 @@ export interface ItemFilters {
   trade: {
     offline: boolean
     onlineInLeague: boolean
+    merchantOnly: boolean
     listed: string | undefined
     currency: string | undefined
     league: string
     collapseListings: 'api' | 'app'
-    saleType?: SaleType
   }
 }
 
@@ -138,6 +139,7 @@ export interface StatFilter {
 
 export const INTERNAL_TRADE_IDS = [
   'item.base_percentile',
+  'item.memory_strands',
   'item.armour',
   'item.evasion_rating',
   'item.energy_shield',
@@ -169,6 +171,7 @@ export enum FilterTag {
   Fractured = 'fractured',
   Corrupted = 'corrupted',
   Synthesised = 'synthesised',
+  Foulborn = 'foulborn',
   Eldritch = 'eldritch',
   Variant = 'variant',
   Property = 'property',

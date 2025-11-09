@@ -21,10 +21,7 @@ const props = defineProps<{
 
 const isHovered = shallowRef(false)
 const resolvedSrc = computed(() => {
-  if (!props.src) {
-    return props.src
-  }
-  if (props.src.includes('://')) {
+  if (!props.src || props.src.includes('://')) {
     return props.src
   } else {
     return (props.src.length < 32)

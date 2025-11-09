@@ -48,6 +48,7 @@ export enum ItemCategory {
   Tincture = 'Tincture',
   Charm = 'Charm',
   Idol = 'Idol',
+  Graft = 'Graft',
 }
 
 export const WEAPON_ONE_HANDED_MELEE = new Set([
@@ -91,7 +92,12 @@ export const ARMOUR = new Set([
 export const ACCESSORY = new Set([
   ItemCategory.Amulet,
   ItemCategory.Belt,
-  ItemCategory.Ring,
-  ItemCategory.Trinket
-  // ItemCategory.Quiver
+  ItemCategory.Ring
+])
+
+export const HEIST_EQUIPMENT = new Set([
+  ItemCategory.HeistTool,
+  ItemCategory.HeistBrooch,
+  ItemCategory.HeistGear,
+  ItemCategory.HeistCloak
 ])

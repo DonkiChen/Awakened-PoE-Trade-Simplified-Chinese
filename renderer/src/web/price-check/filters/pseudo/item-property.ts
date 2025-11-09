@@ -27,6 +27,19 @@ export function filterBasePercentile (ctx: FiltersCreationContext) {
   }
 }
 
+export function filterMemoryStrands (ctx: FiltersCreationContext, hidden?: string) {
+  if (ctx.item.memoryStrands != null) {
+    ctx.filters.push(propToFilter({
+      ref: 'Memory Strands: #',
+      tradeId: 'item.memory_strands',
+      roll: { min: 0, max: 100, value: ctx.item.memoryStrands },
+      sources: [],
+      disabled: (ctx.item.memoryStrands < 60 || hidden !== undefined),
+      hidden: hidden
+    }, ctx))
+  }
+}
+
 export const ARMOUR_STATS = new Set<string>([
   ...QUALITY_STATS.ARMOUR.flat,
   ...QUALITY_STATS.EVASION.flat,
@@ -153,13 +166,15 @@ function weaponProps (ctx: FiltersCreationContext) {
   }
 
   if (item.weaponELEMENTAL) {
-    ctx.filters.push(propToFilter({
-      ref: 'Total DPS: #',
-      tradeId: 'item.total_dps',
-      roll: dps,
-      sources: [],
-      disabled: false
-    }, ctx))
+    if (item.weaponPHYSICAL) {
+      ctx.filters.push(propToFilter({
+        ref: 'Total DPS: #',
+        tradeId: 'item.total_dps',
+        roll: dps,
+        sources: [],
+        disabled: false
+      }, ctx))
+    }
 
     ctx.filters.push(propToFilter({
       ref: 'Elemental DPS: #',

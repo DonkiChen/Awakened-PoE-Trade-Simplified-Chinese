@@ -19,12 +19,11 @@ export default {
   STACK_SIZE: 'Размер стопки: ',
   SOCKETS: 'Гнезда: ',
   QUALITY: 'Качество: ',
+  MEMORY_STRANDS: 'Пряди воспоминаний: ',
   PHYSICAL_DAMAGE: 'Физический урон: ',
   ELEMENTAL_DAMAGE: 'Урон от стихий: ',
   CRIT_CHANCE: 'Шанс критического удара: ',
   ATTACK_SPEED: 'Атак в секунду: ',
-  MEMORY_STRANDS: 'Memory Strands: ',
-  STORED_EXPERIENCE: 'Stored Experience: ',
   ARMOUR: 'Броня: ',
   EVASION: 'Уклонение: ',
   ENERGY_SHIELD: 'Энерг. щит: ',
@@ -106,7 +105,6 @@ export default {
     'Освободительный', 'Освободительная', 'Освободительное', 'Освободительные', 'Освободительные', 'Освободительные'
   ],
   WARLORD_MODS: [
-    'Главный', 'Главная', 'Главное', 'Главные', 'Главные', 'Главные',
     'Военный', 'Военная', 'Военное', 'Военные', 'Военные', 'Военные',
     'завоевания'
   ],
@@ -130,6 +128,8 @@ export default {
   ],
   FOIL_UNIQUE: 'Особый уникальный предмет',
   UNMODIFIABLE: 'Неизменяемый',
+  FOULBORN_NAME: /^Нечестивый: (.*)$/,
+  FOULBORN_MODIFIER: 'Нечестивое уникальное свойство',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

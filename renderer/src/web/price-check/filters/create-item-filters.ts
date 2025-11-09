@@ -4,6 +4,7 @@ import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
+import { PERMANENT_SC } from '../../background/Leagues'
 import { AppConfig } from '@/web/Config'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
@@ -27,6 +28,7 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
+      merchantOnly: !PERMANENT_SC.includes(opts.league),
       listed: undefined,
       currency: opts.currency,
       league: opts.league,
@@ -44,15 +46,7 @@ export function createFilters (
     }
     return filters
   }
-  if (item.stackSize || tradeTag(item)) {
-    // lens has trade tag: facetors
-    if (item.storedExperience) {
-      filters.storedExperience = {
-        value: item.storedExperience,
-        disabled: false
-      }
-    }
-
+  if (item.stackSize || tradeTag(item) || item.info.exchangeable) {
     filters.stackSize = {
       value: item.stackSize?.value || 1,
       disabled: !(item.stackSize && item.stackSize.value > 1 && opts.activateStockFilter)
@@ -91,15 +85,16 @@ export function createFilters (
         disabled: false
       }
     }
-    if (item.info.refName === 'Mirrored Tablet' || item.info.refName === 'Forbidden Tome') {
+    if (item.info.refName === 'Mirrored Tablet') {
       filters.areaLevel = {
         value: item.areaLevel!,
         disabled: false
       }
     }
-    if (item.info.refName === 'Filled Coffin') {
+    // Incubators, Wombgifts, Forbidden Tome
+    if (item.itemLevel) {
       filters.itemLevel = {
-        value: item.itemLevel!,
+        value: item.itemLevel,
         disabled: false
       }
     }
@@ -182,7 +177,8 @@ export function createFilters (
       let disabled = opts.exact
       if (
         item.category === ItemCategory.ClusterJewel ||
-        item.category === ItemCategory.Idol
+        item.category === ItemCategory.Idol ||
+        item.category === ItemCategory.Graft
       ) {
         disabled = true
       } else if (
@@ -206,7 +202,10 @@ export function createFilters (
   }
 
   if (item.quality && item.quality >= 20) {
-    if (item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture) {
+    if (
+      item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture ||
+      opts.exact // for Weapons & Armour
+    ) {
       filters.quality = {
         value: item.quality,
         disabled: (item.quality <= 20)
@@ -245,13 +244,6 @@ export function createFilters (
   if (item.sockets?.blue && (item.info.refName === 'Skin of the Lords' || item.info.refName === 'Skin of the Loyal')) {
     filters.blueSockets = {
       value: item.sockets.blue,
-      disabled: false
-    }
-  }
-
-  if (item.memoryStrands) {
-    filters.memoryStrands = {
-      value: item.memoryStrands,
       disabled: false
     }
   }
@@ -379,6 +371,12 @@ export function createFilters (
       if (filters.itemLevel) {
         filters.itemLevel.disabled = false
       }
+    }
+  }
+
+  if (item.rarity === ItemRarity.Unique) {
+    filters.foulborn = {
+      value: Boolean(item.isFoulborn)
     }
   }
 

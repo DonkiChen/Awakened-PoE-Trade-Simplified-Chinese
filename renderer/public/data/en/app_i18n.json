@@ -7,9 +7,6 @@
   "league": "League",
   "realm": "Realm",
   "realm_intl": "International",
-  "sale_type": "SaleType",
-  "sale_type_any": "Any",
-  "sale_type_strict_auto_buyout": "Strict Auto Buyout",
 
   "app": {
     "leagues_loading": "Loading leagues\u2026",
@@ -69,9 +66,8 @@
     "linked_sockets": "Links: {0}",
     "white_sockets": "White: {0}",
     "quality": "Quality: {0}",
+    "memory_strands": "Memory Strands: {0}",
     "gem_level": "Level: {0}",
-    "memory_strands": "Memory strands: {0}",
-    "stored_experience": "Stored Experience: {0}",
     "sentinel_charge": "Charge: {0}",
     "find_in_stash": "Find in Stash",
     "parse_error": "An error occurred while parsing the item",
@@ -139,7 +135,8 @@
     "sanctum_relic": "Sanctum Relic",
     "tincture": "Tincture",
     "azmeri_charm": "Charm",
-    "idol": "Idol"
+    "idol": "Idol",
+    "graft": "Graft"
   },
   "filters": {
     "selected_some": "{0} of {1}, stats",
@@ -168,6 +165,7 @@
     "tag_variant": "variant",
     "tag_corrupted": "corrupted",
     "tag_synthesised": "synthesised",
+    "tag_foulborn": "foulborn",
     "tag_eldritch": "eldritch",
     "tag_pseudo": "pseudo",
     "tag_explicit": "explicit",
@@ -184,6 +182,7 @@
   "online_filter": {
     "offline_toggle": "Offline & Online",
     "in_league_toggle": "In League",
+    "merchant_toggle": "Merchant Only",
     "listed_any_time": "Listed: Any Time",
     "listed_1day": "1 Day Ago",
     "listed_3days": "3 Days Ago",
@@ -271,14 +270,14 @@
     "seller" :"Seller",
     "item_level": "iLvl",
     "gem_level": "Level",
-    "memory_strands": "Memory strands",
     "quality": "Quality",
     "base_item": "Base item",
     "graph_7d": "Last 7 days",
     "getting_price": "Getting price {0}",
     "getting_price_from": "from poe.ninja \u2026",
     "you_have": "You have",
-    "stack": "Stack"
+    "stack": "Stack",
+    "legacy_bulk_xchg_msg": "Please use the in-game Currency Exchange Market for this item."
   },
   "settings": {
     "title": "Settings - Awakened PoE Trade Simplified Chinese",
@@ -309,7 +308,8 @@
     "poe_cfg_file" :"PoE config file",
     "restore_clipboard" :"Restore clipboard",
     "show_overlay_ready" :"Show a notification when the Overlay detects a PoE window",
-    "debug_hotkeys": "Record all key presses"
+    "debug_hotkeys": "Record all key presses",
+    "use_intl_site": "Force the English version of the site"
   },
   "price_check": {
     "name": "Price check",
