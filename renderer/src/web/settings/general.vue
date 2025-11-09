@@ -108,7 +108,7 @@ export default defineComponent({
         get () { return props.config.realm },
         set (value) {
           props.config.realm = value
-          props.config.useIntlSite = (value === 'pc-ggg' && props.config.language === 'cmn-Hant')
+          props.config.useIntlSite = (value === 'pc-ggg' && (props.config.language === 'cmn-Hant' || props.config.language === 'zh_CN'))
         }
       }),
       cookies: configModelValue(() => props.config, 'cookies'),
