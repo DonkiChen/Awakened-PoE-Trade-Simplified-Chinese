@@ -82,30 +82,6 @@ export interface ItemFilters {
   }
 }
 
-export enum SaleType {
-  ANY = 'any',
-  /**
-   * 精确一口价
-   */
-  STRICT_AUTO_BUYOUT = 'strict_auto_buyout',
-  /**
-   * 一口价
-   */
-  AUTO_BUYOUT = 'auto_buyout',
-  /**
-   * 询价
-   */
-  PRICED = 'priced',
-  /**
-   * 备注
-   */
-  PRICED_WITH_INFO = 'priced_with_info',
-  /**
-   * 未标价
-   */
-  UNPRICED = 'unpriced'
-}
-
 export interface FilterNumeric {
   value: number
   max?: number | undefined
