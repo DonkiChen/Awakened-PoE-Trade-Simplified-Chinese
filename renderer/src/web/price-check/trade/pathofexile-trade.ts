@@ -165,9 +165,13 @@ interface TradeRequest { /* eslint-disable camelcase */
       map_filters?: {
         filters: {
           map_tier?: FilterRange
+          map_iiq?: FilterRange
+          map_iir?: FilterRange
+          map_packsize?: FilterRange
           map_blighted?: FilterBoolean
           map_uberblighted?: FilterBoolean
           area_level?: FilterRange
+          map_completion_reward?: { option?: 'any' | string }
         }
       }
       heist_filters?: {
@@ -307,7 +311,7 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
   if (filters.foil && !filters.foil.disabled) {
     propSet(query.filters, 'type_filters.filters.rarity.option', 'uniquefoil')
   } else if (filters.rarity) {
-    propSet(query.filters, 'type_filters.filters.rarity.option', filters.rarity.value)
+    propSet(query.filters, 'type_filters.filters.rarity.option', (filters.rarity.disabled) ? 'nonunique' : filters.rarity.value)
   }
 
   if (activeSearch.category) {
@@ -394,6 +398,10 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
     } else if (filters.mapBlighted.value === 'Blight-ravaged') {
       propSet(query.filters, 'map_filters.filters.map_uberblighted.option', String(true))
     }
+  }
+
+  if (filters.mapCompletionReward) {
+    propSet(query.filters, 'map_filters.filters.map_completion_reward.option', filters.mapCompletionReward.nameTrade)
   }
 
   if (filters.unidentified && !filters.unidentified.disabled) {
@@ -511,6 +519,18 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
       case 'item.aps':
         propSet(query.filters, 'weapon_filters.filters.aps.min', typeof input.min === 'number' ? input.min : undefined)
         propSet(query.filters, 'weapon_filters.filters.aps.max', typeof input.max === 'number' ? input.max : undefined)
+        break
+      case 'item.map_item_quantity':
+        propSet(query.filters, 'map_filters.filters.map_iiq.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_iiq.max', typeof input.max === 'number' ? input.max : undefined)
+        break
+      case 'item.map_item_rarity':
+        propSet(query.filters, 'map_filters.filters.map_iir.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_iir.max', typeof input.max === 'number' ? input.max : undefined)
+        break
+      case 'item.map_pack_size':
+        propSet(query.filters, 'map_filters.filters.map_packsize.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_packsize.max', typeof input.max === 'number' ? input.max : undefined)
         break
     }
   }

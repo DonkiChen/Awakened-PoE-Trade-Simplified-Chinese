@@ -1,11 +1,11 @@
 import type { ItemFilters } from './interfaces'
 import { ParsedItem, ItemCategory, ItemRarity } from '@/parser'
+import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM } from '@/parser/meta'
 import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
 import { PERMANENT_SC } from '../../background/Leagues'
-import { AppConfig } from '@/web/Config'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
 
@@ -28,11 +28,20 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
-      merchantOnly: !PERMANENT_SC.includes(opts.league),
+      merchantOnly: !PERMANENT_SC.includes(opts.league) &&
+        item.category !== ItemCategory.DivinationCard,
       listed: undefined,
       currency: opts.currency,
       league: opts.league,
       collapseListings: opts.collapseListings
+    }
+  }
+
+  if (!opts.currency) {
+    if ((!item.info.craftable || CONSUMABLE_CRAFTABLE_ITEM.has(item.category!)) &&
+      item.rarity !== ItemRarity.Unique
+    ) {
+      filters.trade.currency = 'chaos_divine'
     }
   }
 
@@ -42,7 +51,7 @@ export function createFilters (
   if (item.category === ItemCategory.CapturedBeast) {
     filters.searchExact = {
       baseType: item.info.name,
-      baseTypeTrade: item.info.name // NOTE: 已经更改为现有名称 2024.8.5
+      baseTypeTrade: t(opts, item.info)
     }
     return filters
   }
@@ -109,14 +118,18 @@ export function createFilters (
         baseTypeTrade: t(opts, ITEM_BY_REF('ITEM', item.info.unique.base)![0])
       }
     } else {
-      const isOccupiedBy = item.statsByType.some(calc => calc.stat.ref === 'Map is occupied by #')
+      const ignoreLayout =
+        item.mapCompletionReward != null ||
+        item.statsByType.some(calc =>
+          calc.stat.ref === 'Map is occupied by #' ||
+          calc.stat.ref === "Map contains #'s Citadel")
       filters.searchExact = {
         baseType: item.info.name,
         baseTypeTrade: t(opts, item.info)
       }
       filters.searchRelaxed = {
         category: item.category,
-        disabled: !isOccupiedBy
+        disabled: !ignoreLayout
       }
     }
 
@@ -124,12 +137,15 @@ export function createFilters (
       filters.mapBlighted = { value: item.mapBlighted }
     }
 
-    if (item.mapReward) {
-      filters.mapReward = AppConfig().realm === 'pc-ggg' ? ITEM_BY_TRANSLATED('UNIQUE', item.mapReward)![0].refName : ITEM_BY_TRANSLATED('UNIQUE', item.mapReward)![0].name
+    if (item.mapCompletionReward) {
+      filters.mapCompletionReward = {
+        name: item.mapCompletionReward,
+        nameTrade: t(opts, ITEM_BY_TRANSLATED('UNIQUE', item.mapCompletionReward)![0])
+      }
     }
 
     filters.mapTier = {
-      value: item.mapTier!,
+      value: item.map!.tier,
       disabled: false
     }
   } else if (item.info.refName === 'Expedition Logbook') {
@@ -267,7 +283,18 @@ export function createFilters (
 
   if (forAdornedJewel) {
     filters.rarity = {
-      value: 'magic'
+      value: 'magic',
+      disabled: false
+    }
+  } else if (
+    opts.exact &&
+    item.rarity === ItemRarity.Magic &&
+    !CONSUMABLE_CRAFTABLE_ITEM.has(item.category!) &&
+    !MAGIC_ONLY_OR_UNIQUE_ITEM.has(item.category!)
+  ) {
+    filters.rarity = {
+      value: 'magic',
+      disabled: true
     }
   } else if (
     item.rarity === ItemRarity.Normal ||
@@ -275,7 +302,8 @@ export function createFilters (
     item.rarity === ItemRarity.Rare
   ) {
     filters.rarity = {
-      value: 'nonunique'
+      value: 'nonunique',
+      disabled: false
     }
   }
 
@@ -283,7 +311,9 @@ export function createFilters (
     filters.mirrored = { disabled: false }
   }
 
-  if (!item.isFractured && opts.exact) {
+  if (!item.isFractured &&
+    (item.info.craftable && !item.isCorrupted && !item.isMirrored)
+  ) {
     filters.fractured = { value: false }
   }
 

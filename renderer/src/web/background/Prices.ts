@@ -112,8 +112,13 @@ export const usePoeninja = createGlobalState(() => {
     switch (league) {
       case 'Standard': return 'standard'
       case 'Hardcore': return 'hardcore'
-      default:
-        return (league.startsWith('Hardcore ')) ? 'challengehc' : 'challenge'
+      default: {
+        let ninjaId = league.replace('Hardcore ', '').toLowerCase()
+        if (league.startsWith('Hardcore ')) {
+          ninjaId += 'hc'
+        }
+        return ninjaId
+      }
     }
   }
 
@@ -138,10 +143,9 @@ export const usePoeninja = createGlobalState(() => {
 
         const info: NinjaDenseInfo = JSON.parse(lines.slice(startPos, endPos + 1))
 
-        return {
-          ...info,
-          url: `https://poe.ninja/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
-        }
+      return {
+        ...info,
+        url: `https://poe.ninja/poe1/economy/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
       }
     } else {
       // FIXME: 这段代码会导致无法查宝石, 暂时注释

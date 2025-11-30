@@ -14,8 +14,6 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedIt
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, CRUCIBLE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
-import { AppConfig } from '@/web/Config'
-// import { Host } from '@/web/background/IPC'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -148,100 +146,57 @@ function normalizeName (item: ParserState) {
       item.rarity === ItemRarity.Rare
   ) {
     if (item.baseType) {
-      if ((AppConfig().realm === 'pc-ggg'
-        ? _$REF
-        : _$).MAP_BLIGHTED.test(item.baseType)) {
-        item.baseType = (AppConfig().realm === 'pc-ggg'
-          ? _$REF
-          : _$).MAP_BLIGHTED.exec(item.baseType)![1]
-      } else if ((AppConfig().realm === 'pc-ggg'
-        ? _$REF
-        : _$).MAP_BLIGHT_RAVAGED.test(item.baseType)) {
-        item.baseType = (AppConfig().realm === 'pc-ggg'
-          ? _$REF
-          : _$).MAP_BLIGHT_RAVAGED.exec(item.baseType)![1]
+      if (_$REF.MAP_BLIGHTED.test(item.baseType)) {
+        item.baseType = _$REF.MAP_BLIGHTED.exec(item.baseType)![1]
+      } else if (_$REF.MAP_BLIGHT_RAVAGED.test(item.baseType)) {
+        item.baseType = _$REF.MAP_BLIGHT_RAVAGED.exec(item.baseType)![1]
       }
     } else {
-      if ((AppConfig().realm === 'pc-ggg'
-        ? _$REF
-        : _$).MAP_BLIGHTED.test(item.name)) {
-        item.name = (AppConfig().realm === 'pc-ggg'
-          ? _$REF
-          : _$).MAP_BLIGHTED.exec(item.name)![1]
-      } else if ((AppConfig().realm === 'pc-ggg'
-        ? _$REF
-        : _$).MAP_BLIGHT_RAVAGED.test(item.name)) {
-        item.name = (AppConfig().realm === 'pc-ggg'
-          ? _$REF
-          : _$).MAP_BLIGHT_RAVAGED.exec(item.name)![1]
+      if (_$REF.MAP_BLIGHTED.test(item.name)) {
+        item.name = _$REF.MAP_BLIGHTED.exec(item.name)![1]
+      } else if (_$REF.MAP_BLIGHT_RAVAGED.test(item.name)) {
+        item.name = _$REF.MAP_BLIGHT_RAVAGED.exec(item.name)![1]
       }
     }
   }
 
   if (item.category === ItemCategory.MetamorphSample) {
-    if ((AppConfig().realm === 'pc-ggg'
-      ? _$REF
-      : _$).METAMORPH_BRAIN.test(item.name)) {
+    if (_$REF.METAMORPH_BRAIN.test(item.name)) {
       item.name = 'Metamorph Brain'
-    } else if ((AppConfig().realm === 'pc-ggg'
-      ? _$REF
-      : _$).METAMORPH_EYE.test(item.name)) {
+    } else if (_$REF.METAMORPH_EYE.test(item.name)) {
       item.name = 'Metamorph Eye'
-    } else if ((AppConfig().realm === 'pc-ggg'
-      ? _$REF
-      : _$).METAMORPH_LUNG.test(item.name)) {
+    } else if (_$REF.METAMORPH_LUNG.test(item.name)) {
       item.name = 'Metamorph Lung'
-    } else if ((AppConfig().realm === 'pc-ggg'
-      ? _$REF
-      : _$).METAMORPH_HEART.test(item.name)) {
+    } else if (_$REF.METAMORPH_HEART.test(item.name)) {
       item.name = 'Metamorph Heart'
-    } else if ((AppConfig().realm === 'pc-ggg'
-      ? _$REF
-      : _$).METAMORPH_LIVER.test(item.name)) {
+    } else if (_$REF.METAMORPH_LIVER.test(item.name)) {
       item.name = 'Metamorph Liver'
     }
   }
 }
 
-function getInfo (item: ParserState, ns: BaseType['namespace']) {
-  let info: BaseType[] | undefined
-  if (ns === 'CAPTURED_BEAST' || ns === 'ITEM') {
-    info = ITEM_BY_TRANSLATED(ns, item.baseType ?? item.name) ?? ITEM_BY_REF(ns, item.baseType ?? item.name)
-  } else {
-    info = ITEM_BY_TRANSLATED(ns, item.name) ?? ITEM_BY_REF(ns, item.name)
-  }
-  return info
-}
-
 function findInDatabase (item: ParserState) {
   let info: BaseType[] | undefined
   if (item.category === ItemCategory.DivinationCard) {
-    info = getInfo(item, 'DIVINATION_CARD')
+    info = ITEM_BY_REF('DIVINATION_CARD', item.name)
   } else if (item.category === ItemCategory.CapturedBeast) {
-    info = getInfo(item, 'CAPTURED_BEAST')
+    info = ITEM_BY_REF('CAPTURED_BEAST', item.baseType ?? item.name)
   } else if (item.category === ItemCategory.Gem) {
-    info = getInfo(item, 'GEM')
+    info = ITEM_BY_REF('GEM', item.name)
   } else if (item.category === ItemCategory.MetamorphSample) {
     info = ITEM_BY_REF('ITEM', item.name)
   } else if (item.category === ItemCategory.Voidstone) {
     info = ITEM_BY_REF('ITEM', 'Charged Compass')
   } else if (item.rarity === ItemRarity.Unique && !item.isUnidentified) {
-    info = getInfo(item, 'UNIQUE')
+    info = ITEM_BY_REF('UNIQUE', item.name)
   } else {
-    info = getInfo(item, 'ITEM')
+    info = ITEM_BY_REF('ITEM', item.baseType ?? item.name)
   }
   if (!info?.length) {
     return err('item.unknown')
   }
   if (info[0].unique) {
-    if (AppConfig().realm === 'pc-ggg') {
-      info = info.filter(info => info.unique!.base === item.baseType)
-    } else {
-      const baseInfo: BaseType[] | undefined = ITEM_BY_TRANSLATED('ITEM', item.baseType ?? item.name)
-      if ((info[0].unique.base !== 'Silk Gloves' && info[0].unique.base !== 'Fingerless Silk Gloves' && info[0].unique.base !== 'Velvet Gloves') || AppConfig().realm !== 'pc-tencent') {
-        info = info.filter(info => info.unique!.base === baseInfo![0].refName)
-      }
-    }
+    info = info.filter(info => info.unique!.base === item.baseType)
   }
   item.infoVariants = info
   // choose 1st variant, correct one will be picked at the end of parsing
@@ -259,9 +214,27 @@ function findInDatabase (item: ParserState) {
 
 function parseMap (section: string[], item: ParsedItem) {
   if (section[0].startsWith(_$.MAP_TIER)) {
-    item.mapTier = Number(section[0].slice(_$.MAP_TIER.length))
-    if (section[1] && section[1]!.startsWith(_$.MAP_REWARD)) {
-      item.mapReward = section[1]!.slice(_$.MAP_REWARD.length)
+    item.map = {
+      tier: Number(section[0].slice(_$.MAP_TIER.length))
+    }
+    for (const line of section) {
+      if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
+        item.map.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
+      } else if (line.startsWith(_$.MAP_ITEM_RARITY)) {
+        item.map.itemRarity = parseInt(line.slice(_$.MAP_ITEM_RARITY.length), 10)
+      } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
+        item.map.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
+      } else if (line.startsWith(_$.MAP_MORE_MAPS)) {
+        item.map.moreMaps = parseInt(line.slice(_$.MAP_MORE_MAPS.length), 10)
+      } else if (line.startsWith(_$.MAP_MORE_SCARABS)) {
+        item.map.moreScarabs = parseInt(line.slice(_$.MAP_MORE_SCARABS.length), 10)
+      } else if (line.startsWith(_$.MAP_MORE_CURRENCY)) {
+        item.map.moreCurrency = parseInt(line.slice(_$.MAP_MORE_CURRENCY.length), 10)
+      } else if (line.startsWith(_$.MAP_MORE_DIVINATION_CARDS)) {
+        item.map.moreDivCards = parseInt(line.slice(_$.MAP_MORE_DIVINATION_CARDS.length), 10)
+      } else if (_$.MAP_COMPLETION_REWARD.test(line)) {
+        item.mapCompletionReward = _$.MAP_COMPLETION_REWARD.exec(line)![1]
+      }
     }
     return 'SECTION_PARSED'
   }
@@ -301,9 +274,9 @@ function pickCorrectVariant (item: ParserState) {
     if (cond.propEV && !item.armourEV) continue
     if (cond.propES && !item.armourES) continue
 
-    if (cond.mapTier === 'W' && !(item.mapTier! <= 5)) continue
-    if (cond.mapTier === 'Y' && !(item.mapTier! >= 6 && item.mapTier! <= 10)) continue
-    if (cond.mapTier === 'R' && !(item.mapTier! >= 11)) continue
+    if (cond.mapTier === 'W' && !(item.map!.tier <= 5)) continue
+    if (cond.mapTier === 'Y' && !(item.map!.tier >= 6 && item.map!.tier <= 10)) continue
+    if (cond.mapTier === 'R' && !(item.map!.tier >= 11)) continue
 
     if (cond.hasImplicit && !item.statsByType.some(calc =>
       calc.type === ModifierType.Implicit &&
@@ -482,11 +455,7 @@ function parseVaalGemName (section: string[], item: ParserState) {
       gemName = section[0]
     }
     if (gemName) {
-      if (AppConfig().realm === 'pc-tencent') {
-        item.name = gemName
-      } else {
-        item.name = ITEM_BY_TRANSLATED('GEM', gemName)![0].refName
-      }
+      item.name = ITEM_BY_TRANSLATED('GEM', gemName)![0].refName
       return 'SECTION_PARSED'
     }
   }
@@ -802,13 +771,9 @@ function parseSynthesised (section: string[], item: ParserState) {
     if (section[0] === _$.SECTION_SYNTHESISED) {
       item.isSynthesised = true
       if (item.baseType) {
-        item.baseType = (AppConfig().realm === 'pc-ggg'
-          ? _$REF
-          : _$).ITEM_SYNTHESISED.exec(item.baseType)![1]
+        item.baseType = _$REF.ITEM_SYNTHESISED.exec(item.baseType)![1]
       } else {
-        item.name = (AppConfig().realm === 'pc-ggg'
-          ? _$REF
-          : _$).ITEM_SYNTHESISED.exec(item.name)![1]
+        item.name = _$REF.ITEM_SYNTHESISED.exec(item.name)![1]
       }
       return 'SECTION_PARSED'
     }
@@ -824,12 +789,8 @@ function parseSuperior (item: ParserState) {
     (item.rarity === ItemRarity.Rare && item.isUnidentified) ||
     (item.rarity === ItemRarity.Unique && item.isUnidentified)
   ) {
-    if ((AppConfig().realm === 'pc-ggg'
-      ? _$REF
-      : _$).ITEM_SUPERIOR.test(item.name)) {
-      item.name = (AppConfig().realm === 'pc-ggg'
-        ? _$REF
-        : _$).ITEM_SUPERIOR.exec(item.name)![1]
+    if (_$REF.ITEM_SUPERIOR.test(item.name)) {
+      item.name = _$REF.ITEM_SUPERIOR.exec(item.name)![1]
     }
   }
 }
@@ -837,9 +798,8 @@ function parseSuperior (item: ParserState) {
 function parseFoulborn (item: ParserState) {
   if (item.rarity !== ItemRarity.Unique || item.isUnidentified) return
 
-  const regex = (AppConfig().realm === 'pc-ggg' ? _$REF : _$).FOULBORN_NAME
-  if (regex.test(item.name)) {
-    item.name = regex.exec(item.name)![1]
+  if (_$REF.FOULBORN_NAME.test(item.name)) {
+    item.name = _$REF.FOULBORN_NAME.exec(item.name)![1]
     item.isFoulborn = true
   }
 }
@@ -999,19 +959,6 @@ function markupConditionParser (text: string) {
       ? body
       : ''
   })
-  text = text.replace(/.+?Voidstone$/g, 'Charged Compass')
-  // text = text.replace(/.+?Voidstone$/g, '充能的羅盤') （不知道台服的虚空石叫啥）
-  text = text.replace(/.+?虚空石$/g, '充能罗盘')
-
-  const mapMatch = text.match(/地图:(\S+) \S+/)
-  if (mapMatch) {
-    text = mapMatch[1]
-  }
-
-  const regSetString = /<(.+)>|\[(.+?)]|\s\[(.+?)]|[(（][^)）]+[A-Za-z]+[)）]|✿+|♥+|★+|◆+|[" ]2死灵法师|[" ]3匹狼|[" ]150个流亡者|[" ]五BOSS|[" ]双形态莫薇儿|[" ]海盗船长|[" ]恐惧之雷|[" ]5图腾|[" ]机关枪女|[" ]死灵法师|[" ]无$|[" ]5电BOSS|[" ]2流亡\+海妖|[" ]死神|[" ]日月女神|[" ]灵投跳斩战|[" ]混沌之源|地图:|[" ]电魔像|[" ]机关枪鸡|[" ]诅咒主教|[" ]监狱长|[" ]混沌守卫|[" ]马雷格罗|[" ]尸王|[" ]冲锋鸟|[" ]巨猿2小猴|[" ]女神|[" ]幻化武器|[" ]巨猿|[" ]冰图腾|[" ]绝望之母|[" ]跃击毒蜘蛛|[" ]火电旗|[" ]电鞭女|[" ]电蜘蛛|[" ]D哥3小王|[" ]惊海之王|[" ]无敌欧克|[" ]火球钻地怪|[" ]召唤巫师|[" ]矿坑3小王|[" ]爆尸阿莉亚|[" ]近战将军\+电法|[" ]低血狂暴浣熊|[" ]3机关房|[" ]骸骨冲锋鸟|[" ]箭雨\+电\+冰骷髅|[" ]海盗亡灵\+石魔像|[" ]D哥|[" ]太阳守卫|[" ]蜘蛛群|[" ]闪打盗贼\+盾战|[" ]燃烧箭弓手|[" ]火盾将军|[" ]雕像怪|[" ]大锅德瑞|[" ]石魔像|[" ]薛朗|[" ]鸡狗组|[" ]狼王|[" ]不死石巨人|[" ]莫薇儿|[" ]瓦尔$|[" ]跳斩大羊男|[" ]电陷阱兽|[" ]骨刺巨魔侍|[" ]冰电双图腾|[" ]灵投怪\+暴风盾石像\+女雕像|[" ]炼狱火妖|[" ]流亡2-6人组|[" ]飓风书妖|[" ]电法将军|[" ]P姐双阶段|[" ]D哥双形态|[" ]D哥3小弟|[" ]女王3小弟|[" ]旋风怪|[" ]沙盒守护|[" ]巨鸟|[" ]混沌魔像|[" ]竞技场3小王|[" ]变异P姐|[" ]火图腾|[" ]狮鹫|[" ]福尔|[" ]蝙蝠\+灵投怪|[" ]冰魔像|[" ]马哥|[" ]冈姆|[" ]德瑞索|[" ]冰火魔像合体怪|[" ]宝箱守护|[" ]宝藏守护者|[" ]火系将军|[" ]水银怪|[" ]分身弓|[" ]激光海妖|[" ]塑界者|[" ]跳斩翼人|[" ]冰法|[" ]混伤召唤\+变异怪|[" ]灵投火兽|[" ]风爆电法|[" ]流亡3人组|[" ]破空斩战|[" ]脱壳恐魔|[" ]尸爆阿莉亚|[" ]火系3人组|[" ]骷髅主教|[" ]火伤船长|[" ]物混亡灵|[" ]物伤镇长|[" ]水魔|[" ]日月姐妹|[" ]3冰恶魔|[" ]盾冲战|[" ]石化鸡|[" ]焚烧火法|[" ]跃击战|[" ]白熊|[" ]托尔曼|[" ]古哥|[" ]德瑞|[" ]火雨女|[" ]古灵军团|[" ]EK捕熊猴|[" ]裂空行者|[" ]傀儡女王|[" ]月亮守卫|[" ]典狱长\+薛朗|[" ]图克哈玛|[" ]奇塔弗|[" ]混毒黑寡妇|[" ]激光雨雕像|[" ]电击男爵|[" ]冲锋牛|[" ]转生巫师|[" ]火羊男|[" ]火狗\+牛\+角斗士|[" ]流沙蝎|[" ]旋风斩战\+斧男|[" ]玫红女妖|[" ]沙之女王|[" ]纯洁之神|[" ]激光蜘蛛|[" ]三合体|[" ]物混祭祀|[" ]3农场怪|[" ]飞天怪|[" ]不死鸟+[(（][^)）]+[A-Za-z]+[)）]|[" ]九头蛇+[(（][^)）]+[A-Za-z]+[)）]|[" ]奇美拉+[(（][^)）]+[A-Za-z]+[)）]|[" ]牛头人+[(（][^)）]+[A-Za-z]+[)）]|[" ]九头蛇$|[" ]奇美拉$|[" ]牛头人$|[" ]不死鸟$|\((裂界守卫：约束\))|\((裂界守卫：净世\))|\((裂界守卫：寂灭\))|\((裂界守卫：奴役\))/g
-  if (text !== '异常 幻化武器' && text !== '分歧 幻化武器' && text !== '魅影 幻化武器') {
-    text = text.replace(regSetString, '')
-  }
 
   return text
 }

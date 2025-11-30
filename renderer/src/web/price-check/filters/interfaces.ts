@@ -25,6 +25,7 @@ export interface ItemFilters {
   }
   rarity?: {
     value: string
+    disabled: boolean
   }
   linkedSockets?: FilterNumeric
   whiteSockets?: FilterNumeric
@@ -57,6 +58,10 @@ export interface ItemFilters {
   mapReward?: string
   mapBlighted?: {
     value: NonNullable<ParsedItem['mapBlighted']>
+  }
+  mapCompletionReward?: {
+    name: string
+    nameTrade: string
   }
   itemLevel?: FilterNumeric
   stackSize?: FilterNumeric
@@ -126,7 +131,10 @@ export const INTERNAL_TRADE_IDS = [
   'item.elemental_dps',
   'item.crit',
   'item.aps',
-  'item.has_empty_modifier'
+  'item.has_empty_modifier',
+  'item.map_item_quantity',
+  'item.map_item_rarity',
+  'item.map_pack_size'
 ] as const
 
 export type InternalTradeId = typeof INTERNAL_TRADE_IDS[number]
