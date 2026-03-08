@@ -5,7 +5,6 @@ import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
-import { PERMANENT_SC } from '../../background/Leagues'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
 
@@ -28,8 +27,7 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
-      merchantOnly: !PERMANENT_SC.includes(opts.league) &&
-        item.category !== ItemCategory.DivinationCard,
+      merchantOnly: item.category !== ItemCategory.DivinationCard,
       listed: undefined,
       currency: opts.currency,
       league: opts.league,
@@ -93,15 +91,21 @@ export function createFilters (
         value: floorToBracket(item.areaLevel!, [1, 68, 73, 75, 78, 80]),
         disabled: false
       }
-    }
-    if (item.info.refName === 'Mirrored Tablet') {
+    } else if (item.info.refName === 'Mirrored Tablet') {
       filters.areaLevel = {
         value: item.areaLevel!,
         disabled: false
       }
-    }
-    // Incubators, Wombgifts, Forbidden Tome
-    if (item.itemLevel) {
+    } else if (item.info.refName === 'Forbidden Tome') {
+      filters.areaLevel = {
+        value: item.areaLevel!,
+        disabled: false
+      }
+      if (item.areaLevel! < 83) {
+        filters.areaLevel.max = item.areaLevel!
+      }
+    } else if (item.itemLevel) {
+      // Incubators, Wombgifts
       filters.itemLevel = {
         value: item.itemLevel,
         disabled: false
@@ -118,19 +122,14 @@ export function createFilters (
         baseTypeTrade: t(opts, ITEM_BY_REF('ITEM', item.info.unique.base)![0])
       }
     } else {
-      const ignoreLayout =
-        item.mapCompletionReward != null ||
-        item.statsByType.some(calc =>
-          calc.stat.ref === 'Map is occupied by #' ||
-          calc.stat.ref === "Map contains #'s Citadel")
       filters.searchExact = {
         baseType: item.info.name,
         baseTypeTrade: t(opts, item.info)
       }
-      filters.searchRelaxed = {
-        category: item.category,
-        disabled: !ignoreLayout
-      }
+    }
+
+    if (item.info.refName === 'Map' || item.info.unique?.base === 'Map') {
+      filters.discriminator = { trade: 'map' }
     }
 
     if (item.mapBlighted) {
@@ -308,7 +307,20 @@ export function createFilters (
   }
 
   if (item.isMirrored) {
-    filters.mirrored = { disabled: false }
+    filters.mirrored = { disabled: false, hidden: false }
+  } else if (
+    item.info.craftable && !item.isCorrupted
+  ) {
+    filters.mirrored = { disabled: true, hidden: true }
+  }
+
+  if (item.isSplit) {
+    filters.split = { disabled: false, hidden: false }
+  } else if (
+    item.info.craftable && !item.isCorrupted && !item.isMirrored &&
+    !item.isSynthesised && !item.isFractured && !item.influences.length
+  ) {
+    filters.split = { disabled: true, hidden: true }
   }
 
   if (!item.isFractured &&

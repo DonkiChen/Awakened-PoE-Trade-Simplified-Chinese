@@ -12,7 +12,7 @@ import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg } from './s
 import { ItemCategory, ACCESSORY } from './meta'
 import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedItem'
 import { magicBasetype } from './magic-name'
-import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, CRUCIBLE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
+import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
 
 type SectionParseResult =
@@ -35,6 +35,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   { virtual: parseFoulborn, name: 'parseFoulborn' },
   parseSynthesised,
   parseCategoryByHelpText,
+  { virtual: parseMapTier, name: 'parseMapTier' },
   { virtual: normalizeName, name: 'normalizeName'},
   parseVaalGemName,
   { virtual: handlePatchedItem, name: 'handlePatchedItem'},
@@ -60,6 +61,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseMirroredTablet,
   parseFilledCoffin,
   parseMirrored,
+  parseSplit,
   parseSentinelCharge,
   parseLogbookArea,
   parseLogbookArea,
@@ -244,33 +246,56 @@ function findInDatabase (item: ParserState) {
   }
 }
 
-function parseMap (section: string[], item: ParsedItem) {
-  if (section[0].startsWith(_$.MAP_TIER)) {
-    item.map = {
-      tier: Number(section[0].slice(_$.MAP_TIER.length))
-    }
-    for (const line of section) {
-      if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
-        item.map.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
-      } else if (line.startsWith(_$.MAP_ITEM_RARITY)) {
-        item.map.itemRarity = parseInt(line.slice(_$.MAP_ITEM_RARITY.length), 10)
-      } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
-        item.map.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
-      } else if (line.startsWith(_$.MAP_MORE_MAPS)) {
-        item.map.moreMaps = parseInt(line.slice(_$.MAP_MORE_MAPS.length), 10)
-      } else if (line.startsWith(_$.MAP_MORE_SCARABS)) {
-        item.map.moreScarabs = parseInt(line.slice(_$.MAP_MORE_SCARABS.length), 10)
-      } else if (line.startsWith(_$.MAP_MORE_CURRENCY)) {
-        item.map.moreCurrency = parseInt(line.slice(_$.MAP_MORE_CURRENCY.length), 10)
-      } else if (line.startsWith(_$.MAP_MORE_DIVINATION_CARDS)) {
-        item.map.moreDivCards = parseInt(line.slice(_$.MAP_MORE_DIVINATION_CARDS.length), 10)
-      } else if (_$.MAP_COMPLETION_REWARD.test(line)) {
-        item.mapCompletionReward = _$.MAP_COMPLETION_REWARD.exec(line)![1]
-      }
-    }
-    return 'SECTION_PARSED'
+function parseMapTier (item: ParserState) {
+  // TODO blocked by https://www.pathofexile.com/forum/view-thread/3915458
+  const execResult = _$REF.MAP_TIER.exec(item.baseType || item.name)
+  if (!execResult) return
+
+  item.map = {
+    tier: Number(execResult[1])
   }
-  return 'SECTION_SKIPPED'
+
+  if (item.baseType) {
+    item.baseType = item.baseType.replace(execResult[0], '')
+  } else {
+    item.name = item.name.replace(execResult[0], '')
+  }
+}
+
+function parseMap (section: string[], item: ParsedItem) {
+  if (!item.map) return 'PARSER_SKIPPED'
+
+  let isParsed: SectionParseResult = 'SECTION_SKIPPED'
+
+  for (const line of section) {
+    if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
+      item.map.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_ITEM_RARITY)) {
+      item.map.itemRarity = parseInt(line.slice(_$.MAP_ITEM_RARITY.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
+      item.map.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MORE_MAPS)) {
+      item.map.moreMaps = parseInt(line.slice(_$.MAP_MORE_MAPS.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MORE_SCARABS)) {
+      item.map.moreScarabs = parseInt(line.slice(_$.MAP_MORE_SCARABS.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MORE_CURRENCY)) {
+      item.map.moreCurrency = parseInt(line.slice(_$.MAP_MORE_CURRENCY.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MORE_DIVINATION_CARDS)) {
+      item.map.moreDivCards = parseInt(line.slice(_$.MAP_MORE_DIVINATION_CARDS.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (_$.MAP_COMPLETION_REWARD.test(line)) {
+      item.mapCompletionReward = _$.MAP_COMPLETION_REWARD.exec(line)![1]
+      isParsed = 'SECTION_PARSED'
+    }
+  }
+
+  return isParsed
 }
 
 function parseBlightedMap (item: ParsedItem) {
@@ -709,7 +734,6 @@ function parseModifiers (section: string[], item: ParsedItem) {
   const recognizedLine = section.find(line =>
     line.endsWith(ENCHANT_LINE) ||
     line.endsWith(SCOURGE_LINE) ||
-    line.endsWith(CRUCIBLE_LINE) ||
     isModInfoLine(line)
   )
 
@@ -719,24 +743,17 @@ function parseModifiers (section: string[], item: ParsedItem) {
 
   if (isModInfoLine(recognizedLine)) {
     for (const { modLine, statLines } of groupLinesByMod(section)) {
-      const { modType, lines } = parseModType(statLines)
-
-      if (modType === ModifierType.Crucible) {
-        continue
-      }
-      const modInfo = parseModInfoLine(modLine, modType)
-      parseStatsFromMod(lines, item, { info: modInfo, stats: [] })
-
-      if (modType === ModifierType.Veiled) {
+      const modInfo = parseModInfoLine(modLine)
+      if (statLines[0] === _$.VEILED_PREFIX || statLines[0] === _$.VEILED_SUFFIX) {
+        modInfo.type = ModifierType.Veiled
         item.isVeiled = true
       }
+      parseStatsFromMod(statLines, item, { info: modInfo, stats: [] })
     }
   } else {
-    const { lines } = parseModType(section)
+    const { modType, lines } = parseModType(section)
     const modInfo: ModifierInfo = {
-      type: recognizedLine.endsWith(ENCHANT_LINE)
-        ? ModifierType.Enchant
-        : ModifierType.Scourge,
+      type: modType,
       tags: []
     }
     parseStatsFromMod(lines, item, { info: modInfo, stats: [] })
@@ -749,6 +766,16 @@ function parseMirrored (section: string[], item: ParsedItem) {
   if (section.length === 1) {
     if (section[0] === _$.MIRRORED) {
       item.isMirrored = true
+      return 'SECTION_PARSED'
+    }
+  }
+  return 'SECTION_SKIPPED'
+}
+
+function parseSplit (section: string[], item: ParsedItem) {
+  if (section.length === 1) {
+    if (section[0] === _$.SPLIT) {
+      item.isSplit = true
       return 'SECTION_PARSED'
     }
   }
@@ -949,7 +976,7 @@ function parseMirroredTablet (section: string[], item: ParsedItem) {
   if (section.length < 8) return 'SECTION_SKIPPED'
 
   for (const line of section) {
-    const found = tryParseTranslation({ string: line, unscalable: true }, ModifierType.Pseudo)
+    const found = tryParseTranslation({ string: line, unscalable: true }, ModifierType.Pseudo, undefined)
     if (found) {
       item.newMods.push({
         info: { tags: [], type: ModifierType.Pseudo },
@@ -1057,14 +1084,4 @@ function calcBasePercentile (item: ParsedItem) {
   } else if (item.armourWARD && info.ward) {
     item.basePercentile = calcPropPercentile(item.armourWARD, info.ward, QUALITY_STATS.WARD, item)
   }
-}
-
-export function removeLinesEnding (
-  lines: readonly string[], ending: string
-): string[] {
-  return lines.map(line =>
-    line.endsWith(ending)
-      ? line.slice(0, -ending.length)
-      : line
-  )
 }

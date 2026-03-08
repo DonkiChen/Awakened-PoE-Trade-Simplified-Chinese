@@ -23,7 +23,7 @@
   },
 
   "map.mods.heist": "heist",
-  "map.mods.uber": "T17",
+  "map.mods.uber": "T16+",
   "map.mods.outdated": "outdated",
   "Support development on": "Support development\u00A0on",
 
@@ -96,6 +96,8 @@
     "foil_unique": "Foil Unique",
     "mirrored": "Mirrored",
     "not_mirrored": "Not Mirrored",
+    "split": "Split",
+    "not_split": "Not Split",
     "map_foil_reward": "Foil {0}"
   },
   "item_category": {
@@ -172,6 +174,7 @@
     "tag_foulborn": "foulborn",
     "tag_eldritch": "eldritch",
     "tag_pseudo": "pseudo",
+    "tag_not": "not",
     "tag_explicit": "explicit",
     "tag_explicit_shaper": "Shaper",
     "tag_explicit_elder": "Elder",

@@ -41,6 +41,11 @@ export interface ItemFilters {
   }
   mirrored?: {
     disabled: boolean
+    hidden: boolean
+  }
+  split?: {
+    disabled: boolean
+    hidden: boolean
   }
   foil?: {
     disabled: boolean
@@ -100,6 +105,7 @@ export interface StatFilter {
   tag: FilterTag
   oils?: string[]
   sources: StatCalculated['sources']
+  not?: true
   roll?: {
     value: number
     min: number | '' | undefined // NOTE: mutable in UI
