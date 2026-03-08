@@ -9,6 +9,7 @@ import WidgetItemCheck from '@/web/item-check/WidgetItemCheck.vue'
 import WidgetDelveGrid from './WidgetDelveGrid.vue'
 import WidgetItemSearch from '../item-search/WidgetItemSearch.vue'
 import WidgetSettings from '../settings/SettingsWindow.vue'
+import WidgetImageStrip from "@/web/overlay/WidgetImageStrip.vue";
 
 type WidgetComponent = Component & { widget: WidgetSpec }
 

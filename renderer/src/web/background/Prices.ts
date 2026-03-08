@@ -127,14 +127,14 @@ export const usePoeninja = createGlobalState(() => {
     if (!league || !league.isPopular || league.realm === 'pc-garena') return
 
     if (league.realm === 'pc-ggg') {
-    // NOTE: order of keys is important
+      // NOTE: order of keys is important
       const searchString = JSON.stringify({
         name: query.name,
         variant: query.variant,
         chaos: 0
       }).replace(':0}', ':')
 
-      for (const { ns, url, lines } of PRICES_DB) {
+      for (const {ns, url, lines} of PRICES_DB) {
         if (ns !== query.ns) continue
 
         const startPos = lines.indexOf(searchString)
@@ -143,11 +143,12 @@ export const usePoeninja = createGlobalState(() => {
 
         const info: NinjaDenseInfo = JSON.parse(lines.slice(startPos, endPos + 1))
 
-      return {
-        ...info,
-        url: `https://poe.ninja/poe1/economy/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
+        return {
+          ...info,
+          url: `https://poe.ninja/poe1/economy/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
+        }
       }
-    } else {
+    }else {
       // FIXME: 这段代码会导致无法查宝石, 暂时注释
       // const qualities = new Map([
       //   ['anomalous', _$.QUALITY_ANOMALOUS.toString().slice(2, 5)],

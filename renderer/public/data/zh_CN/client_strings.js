@@ -17,7 +17,7 @@ export default {
   MAP_MORE_SCARABS: '更多圣甲虫: ',
   MAP_MORE_CURRENCY: '更多通货: ',
   MAP_MORE_DIVINATION_CARDS: '更多命运卡: ',
-  MAP_COMPLETION_REWARD: /^任务奖励: 烫金 (.*)$/,
+  MAP_COMPLETION_REWARD: /^奖励: 烫金 (.*)$/,
   RARITY: '稀 有 度: ',
   ITEM_CLASS: '物品类别: ',
   ITEM_LEVEL: '物品等级: ',

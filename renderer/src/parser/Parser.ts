@@ -5,7 +5,7 @@ import {
   ITEM_BY_TRANSLATED,
   ITEM_BY_REF,
   STAT_BY_MATCH_STR,
-  BaseType
+  BaseType, ITEM_BY_REF_OR_TRANSLATED
 } from '@/assets/data'
 import { ModifierType, sumStatsByModType } from './modifiers'
 import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg } from './stat-translations'
@@ -29,15 +29,16 @@ interface ParserState extends ParsedItem {
   infoVariants: BaseType[]
 }
 
-const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
+const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, 便于调试 */ name: string }> = [
   parseUnidentified,
-  { virtual: parseSuperior },
-  { virtual: parseFoulborn },
+  { virtual: parseSuperior, name: 'parseSuperior' },
+  { virtual: parseFoulborn, name: 'parseFoulborn' },
   parseSynthesised,
   parseCategoryByHelpText,
-  { virtual: normalizeName },
+  { virtual: normalizeName, name: 'normalizeName'},
   parseVaalGemName,
-  { virtual: findInDatabase },
+  { virtual: handlePatchedItem, name: 'handlePatchedItem'},
+  { virtual: findInDatabase, name: 'findInDatabase' },
   // -----------
   parseItemLevel,
   parseTalismanTier,
@@ -67,11 +68,11 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn }> = [
   parseModifiers, // scourge
   parseModifiers, // implicit
   parseModifiers, // explicit
-  { virtual: transformToLegacyModifiers },
-  { virtual: parseFractured },
-  { virtual: parseBlightedMap },
-  { virtual: pickCorrectVariant },
-  { virtual: calcBasePercentile }
+  { virtual: transformToLegacyModifiers, name: 'transformToLegacyModifiers' },
+  { virtual: parseFractured, name: 'parseFractured' },
+  { virtual: parseBlightedMap, name: 'parseBlightedMap' },
+  { virtual: pickCorrectVariant, name: 'pickCorrectVariant' },
+  { virtual: calcBasePercentile, name: 'calcBasePercentile' }
 ]
 
 export function parseClipboard (clipboard: string): Result<ParsedItem, string> {
@@ -175,28 +176,59 @@ function normalizeName (item: ParserState) {
   }
 }
 
+/**
+ * 处理 A 大功能补丁导致的无法复用原逻辑的问题
+ * @param item
+ */
+function handlePatchedItem(item: ParserState) {
+  const mapMatch = item.baseType && item.baseType.match(/地图:(\S+) \S+/)
+  if (item.baseType && mapMatch) {
+    item.baseType = mapMatch[1]
+  }
+
+  const mapNameMatch = item.name && item.name.match(/地图:(\S+) \S+/)
+  if (item.name && mapNameMatch) {
+    item.name = mapNameMatch[1]
+  }
+}
+
+function getInfo (item: ParserState, ns: BaseType['namespace']) {
+  let info: BaseType[] | undefined
+  if (ns === 'CAPTURED_BEAST' || ns === 'ITEM') {
+    info = ITEM_BY_TRANSLATED(ns, item.baseType ?? item.name) ?? ITEM_BY_REF(ns, item.baseType ?? item.name)
+  } else {
+    info = ITEM_BY_TRANSLATED(ns, item.name) ?? ITEM_BY_REF(ns, item.name)
+  }
+  return info
+}
+
 function findInDatabase (item: ParserState) {
   let info: BaseType[] | undefined
+  // 国服 itemType 和 name 都是中文, 导致没法直接用 ITEM_BY_REF
   if (item.category === ItemCategory.DivinationCard) {
-    info = ITEM_BY_REF('DIVINATION_CARD', item.name)
+    info = ITEM_BY_REF_OR_TRANSLATED('DIVINATION_CARD', item.name)
   } else if (item.category === ItemCategory.CapturedBeast) {
-    info = ITEM_BY_REF('CAPTURED_BEAST', item.baseType ?? item.name)
+    info = ITEM_BY_REF_OR_TRANSLATED('CAPTURED_BEAST', item.baseType ?? item.name)
   } else if (item.category === ItemCategory.Gem) {
-    info = ITEM_BY_REF('GEM', item.name)
+    info = ITEM_BY_REF_OR_TRANSLATED('GEM', item.name)
   } else if (item.category === ItemCategory.MetamorphSample) {
-    info = ITEM_BY_REF('ITEM', item.name)
+    info = ITEM_BY_REF_OR_TRANSLATED('ITEM', item.name)
   } else if (item.category === ItemCategory.Voidstone) {
-    info = ITEM_BY_REF('ITEM', 'Charged Compass')
+    info = ITEM_BY_REF_OR_TRANSLATED('ITEM', 'Charged Compass')
   } else if (item.rarity === ItemRarity.Unique && !item.isUnidentified) {
-    info = ITEM_BY_REF('UNIQUE', item.name)
+    info = ITEM_BY_REF_OR_TRANSLATED('UNIQUE', item.name)
   } else {
-    info = ITEM_BY_REF('ITEM', item.baseType ?? item.name)
+    info = ITEM_BY_REF_OR_TRANSLATED('ITEM', item.baseType ?? item.name)
   }
   if (!info?.length) {
     return err('item.unknown')
   }
   if (info[0].unique) {
-    info = info.filter(info => info.unique!.base === item.baseType)
+    // 国服 itemType 和 name 都是中文, 导致得再查一下
+    const baseType = ITEM_BY_REF_OR_TRANSLATED("ITEM", item.baseType ?? item.name)
+    if (baseType) {
+      info = info.filter(info => info.unique!.base === baseType[0].name || info.unique!.base == baseType[0].refName )
+    }
   }
   item.infoVariants = info
   // choose 1st variant, correct one will be picked at the end of parsing
