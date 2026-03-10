@@ -1,6 +1,8 @@
 name: Build
 
 on:
+  # 加入这一行即可开启手动触发
+  workflow_dispatch:
   push:
     branches:
       - 'master'
