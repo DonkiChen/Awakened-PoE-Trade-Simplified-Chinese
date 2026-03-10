@@ -51,6 +51,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseTincture,
   parseStackSize,
   parseCorrupted,
+  parseImbuedGem,
   parseFoil,
   parseInfluence,
   parseMap,
@@ -263,7 +264,11 @@ function parseMapTier (item: ParserState) {
 }
 
 function parseMap (section: string[], item: ParsedItem) {
-  if (!item.map) return 'PARSER_SKIPPED'
+  if (item.category !== ItemCategory.Map) return 'PARSER_SKIPPED'
+
+  if (!item.map) {
+    item.map = { tier: undefined }
+  }
 
   let isParsed: SectionParseResult = 'SECTION_SKIPPED'
 
@@ -331,9 +336,12 @@ function pickCorrectVariant (item: ParserState) {
     if (cond.propEV && !item.armourEV) continue
     if (cond.propES && !item.armourES) continue
 
-    if (cond.mapTier === 'W' && !(item.map!.tier <= 5)) continue
-    if (cond.mapTier === 'Y' && !(item.map!.tier >= 6 && item.map!.tier <= 10)) continue
-    if (cond.mapTier === 'R' && !(item.map!.tier >= 11)) continue
+    if (cond.mapTier) {
+      if (!item.map?.tier) continue
+      if (cond.mapTier === 'W' && !(item.map.tier <= 5)) continue
+      if (cond.mapTier === 'Y' && !(item.map.tier >= 6 && item.map.tier <= 10)) continue
+      if (cond.mapTier === 'R' && !(item.map.tier >= 11)) continue
+    }
 
     if (cond.hasImplicit && !item.statsByType.some(calc =>
       calc.type === ModifierType.Implicit &&
@@ -528,6 +536,27 @@ function parseGem (section: string[], item: ParsedItem) {
     item.gemLevel = parseInt(section[1].slice(_$.GEM_LEVEL.length), 10)
 
     parseQualityNested(section, item)
+
+    return 'SECTION_PARSED'
+  }
+  return 'SECTION_SKIPPED'
+}
+
+function parseImbuedGem (section: string[], item: ParsedItem) {
+  if (item.category !== ItemCategory.Gem) return 'PARSER_SKIPPED'
+
+  if (section.length === 1) {
+    const support = STAT_BY_MATCH_STR(section[0])
+    if (!support) return 'SECTION_SKIPPED'
+
+    item.newMods.push({
+      info: { tags: [], type: ModifierType.Imbued },
+      stats: [{
+        stat: support.stat,
+        translation: support.matcher
+      }]
+    })
+    item.imbuedGem = true
 
     return 'SECTION_PARSED'
   }
