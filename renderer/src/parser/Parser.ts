@@ -36,9 +36,9 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseSynthesised,
   parseCategoryByHelpText,
   { virtual: parseMapTier, name: 'parseMapTier' },
-  { virtual: normalizeName, name: 'normalizeName'},
+  { virtual: normalizeName, name: 'normalizeName' },
   parseVaalGemName,
-  { virtual: handlePatchedItem, name: 'handlePatchedItem'},
+  { virtual: handlePatchedItem, name: 'handlePatchedItem' },
   { virtual: findInDatabase, name: 'findInDatabase' },
   // -----------
   parseItemLevel,
@@ -147,7 +147,7 @@ function normalizeName (item: ParserState) {
   }
 
   if (item.rarity === ItemRarity.Normal ||
-      item.rarity === ItemRarity.Rare
+    item.rarity === ItemRarity.Rare
   ) {
     if (item.baseType) {
       if (_$REF.MAP_BLIGHTED.test(item.baseType)) {
@@ -183,7 +183,7 @@ function normalizeName (item: ParserState) {
  * 处理 A 大功能补丁导致的无法复用原逻辑的问题
  * @param item
  */
-function handlePatchedItem(item: ParserState) {
+function handlePatchedItem (item: ParserState) {
   const mapMatch = item.baseType && item.baseType.match(/地图:(\S+) \S+/)
   if (item.baseType && mapMatch) {
     item.baseType = mapMatch[1]
@@ -193,16 +193,6 @@ function handlePatchedItem(item: ParserState) {
   if (item.name && mapNameMatch) {
     item.name = mapNameMatch[1]
   }
-}
-
-function getInfo (item: ParserState, ns: BaseType['namespace']) {
-  let info: BaseType[] | undefined
-  if (ns === 'CAPTURED_BEAST' || ns === 'ITEM') {
-    info = ITEM_BY_TRANSLATED(ns, item.baseType ?? item.name) ?? ITEM_BY_REF(ns, item.baseType ?? item.name)
-  } else {
-    info = ITEM_BY_TRANSLATED(ns, item.name) ?? ITEM_BY_REF(ns, item.name)
-  }
-  return info
 }
 
 function findInDatabase (item: ParserState) {
@@ -228,9 +218,9 @@ function findInDatabase (item: ParserState) {
   }
   if (info[0].unique) {
     // 国服 itemType 和 name 都是中文, 导致得再查一下
-    const baseType = ITEM_BY_REF_OR_TRANSLATED("ITEM", item.baseType ?? item.name)
+    const baseType = ITEM_BY_REF_OR_TRANSLATED('ITEM', item.baseType ?? item.name)
     if (baseType) {
-      info = info.filter(info => info.unique!.base === baseType[0].name || info.unique!.base == baseType[0].refName )
+      info = info.filter(info => info.unique!.base === baseType[0].name || info.unique!.base === baseType[0].refName)
     }
   }
   item.infoVariants = info
@@ -388,8 +378,8 @@ function parseNamePlate (section: string[]) {
   const item: ParserState = {
     rarity: undefined,
     category: undefined,
-    name: name,
-    baseType: baseType,
+    name,
+    baseType,
     isUnidentified: false,
     isCorrupted: false,
     newMods: [],
@@ -565,8 +555,8 @@ function parseImbuedGem (section: string[], item: ParsedItem) {
 
 function parseStackSize (section: string[], item: ParsedItem) {
   if (item.rarity !== ItemRarity.Normal &&
-      item.category !== ItemCategory.Currency &&
-      item.category !== ItemCategory.DivinationCard) {
+    item.category !== ItemCategory.Currency &&
+    item.category !== ItemCategory.DivinationCard) {
     return 'PARSER_SKIPPED'
   }
   if (section[0].startsWith(_$.STACK_SIZE)) {

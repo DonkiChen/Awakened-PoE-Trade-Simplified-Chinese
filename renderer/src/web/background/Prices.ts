@@ -134,7 +134,7 @@ export const usePoeninja = createGlobalState(() => {
         chaos: 0
       }).replace(':0}', ':')
 
-      for (const {ns, url, lines} of PRICES_DB) {
+      for (const { ns, url, lines } of PRICES_DB) {
         if (ns !== query.ns) continue
 
         const startPos = lines.indexOf(searchString)
@@ -148,7 +148,7 @@ export const usePoeninja = createGlobalState(() => {
           url: `https://poe.ninja/poe1/economy/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
         }
       }
-    }else {
+    } else {
       // FIXME: 这段代码会导致无法查宝石, 暂时注释
       // const qualities = new Map([
       //   ['anomalous', _$.QUALITY_ANOMALOUS.toString().slice(2, 5)],

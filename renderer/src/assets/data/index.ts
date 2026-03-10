@@ -102,7 +102,7 @@ async function loadItems (language: string) {
 
   ITEM_BY_TRANSLATED = commonFind(indexNames, 'name')
   ITEM_BY_REF = commonFind(indexRefNames, 'refName')
-  ITEM_BY_REF_OR_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => ITEM_BY_REF(ns, name) ?? ITEM_BY_TRANSLATED(ns,  name)
+  ITEM_BY_REF_OR_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => ITEM_BY_REF(ns, name) ?? ITEM_BY_TRANSLATED(ns, name)
   ITEMS_ITERATOR = ndjsonFindLines<BaseType>(ndjson)
   ALTQ_GEM_NAMES = itemNamesFromLines(ITEMS_ITERATOR('altQuality":["Anomalous'))
   REPLICA_UNIQUE_NAMES = itemNamesFromLines(ITEMS_ITERATOR('refName":"Replica'))

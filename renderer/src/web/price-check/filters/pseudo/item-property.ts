@@ -35,7 +35,7 @@ export function filterMemoryStrands (ctx: FiltersCreationContext, hidden?: strin
       roll: { min: 0, max: 100, value: ctx.item.memoryStrands },
       sources: [],
       disabled: (ctx.item.memoryStrands < 60 || hidden !== undefined),
-      hidden: hidden
+      hidden
     }, ctx))
   }
 }
