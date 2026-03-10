@@ -59,7 +59,7 @@ export const usePoeninja = createGlobalState(() => {
       let divine
 
       if (league.realm === 'pc-ggg') {
-        const response = await Host.proxy(`poe.ninja/api/data/DenseOverviews?league=${league.id}&language=en`, {
+        const response = await Host.proxy(`poe.ninja/poe1/api/economy/current/dense/overviews?league=${league.id}&language=en`, {
           signal: downloadController.signal
         })
         const jsonBlob = await response.text()
@@ -112,8 +112,13 @@ export const usePoeninja = createGlobalState(() => {
     switch (league) {
       case 'Standard': return 'standard'
       case 'Hardcore': return 'hardcore'
-      default:
-        return (league.startsWith('Hardcore ')) ? 'challengehc' : 'challenge'
+      default: {
+        let ninjaId = league.replace('Hardcore ', '').toLowerCase()
+        if (league.startsWith('Hardcore ')) {
+          ninjaId += 'hc'
+        }
+        return ninjaId
+      }
     }
   }
 
@@ -122,14 +127,14 @@ export const usePoeninja = createGlobalState(() => {
     if (!league || !league.isPopular || league.realm === 'pc-garena') return
 
     if (league.realm === 'pc-ggg') {
-    // NOTE: order of keys is important
+      // NOTE: order of keys is important
       const searchString = JSON.stringify({
         name: query.name,
         variant: query.variant,
         chaos: 0
       }).replace(':0}', ':')
 
-      for (const { ns, url, lines } of PRICES_DB) {
+      for (const {ns, url, lines} of PRICES_DB) {
         if (ns !== query.ns) continue
 
         const startPos = lines.indexOf(searchString)
@@ -140,10 +145,10 @@ export const usePoeninja = createGlobalState(() => {
 
         return {
           ...info,
-          url: `https://poe.ninja/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
+          url: `https://poe.ninja/poe1/economy/${selectedLeagueToUrl()}/${url}/${denseInfoToDetailsId(info)}`
         }
       }
-    } else {
+    }else {
       // FIXME: 这段代码会导致无法查宝石, 暂时注释
       // const qualities = new Map([
       //   ['anomalous', _$.QUALITY_ANOMALOUS.toString().slice(2, 5)],

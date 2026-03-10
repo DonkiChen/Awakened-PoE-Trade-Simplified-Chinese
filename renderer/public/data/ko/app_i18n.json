@@ -51,6 +51,9 @@
     "elemental_dps": "원소 DPS: {0}",
     "crit": "치명타 확률: {0}%",
     "aps": "초당 공격 횟수: {0}",
+    "map_item_quantity": "아이템 수량: {0}%",
+    "map_item_rarity": "아이템 희귀도: {0}%",
+    "map_pack_size": "몬스터 무리 규모: {0}%",
     "has_empty_modifier": "비었거나 작업대 모드 1",
     "has_empty_affix": "빈 속성 부여",
     "has_empty_prefix": "빈 접두어",
@@ -89,7 +92,8 @@
     "veiled": "장막 속성",
     "foil_unique": "반짝이",
     "mirrored": "복제된",
-    "not_mirrored": "복제되지 않은"
+    "not_mirrored": "복제되지 않은",
+    "map_foil_reward": "반짝이 {0}"
   },
   "item_category": {
     "prop": "유형: {0}",
@@ -163,6 +167,7 @@
     "tag_foulborn": "삿된",
     "tag_eldritch": "섬뜩한",
     "tag_pseudo": "pseudo",
+    "tag_not": "not",
     "tag_explicit": "부여된 속성",
     "tag_explicit_shaper": "쉐이퍼",
     "tag_explicit_elder": "엘더",
@@ -270,7 +275,8 @@
     "getting_price": "Getting price {0}",
     "getting_price_from": "from poe.ninja \u2026",
     "you_have": "가진 갯수",
-    "stack": "스택"
+    "stack": "스택",
+    "market_ratio": "시장 비율"
   },
   "settings": {
     "title": "세팅 - Awakened PoE Trade",

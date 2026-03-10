@@ -14,7 +14,7 @@
 
 ### Development
 
-See [DEVELOPING.md](./DEVELOPING.md)
+See [DEVELOPING.md](./DEVELOPING.md), [更新指南](./更新指南（作者看）), and [中文词缀翻译指南](./CN_TRANSLATOR.md)
 
 ### Acknowledgments
 

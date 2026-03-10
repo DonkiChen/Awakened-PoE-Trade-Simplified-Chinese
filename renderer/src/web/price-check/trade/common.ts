@@ -22,10 +22,13 @@ export type TradeResponse<T> = (T & { error?: null }) | {
 }
 
 export function apiToSatisfySearch (item: ParsedItem, stats: StatFilter[], filters: ItemFilters): 'trade' | 'bulk' {
+  if (stats.some(s => !s.disabled)) {
+    return 'trade'
+  }
   if (AppConfig().realm === 'pc-tencent') {
     return 'trade'
   }
-  return (item.info.exchangeable) ? 'bulk' : 'trade'
+  return tradeTag(item) != null ? 'bulk' : 'trade'
 }
 
 export function tradeTag (item: ParsedItem): string | undefined {

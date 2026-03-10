@@ -9,6 +9,7 @@ import WidgetItemCheck from '@/web/item-check/WidgetItemCheck.vue'
 import WidgetDelveGrid from './WidgetDelveGrid.vue'
 import WidgetItemSearch from '../item-search/WidgetItemSearch.vue'
 import WidgetSettings from '../settings/SettingsWindow.vue'
+import WidgetImageStrip from "@/web/overlay/WidgetImageStrip.vue";
 
 type WidgetComponent = Component & { widget: WidgetSpec }
 
@@ -29,5 +30,5 @@ registry.widgets.push(WidgetTimer as unknown as WidgetComponent)
 registry.widgets.push(WidgetStashSearch as unknown as WidgetComponent)
 registry.widgets.push(PriceCheckWindow as unknown as WidgetComponent)
 registry.widgets.push(WidgetItemCheck as unknown as WidgetComponent)
-// registry.widgets.push(WidgetImageStrip as unknown as WidgetComponent)
+registry.widgets.push(WidgetImageStrip as unknown as WidgetComponent)
 registry.widgets.push(WidgetDelveGrid as unknown as WidgetComponent)

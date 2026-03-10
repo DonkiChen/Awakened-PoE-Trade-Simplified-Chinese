@@ -23,7 +23,7 @@
   },
 
   "map.mods.heist": "heist",
-  "map.mods.uber": "T17",
+  "map.mods.uber": "T16+",
   "map.mods.outdated": "outdated",
   "Support development on": "Support development\u00A0on",
 
@@ -54,6 +54,9 @@
     "elemental_dps": "Elemental DPS: {0}",
     "crit": "Critical Strike Chance: {0}%",
     "aps": "Attacks per Second: {0}",
+    "map_item_quantity": "Item Quantity: {0}%",
+    "map_item_rarity": "Item Rarity: {0}%",
+    "map_pack_size": "Monster Pack Size: {0}%",
     "has_empty_modifier": "1 Empty or Crafted Modifier",
     "has_empty_affix": "Any",
     "has_empty_prefix": "Prefix",
@@ -92,7 +95,10 @@
     "veiled": "Veiled",
     "foil_unique": "Foil Unique",
     "mirrored": "Mirrored",
-    "not_mirrored": "Not Mirrored"
+    "not_mirrored": "Not Mirrored",
+    "split": "Split",
+    "not_split": "Not Split",
+    "map_foil_reward": "Foil {0}"
   },
   "item_category": {
     "prop": "Category: {0}",
@@ -168,6 +174,7 @@
     "tag_foulborn": "foulborn",
     "tag_eldritch": "eldritch",
     "tag_pseudo": "pseudo",
+    "tag_not": "not",
     "tag_explicit": "explicit",
     "tag_explicit_shaper": "Shaper",
     "tag_explicit_elder": "Elder",
@@ -277,7 +284,8 @@
     "getting_price_from": "from poe.ninja \u2026",
     "you_have": "You have",
     "stack": "Stack",
-    "legacy_bulk_xchg_msg": "Please use the in-game Currency Exchange Market for this item."
+    "legacy_bulk_xchg_msg": "This item is available on the Currency Exchange Market.",
+    "market_ratio": "Market Ratio"
   },
   "settings": {
     "title": "Settings - Awakened PoE Trade Simplified Chinese",

@@ -47,6 +47,7 @@
 
   "Blighted": "Заражённая",
   "Blight-ravaged": "Разорённая Скверной",
+  "Magic": "Волшебный",
   "Shaper": "Создатель",
   "Elder": "Древний",
   "Crusader": "Крестоносец",
@@ -71,6 +72,9 @@
     "elemental_dps": "Стихийный ДПС: {0}",
     "crit": "Шанс критического удара: {0}%",
     "aps": "Атак в секунду: {0}",
+    "map_item_quantity": "Количество предметов: {0}%",
+    "map_item_rarity": "Редкость предметов: {0}%",
+    "map_pack_size": "Размер групп монстров: {0}%",
     "has_empty_modifier": "1 свободное или ремесленное свойство",
     "has_empty_affix": "Любое",
     "has_empty_prefix": "Префикс",
@@ -109,7 +113,10 @@
     "veiled": "Завуалирован",
     "foil_unique": "Реликвия",
     "mirrored": "Отражено",
-    "not_mirrored": "Не отражено"
+    "not_mirrored": "Не отражено",
+    "split": "Разделено",
+    "not_split": "Не разделено",
+    "map_foil_reward": "Особая {0}"
   },
   "item_category": {
     "prop": "Категория: {0}",
@@ -185,6 +192,7 @@
     "tag_foulborn": "нечестивый",
     "tag_eldritch": "зловещий",
     "tag_pseudo": "псевдо",
+    "tag_not": "нет",
     "tag_explicit": "свойство",
     "tag_explicit_shaper": "Создатель",
     "tag_explicit_elder": "Древний",
@@ -293,7 +301,8 @@
     "getting_price_from": "с poe.ninja \u2026",
     "you_have": "В наличии",
     "stack": "Стак",
-    "legacy_bulk_xchg_msg": "Используйте внутриигровой рынок обмена валюты для этого предмета."
+    "legacy_bulk_xchg_msg": "Этот предмет доступен на внутриигровом рынке обмена валют.",
+    "market_ratio": "Рыночный курс"
   },
   "settings": {
     "title": "Настройки - Awakened PoE Trade",

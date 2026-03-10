@@ -5,8 +5,9 @@ import { FilterTag, ItemHasEmptyModifier, StatFilter } from './interfaces'
 import { filterPseudo } from './pseudo'
 import { applyRules as applyAtzoatlRules } from './pseudo/atzoatl-rules'
 import { applyRules as applyMirroredTabletRules } from './pseudo/reflection-rules'
-import { applyRules as applyT17MapRules } from './pseudo/t17-map-rules'
 import { filterItemProp, filterBasePercentile, filterMemoryStrands } from './pseudo/item-property'
+import { mapProps, valdoBadMods } from './pseudo/maps'
+import { applyFlaskHybridMod } from './pseudo/flasks'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
 import { StatBetter, CLIENT_STRINGS, CLIENT_STRINGS_REF } from '@/assets/data'
 
@@ -32,7 +33,7 @@ export function createExactStatFilters (
     !item.isSynthesised
   ) return []
 
-  const keepByType = [ModifierType.Pseudo, ModifierType.Fractured, ModifierType.Enchant, ModifierType.Necropolis]
+  const keepByType = [ModifierType.Pseudo, ModifierType.Fractured, ModifierType.Enchant, ModifierType.Necropolis, ModifierType.Imbued]
 
   if (
     !item.influences.length &&
@@ -55,23 +56,23 @@ export function createExactStatFilters (
     keepByType.push(ModifierType.Explicit)
   }
 
-  if (item.mapTier === 17) {
-    keepByType.push(ModifierType.Explicit)
-  }
-
   if (item.category === ItemCategory.Flask) {
     keepByType.push(ModifierType.Crafted)
   }
 
   const ctx: FiltersCreationContext = {
     item,
-    searchInRange: Math.min(2, opts.searchStatRange),
+    searchInRange: (item.category !== ItemCategory.Map)
+      ? Math.min(2, opts.searchStatRange)
+      : opts.searchStatRange,
     filters: [],
     statsByType: statsByType.filter(calc => keepByType.includes(calc.type))
   }
 
   filterBasePercentile(ctx)
   filterMemoryStrands(ctx)
+  mapProps(ctx)
+  valdoBadMods(ctx)
 
   ctx.filters.push(
     ...ctx.statsByType.map(mod => calculatedStatToFilter(mod, ctx.searchInRange, item))
@@ -85,10 +86,15 @@ export function createExactStatFilters (
     applyMirroredTabletRules(ctx.filters)
     return ctx.filters
   }
-  if (item.mapTier === 17) {
-    applyT17MapRules(ctx.filters)
+  if (item.category === ItemCategory.Map) {
+    for (const filter of ctx.filters) {
+      if (filter.tag !== FilterTag.Property && filter.tag !== FilterTag.Pseudo) {
+        filter.disabled = false
+      }
+    }
     return ctx.filters
   }
+
   for (const filter of ctx.filters) {
     filter.hidden = undefined
 
@@ -112,6 +118,7 @@ export function createExactStatFilters (
     applyClusterJewelRules(ctx.filters)
   } else if (item.category === ItemCategory.Flask) {
     applyFlaskRules(ctx.filters)
+    applyFlaskHybridMod(ctx)
   } else if (
     item.category === ItemCategory.MemoryLine ||
     item.category === ItemCategory.SanctumRelic ||
@@ -197,6 +204,10 @@ export function calculatedStatToFilter (
         value: sources[0].contributes!.value
       },
       disabled: false
+    }
+
+    if (filter.oils) {
+      filter.disabled = true
     }
   }
 
@@ -361,6 +372,12 @@ function hideNotVariableStat (filter: StatFilter, item: ParsedItem) {
     filter.roll.max = undefined
     filter.hidden = 'filters.hide_const_roll'
   }
+
+  if (item.isFoulborn && filter.tag === FilterTag.Explicit) {
+    // some mod not being replaced with foulborn one can be important
+    filter.hidden = undefined
+    filter.disabled = false
+  }
 }
 
 function filterFillMinMax (
@@ -412,6 +429,7 @@ function finalFilterTweaks (ctx: FiltersCreationContext) {
     applyClusterJewelRules(ctx.filters)
   } else if (item.category === ItemCategory.Flask) {
     applyFlaskRules(ctx.filters)
+    applyFlaskHybridMod(ctx)
   }
 
   const hasEmptyModifier = showHasEmptyModifier(ctx)

@@ -5,9 +5,8 @@
         :filter="filters.linkedSockets" :name="t('item.linked_sockets')" />
       <filter-btn-numeric v-if="filters.mapTier"
         :filter="filters.mapTier" :name="t('item.map_tier')" />
-      <filter-btn-logical v-if="filters.mapReward" readonly
-        :filter="{ disabled: false }"
-        :text="item.mapReward!" />
+      <filter-btn-logical v-if="filters.mapCompletionReward" readonly
+        :filter="{ disabled: false }" :text="t('item.map_foil_reward', [filters.mapCompletionReward.name])" />
       <filter-btn-numeric v-if="filters.areaLevel"
         :filter="filters.areaLevel" :name="t('item.area_level')" />
       <filter-btn-numeric v-if="filters.heistWingsRevealed"
@@ -16,8 +15,6 @@
         :filter="filters.sentinelCharge" :name="t('item.sentinel_charge')" />
       <filter-btn-logical v-if="filters.mapBlighted" readonly
         :filter="{ disabled: false }" :text="filters.mapBlighted.value" />
-      <filter-btn-logical v-if="filters.rarity?.value === 'magic'" readonly
-        :filter="{ disabled: false }" text="Magic" />
       <filter-btn-logical v-if="filters.discriminator?.value" readonly
         :filter="{ disabled: false }" :text="filters.discriminator.value" />
       <filter-btn-numeric v-if="filters.itemLevel"
@@ -40,14 +37,18 @@
         <filter-btn-logical v-for="influence of filters.influences" :key="influence.value"
           :filter="influence" :text="influence.value" :img="`/images/influence-${influence.value}.png`" />
       </template>
+      <filter-btn-logical v-if="filters.rarity?.value === 'magic'"
+        :filter="filters.rarity" text="Magic" />
       <filter-btn-logical v-if="filters.unidentified"
         :filter="filters.unidentified" :text="t('item.unidentified')" />
       <filter-btn-logical v-if="filters.veiled"
         :filter="filters.veiled" :text="t('item.veiled')" />
       <filter-btn-logical v-if="filters.foil"
         :filter="filters.foil" :text="t('item.foil_unique')" />
-      <filter-btn-logical v-if="filters.mirrored" active
+      <filter-btn-logical v-if="filters.mirrored && !filters.mirrored.hidden" active
         :filter="filters.mirrored" :text="t(filters.mirrored.disabled ? 'item.not_mirrored' : 'item.mirrored')" />
+      <filter-btn-logical v-if="filters.split && !filters.split.hidden" active
+        :filter="filters.split" :text="t(filters.split.disabled ? 'item.not_split' : 'item.split')" />
       <filter-btn-logical v-if="hasStats"
         :collapse="statsVisibility.disabled"
         :filter="statsVisibility"
@@ -146,7 +147,7 @@ export default defineComponent({
     const showUnknownMods = computed(() =>
       props.item.unknownModifiers.length &&
       props.item.category !== ItemCategory.Sentinel &&
-      !(props.item.category === ItemCategory.Map && props.item.rarity === ItemRarity.Unique)
+      props.item.category !== ItemCategory.Map
     )
 
     const { t } = useI18n()

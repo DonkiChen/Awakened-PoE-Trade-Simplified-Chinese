@@ -25,6 +25,7 @@ export interface ItemFilters {
   }
   rarity?: {
     value: string
+    disabled: boolean
   }
   linkedSockets?: FilterNumeric
   whiteSockets?: FilterNumeric
@@ -36,10 +37,18 @@ export interface ItemFilters {
     exact?: boolean
   }
   fractured?: {
-    value: boolean
+    value: false
+  }
+  imbuedGem?: {
+    disabled: true
   }
   mirrored?: {
     disabled: boolean
+    hidden: boolean
+  }
+  split?: {
+    disabled: boolean
+    hidden: boolean
   }
   foil?: {
     disabled: boolean
@@ -57,6 +66,10 @@ export interface ItemFilters {
   mapReward?: string
   mapBlighted?: {
     value: NonNullable<ParsedItem['mapBlighted']>
+  }
+  mapCompletionReward?: {
+    name: string
+    nameTrade: string
   }
   itemLevel?: FilterNumeric
   stackSize?: FilterNumeric
@@ -95,6 +108,7 @@ export interface StatFilter {
   tag: FilterTag
   oils?: string[]
   sources: StatCalculated['sources']
+  not?: true
   roll?: {
     value: number
     min: number | '' | undefined // NOTE: mutable in UI
@@ -126,7 +140,10 @@ export const INTERNAL_TRADE_IDS = [
   'item.elemental_dps',
   'item.crit',
   'item.aps',
-  'item.has_empty_modifier'
+  'item.has_empty_modifier',
+  'item.map_item_quantity',
+  'item.map_item_rarity',
+  'item.map_pack_size'
 ] as const
 
 export type InternalTradeId = typeof INTERNAL_TRADE_IDS[number]

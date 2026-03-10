@@ -127,7 +127,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 19,
+  configVersion: 20,
   overlayKey: 'Shift + Space',
   overlayBackground: 'rgba(129, 139, 149, 0.15)',
   overlayBackgroundClose: true,
@@ -451,8 +451,14 @@ function upgradeConfig (_config: Config): Config {
 
   if (config.configVersion < 19) {
     config.useIntlSite = ((config.language === 'cmn-Hant' || config.language === 'zh_CN') && config.realm === 'pc-ggg')
-    config.windowTitle = 'Path of Exile;流放之路'
+
     config.configVersion = 19
+  }
+
+  if (config.configVersion < 20) {
+    config.windowTitle = 'Path of Exile;流放之路'
+
+    config.configVersion = 20
   }
 
   return config as unknown as Config

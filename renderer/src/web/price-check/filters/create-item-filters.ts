@@ -1,11 +1,10 @@
 import type { ItemFilters } from './interfaces'
 import { ParsedItem, ItemCategory, ItemRarity } from '@/parser'
+import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM } from '@/parser/meta'
 import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
-import { PERMANENT_SC } from '../../background/Leagues'
-import { AppConfig } from '@/web/Config'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
 
@@ -28,11 +27,19 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
-      merchantOnly: !PERMANENT_SC.includes(opts.league),
+      merchantOnly: item.category !== ItemCategory.DivinationCard,
       listed: undefined,
       currency: opts.currency,
       league: opts.league,
       collapseListings: opts.collapseListings
+    }
+  }
+
+  if (!opts.currency) {
+    if ((!item.info.craftable || CONSUMABLE_CRAFTABLE_ITEM.has(item.category!)) &&
+      item.rarity !== ItemRarity.Unique
+    ) {
+      filters.trade.currency = 'chaos_divine'
     }
   }
 
@@ -42,7 +49,7 @@ export function createFilters (
   if (item.category === ItemCategory.CapturedBeast) {
     filters.searchExact = {
       baseType: item.info.name,
-      baseTypeTrade: item.info.name // NOTE: 已经更改为现有名称 2024.8.5
+      baseTypeTrade: t(opts, item.info)
     }
     return filters
   }
@@ -84,15 +91,21 @@ export function createFilters (
         value: floorToBracket(item.areaLevel!, [1, 68, 73, 75, 78, 80]),
         disabled: false
       }
-    }
-    if (item.info.refName === 'Mirrored Tablet') {
+    } else if (item.info.refName === 'Mirrored Tablet') {
       filters.areaLevel = {
         value: item.areaLevel!,
         disabled: false
       }
-    }
-    // Incubators, Wombgifts, Forbidden Tome
-    if (item.itemLevel) {
+    } else if (item.info.refName === 'Forbidden Tome') {
+      filters.areaLevel = {
+        value: item.areaLevel!,
+        disabled: false
+      }
+      if (item.areaLevel! < 83) {
+        filters.areaLevel.max = item.areaLevel!
+      }
+    } else if (item.itemLevel) {
+      // Incubators, Wombgifts
       filters.itemLevel = {
         value: item.itemLevel,
         disabled: false
@@ -109,28 +122,32 @@ export function createFilters (
         baseTypeTrade: t(opts, ITEM_BY_REF('ITEM', item.info.unique.base)![0])
       }
     } else {
-      const isOccupiedBy = item.statsByType.some(calc => calc.stat.ref === 'Map is occupied by #')
       filters.searchExact = {
         baseType: item.info.name,
         baseTypeTrade: t(opts, item.info)
       }
-      filters.searchRelaxed = {
-        category: item.category,
-        disabled: !isOccupiedBy
-      }
+    }
+
+    if (item.info.refName === 'Map' || item.info.unique?.base === 'Map') {
+      filters.discriminator = { trade: 'map' }
     }
 
     if (item.mapBlighted) {
       filters.mapBlighted = { value: item.mapBlighted }
     }
 
-    if (item.mapReward) {
-      filters.mapReward = AppConfig().realm === 'pc-ggg' ? ITEM_BY_TRANSLATED('UNIQUE', item.mapReward)![0].refName : ITEM_BY_TRANSLATED('UNIQUE', item.mapReward)![0].name
+    if (item.mapCompletionReward) {
+      filters.mapCompletionReward = {
+        name: item.mapCompletionReward,
+        nameTrade: t(opts, ITEM_BY_TRANSLATED('UNIQUE', item.mapCompletionReward)![0])
+      }
     }
 
-    filters.mapTier = {
-      value: item.mapTier!,
-      disabled: false
+    if (item.map!.tier) {
+      filters.mapTier = {
+        value: item.map!.tier,
+        disabled: false
+      }
     }
   } else if (item.info.refName === 'Expedition Logbook') {
     filters.searchExact = {
@@ -267,7 +284,18 @@ export function createFilters (
 
   if (forAdornedJewel) {
     filters.rarity = {
-      value: 'magic'
+      value: 'magic',
+      disabled: false
+    }
+  } else if (
+    opts.exact &&
+    item.rarity === ItemRarity.Magic &&
+    !CONSUMABLE_CRAFTABLE_ITEM.has(item.category!) &&
+    !MAGIC_ONLY_OR_UNIQUE_ITEM.has(item.category!)
+  ) {
+    filters.rarity = {
+      value: 'magic',
+      disabled: true
     }
   } else if (
     item.rarity === ItemRarity.Normal ||
@@ -275,15 +303,31 @@ export function createFilters (
     item.rarity === ItemRarity.Rare
   ) {
     filters.rarity = {
-      value: 'nonunique'
+      value: 'nonunique',
+      disabled: false
     }
   }
 
   if (item.isMirrored) {
-    filters.mirrored = { disabled: false }
+    filters.mirrored = { disabled: false, hidden: false }
+  } else if (
+    item.info.craftable && !item.isCorrupted
+  ) {
+    filters.mirrored = { disabled: true, hidden: true }
   }
 
-  if (!item.isFractured && opts.exact) {
+  if (item.isSplit) {
+    filters.split = { disabled: false, hidden: false }
+  } else if (
+    item.info.craftable && !item.isCorrupted && !item.isMirrored &&
+    !item.isSynthesised && !item.isFractured && !item.influences.length
+  ) {
+    filters.split = { disabled: true, hidden: true }
+  }
+
+  if (!item.isFractured &&
+    (item.info.craftable && !item.isCorrupted && !item.isMirrored)
+  ) {
     filters.fractured = { value: false }
   }
 
@@ -406,6 +450,12 @@ function createGemFilters (
 
   filters.corrupted = {
     value: item.isCorrupted
+  }
+
+  if (!item.imbuedGem && item.isCorrupted && item.gemLevel! >= 20) {
+    filters.imbuedGem = {
+      disabled: true
+    }
   }
 
   if (item.info.gem!.awakened) {

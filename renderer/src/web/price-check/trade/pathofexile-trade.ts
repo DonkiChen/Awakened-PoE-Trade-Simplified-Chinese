@@ -1,4 +1,4 @@
-import { ItemInfluence, ItemCategory, ParsedItem, ItemRarity } from '@/parser'
+import { ItemInfluence, ItemCategory, ParsedItem } from '@/parser'
 import { ItemFilters, StatFilter, INTERNAL_TRADE_IDS, InternalTradeId } from '../filters/interfaces'
 import { setProperty as propSet } from 'dot-prop'
 import { DateTime } from 'luxon'
@@ -80,11 +80,6 @@ const INFLUENCE_PSEUDO_TEXT = {
   [ItemInfluence.Warlord]: stat('Has Warlord Influence')
 }
 
-const FLASK = {
-  INCR_CHARGE_RECOVERY: stat('#% increased Charge Recovery'),
-  INCR_EFFECT: stat('#% increased effect')
-}
-
 interface FilterBoolean { option?: 'true' | 'false' }
 interface FilterRange { min?: number, max?: number }
 
@@ -136,7 +131,9 @@ interface TradeRequest { /* eslint-disable camelcase */
           gem_level?: FilterRange
           corrupted?: FilterBoolean
           fractured_item?: FilterBoolean
+          gem_imbued?: FilterBoolean
           mirrored?: FilterBoolean
+          split?: FilterBoolean
           identified?: FilterBoolean
           stack_size?: FilterRange
           memory_level?: FilterRange
@@ -165,9 +162,13 @@ interface TradeRequest { /* eslint-disable camelcase */
       map_filters?: {
         filters: {
           map_tier?: FilterRange
+          map_iiq?: FilterRange
+          map_iir?: FilterRange
+          map_packsize?: FilterRange
           map_blighted?: FilterBoolean
           map_uberblighted?: FilterBoolean
           area_level?: FilterRange
+          map_completion_reward?: { option?: 'any' | string }
         }
       }
       heist_filters?: {
@@ -307,7 +308,7 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
   if (filters.foil && !filters.foil.disabled) {
     propSet(query.filters, 'type_filters.filters.rarity.option', 'uniquefoil')
   } else if (filters.rarity) {
-    propSet(query.filters, 'type_filters.filters.rarity.option', filters.rarity.value)
+    propSet(query.filters, 'type_filters.filters.rarity.option', (filters.rarity.disabled) ? 'nonunique' : filters.rarity.value)
   }
 
   if (activeSearch.category) {
@@ -325,18 +326,16 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
   if (filters.fractured?.value === false) {
     propSet(query.filters, 'misc_filters.filters.fractured_item.option', String(false))
   }
+  if (filters.imbuedGem?.disabled) {
+    propSet(query.filters, 'misc_filters.filters.gem_imbued.option', String(false))
+  }
+  if (filters.split?.disabled) {
+    propSet(query.filters, 'misc_filters.filters.split.option', String(false))
+  }
   if (filters.foulborn?.value === false) {
     propSet(query.filters, 'misc_filters.filters.foulborn_item.option', String(false))
   }
-  if (filters.mirrored) {
-    if (filters.mirrored.disabled) {
-      propSet(query.filters, 'misc_filters.filters.mirrored.option', String(false))
-    }
-  } else if (
-    item.rarity === ItemRarity.Normal ||
-    item.rarity === ItemRarity.Magic ||
-    item.rarity === ItemRarity.Rare
-  ) {
+  if (filters.mirrored?.disabled) {
     propSet(query.filters, 'misc_filters.filters.mirrored.option', String(false))
   }
 
@@ -396,12 +395,19 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
     }
   }
 
+  if (filters.mapCompletionReward) {
+    propSet(query.filters, 'map_filters.filters.map_completion_reward.option', filters.mapCompletionReward.nameTrade)
+  }
+
   if (filters.unidentified && !filters.unidentified.disabled) {
     propSet(query.filters, 'misc_filters.filters.identified.option', String(false))
   }
 
   if (filters.areaLevel && !filters.areaLevel.disabled) {
     propSet(query.filters, 'map_filters.filters.area_level.min', filters.areaLevel.value)
+    if (filters.areaLevel.max) {
+      propSet(query.filters, 'map_filters.filters.area_level.max', filters.areaLevel.max)
+    }
   }
 
   if (filters.heistWingsRevealed && !filters.heistWingsRevealed.disabled) {
@@ -437,25 +443,6 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
         filters: [
           { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: stat.disabled },
           { id: TARGET_ID.TOTAL_MODIFIERS, value: { min: 6, max: undefined }, disabled: stat.disabled }
-        ]
-      })
-    } else if ( // https://github.com/SnosMe/awakened-poe-trade/issues/758
-      item.category === ItemCategory.Flask &&
-      stat.statRef === FLASK.INCR_CHARGE_RECOVERY &&
-      !stats.some(s => s.statRef === FLASK.INCR_EFFECT)
-    ) {
-      const statGroup = STAT_BY_REF_V2(FLASK.INCR_EFFECT)!
-      if (!('stats' in statGroup && statGroup.resolve.strat === 'select')) {
-        throw new Error(`Unexpected stat shape: ${FLASK.INCR_EFFECT}`)
-      }
-      const incrStat = statGroup.stats[statGroup.resolve.test.indexOf(null)]
-
-      const reducedEffectId = incrStat.trade.ids[ModifierType.Explicit][0]
-      query.stats.push({
-        type: 'not',
-        disabled: stat.disabled,
-        filters: [
-          { id: reducedEffectId, disabled: stat.disabled }
         ]
       })
     }
@@ -512,6 +499,18 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
         propSet(query.filters, 'weapon_filters.filters.aps.min', typeof input.min === 'number' ? input.min : undefined)
         propSet(query.filters, 'weapon_filters.filters.aps.max', typeof input.max === 'number' ? input.max : undefined)
         break
+      case 'item.map_item_quantity':
+        propSet(query.filters, 'map_filters.filters.map_iiq.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_iiq.max', typeof input.max === 'number' ? input.max : undefined)
+        break
+      case 'item.map_item_rarity':
+        propSet(query.filters, 'map_filters.filters.map_iir.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_iir.max', typeof input.max === 'number' ? input.max : undefined)
+        break
+      case 'item.map_pack_size':
+        propSet(query.filters, 'map_filters.filters.map_packsize.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_packsize.max', typeof input.max === 'number' ? input.max : undefined)
+        break
     }
   }
 
@@ -541,17 +540,32 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[], i
   }
 
   const qAnd = query.stats[0]
+  const qNot: TradeRequest['query']['stats'][number] = {
+    type: 'not',
+    filters: []
+  }
+
   for (const stat of realStats) {
-    if (stat.tradeId.length === 1) {
-      qAnd.filters.push(tradeIdToQuery(stat.tradeId[0], stat))
+    if (stat.not) {
+      for (const id of stat.tradeId) {
+        qNot.filters.push(tradeIdToQuery(id, stat))
+      }
     } else {
-      query.stats.push({
-        type: 'count',
-        value: { min: 1 },
-        disabled: stat.disabled,
-        filters: stat.tradeId.map(id => tradeIdToQuery(id, stat))
-      })
+      if (stat.tradeId.length === 1) {
+        qAnd.filters.push(tradeIdToQuery(stat.tradeId[0], stat))
+      } else {
+        query.stats.push({
+          type: 'count',
+          value: { min: 1 },
+          disabled: stat.disabled,
+          filters: stat.tradeId.map(id => tradeIdToQuery(id, stat))
+        })
+      }
     }
+  }
+
+  if (qNot.filters.length) {
+    query.stats.push(qNot)
   }
 
   return body

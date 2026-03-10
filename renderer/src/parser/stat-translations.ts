@@ -136,14 +136,15 @@ function * _statPlaceholderGenerator (stat: string) {
 export function tryParseTranslation (
   stat: StatString,
   modType: ModifierType,
-  itemCategory?: ItemCategory
+  itemCategory: ItemCategory | undefined
 ): ParsedStat | undefined {
   for (const combination of _statPlaceholderGenerator(stat.string)) {
-    const found = findAndResolveTranslation(
-      combination.stat,
-      itemCategory,
-      (combination.values.length === 1) ? combination.values[0].roll : undefined
-    )
+    const found = findAndResolveTranslation({
+      matchStr: combination.stat,
+      modType: modType,
+      itemCategory: itemCategory,
+      roll: (combination.values.length === 1) ? combination.values[0].roll : undefined
+    })
     if (!found || !(modType in found.stat.trade.ids)) {
       continue
     }
@@ -229,11 +230,17 @@ export function getRollOrMinmaxAvg (values: number[]): number {
   }
 }
 
+interface FindResolveParams {
+  matchStr: string
+  modType: ModifierType
+  itemCategory: ItemCategory | undefined
+  roll: number | undefined
+}
+
 function findAndResolveTranslation (
-  matchStr: string,
-  itemCategory?: ItemCategory,
-  roll?: number
+  params: FindResolveParams
 ): { matcher: StatMatcher, stat: Stat } | undefined {
+  const { matchStr } = params
   const statOrGroup = STAT_BY_MATCH_STR_V2(matchStr)
   if (!statOrGroup) return undefined
 
@@ -241,7 +248,7 @@ function findAndResolveTranslation (
   if (!('stats' in statOrGroup)) {
     stat = statOrGroup
   } else {
-    stat = _resolveTranslation(statOrGroup, matchStr, itemCategory, roll)
+    stat = _resolveTranslation(statOrGroup, params)
   }
 
   if (stat) {
@@ -253,13 +260,12 @@ function findAndResolveTranslation (
   return undefined
 }
 
-function _resolveTranslation (
+export function _resolveTranslation (
   statGroup: StatGroup,
-  matchStr: string,
-  itemCategory?: ItemCategory,
-  roll?: number
+  params: FindResolveParams
 ): Stat | undefined {
-  let { resolve, stats } = statGroup
+  const { resolve, stats } = statGroup
+  const { matchStr, modType, itemCategory, roll } = params
   if (resolve.strat === 'select') {
     // give priority to exact match
     let idx = resolve.test.findIndex(expected => expected !== null &&
@@ -267,12 +273,19 @@ function _resolveTranslation (
     // fallback to any match (if it exists at all)
     if (idx === -1) idx = resolve.test.indexOf(null)
     return (idx !== -1) ? stats[idx] : undefined
-  } else if (resolve.strat === 'trivial-merge') {
-    stats = stats.filter(stat =>
-      stat.matchers.some(m => m.string === matchStr || m.advanced === matchStr))
-    if (!stats.length) return undefined
-    const merged = stats[0]
-    for (const stat of stats) {
+  }
+
+  const onTradeStats = stats.filter(stat => (modType in stat.trade.ids))
+  if (onTradeStats.length === 1) return onTradeStats[0]
+
+  if (resolve.strat === 'trivial-merge') {
+    const withMatchStr = (matchStr.length)
+      ? onTradeStats.filter(stat =>
+        stat.matchers.some(m => m.string === matchStr || m.advanced === matchStr))
+      : onTradeStats
+    if (!withMatchStr.length) return undefined
+    const merged = withMatchStr[0]
+    for (const stat of withMatchStr) {
       if (merged === stat) continue
       _mergeTradeIdsInto(merged, stat)
     }
@@ -300,7 +313,6 @@ function _resolveTranslation (
     }
     return valStat
   }
-
   return undefined
 }
 

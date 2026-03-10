@@ -1,16 +1,16 @@
 {
   "please_wait": "请等待\u2026",
   "choose_file": "选择文件",
-  "browse": "浏览",
   "app_is_ready": "已经准备就绪并且已经在后台运行",
   "reopen_settings": "按{0}继续编辑",
   "seconds": "秒",
   "league": "赛季",
   "realm": "服务器",
   "realm_intl": "国际服",
+
+  "browse": "浏览",
   "realm_garena": "台服",
   "realm_tencent": "国服",
-
   "Log level": "日志级别",
   "itemName": "物品名称",
   "Add": "添加",
@@ -53,7 +53,9 @@
     "quit": "退出"
   },
 
+
   "map.mods.heist": "夺宝",
+  "map.mods.uber": "T17",
   "map.mods.outdated": "过时",
   "Support development on": "支持原作者开发",
   "Support development CN on": "支持简中作者开发",
@@ -67,7 +69,6 @@
   "Hunter": "狩猎者",
   "Redeemer": "救赎者",
   "Warlord": "督军",
-
   "Superior": "精良",
   "Anomalous": "异常",
   "Divergent": "分歧",
@@ -86,6 +87,9 @@
     "elemental_dps": "元素DPS: {0}",
     "crit": "暴击率: {0}%",
     "aps": "每秒攻击次数: {0}",
+    "map_item_quantity": "物品数量: {0}%",
+    "map_item_rarity": "物品稀有度: {0}%",
+    "map_pack_size": "怪物群大小: {0}%",
     "has_empty_modifier": "1个空词缀或工艺词缀",
     "has_empty_affix": "空词缀",
     "has_empty_prefix": "空前缀",
@@ -126,7 +130,8 @@
     "veiled": "隐匿",
     "foil_unique": "古藏传奇",
     "mirrored": "已复制",
-    "not_mirrored": "未复制"
+    "not_mirrored": "未复制",
+    "map_foil_reward": "烫金 {0}"
   },
   "item_category": {
     "prop": "类型: {0}",
@@ -166,8 +171,11 @@
     "heistequipment_heistweapon": "夺宝装置",
     "heistequipment_heistutility": "夺宝斗篷",
     "accessory_trinket": "饰品",
+    "sanctum_relic": "禁域遗物",
     "tincture": "酊剂",
-    "azmeri_charm": "咒符"
+    "azmeri_charm": "咒符",
+    "idol": "雕像",
+    "graft": "移植物"
   },
   "filters": {
     "selected_some": "词缀: {0}/{1}",
@@ -187,17 +195,19 @@
     "hide_anointment": "买家可能会更改涂油",
     "hide_for_crafting": "当你只想查询基底价格的时候才选取",
     "hide_empty_mod": "当物品有6个词缀(其中1个是工艺词缀)，或是5个词缀才选取",
+
     "tag_implicit": "固定",
-    "tag_explicit": "随机",
-    "tag_enchant": "附魔",
-    "tag_crafted": "工艺",
     "tag_fractured": "破裂",
+    "tag_crafted": "工艺",
     "tag_scourge": "天灾",
+    "tag_enchant": "附魔",
     "tag_variant": "种类",
     "tag_corrupted": "已腐化",
     "tag_synthesised": "忆境",
+    "tag_foulborn": "秽生",
     "tag_eldritch": "古灵",
     "tag_pseudo": "伪属性",
+    "tag_explicit": "随机",
     "tag_explicit_shaper": "塑界者",
     "tag_explicit_elder": "裂界者",
     "tag_explicit_crusader": "圣战者",
@@ -221,7 +231,8 @@
     "listed_2months": "2月内",
     "currency_any": "所有通货",
     "currency_only_chaos": "混沌石",
-    "currency_only_div": "神圣石"
+    "currency_only_div": "神圣石",
+    "currency_chaos_div": "混沌石或神圣石"
   },
   "widget": {
     "title": "组件标题",
@@ -304,7 +315,9 @@
     "getting_price": "正在获取价格{0}",
     "getting_price_from": "从poe.ninja \u2026",
     "you_have": "你拥有",
-    "stack": "堆叠"
+    "stack": "堆叠",
+    "legacy_bulk_xchg_msg": "This item is available on the Currency Exchange Market.",
+    "market_ratio": "Market Ratio"
   },
   "settings": {
     "title": "设置 - Awakened PoE Trade Simplified Chinese By 红尘渡者 and DonkiChen",
@@ -334,7 +347,9 @@
     "poe_log_file" :"PoE日志文件",
     "poe_cfg_file" :"PoE配置文件",
     "restore_clipboard" :"恢复剪贴板",
-    "show_overlay_ready" :"打开流放之路时显示通知"
+    "show_overlay_ready" :"打开流放之路时显示通知",
+    "debug_hotkeys": "Record all key presses",
+    "use_intl_site": "Force the English version of the site"
   },
   "price_check": {
     "name": "价格搜索",
