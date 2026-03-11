@@ -193,8 +193,16 @@ async function fetchUint32Array (url: string) {
 }
 
 async function importClientStrings (url: string) {
-  const module = await import(/* @vite-ignore */url)
-  return module.default as TranslationDict
+  const response = await fetch(url)
+  const moduleSource = await response.text()
+  const moduleUrl = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }))
+
+  try {
+    const module = await import(/* @vite-ignore */moduleUrl)
+    return module.default as TranslationDict
+  } finally {
+    URL.revokeObjectURL(moduleUrl)
+  }
 }
 
 export function hydrateStaticData (data: StaticDataPayload) {
