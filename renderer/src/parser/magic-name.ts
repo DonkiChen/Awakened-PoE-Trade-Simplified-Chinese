@@ -1,8 +1,9 @@
-import { AppConfig } from '@/web/Config'
 import { ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
+import { parserRealm } from './runtime'
 
 export function magicBasetype (name: string) {
-  const sep = (AppConfig().realm !== 'pc-ggg') ? '' : ' '
+  const realm = parserRealm()
+  const sep = (realm !== 'pc-ggg') ? '' : ' '
   const words = name.split(sep)
 
   const perm: string[] = words.flatMap((_, start) =>
@@ -15,7 +16,7 @@ export function magicBasetype (name: string) {
 
   const result = perm
     .map(name => {
-      const result = (AppConfig().realm !== 'pc-ggg') ? ITEM_BY_TRANSLATED('ITEM', name) : ITEM_BY_REF('ITEM', name)
+      const result = (realm !== 'pc-ggg') ? ITEM_BY_TRANSLATED('ITEM', name) : ITEM_BY_REF('ITEM', name)
       return { name, found: (result && result[0].craftable) }
     })
     .filter(res => res.found)
