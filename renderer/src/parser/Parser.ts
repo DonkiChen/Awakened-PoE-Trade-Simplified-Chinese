@@ -14,6 +14,7 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedIt
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
+import { matchesClientString } from './client-string-variants'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -793,7 +794,7 @@ function parseMirrored (section: string[], item: ParsedItem) {
 
 function parseSplit (section: string[], item: ParsedItem) {
   if (section.length === 1) {
-    if (section[0] === _$.SPLIT) {
+    if (matchesClientString('SPLIT', section[0])) {
       item.isSplit = true
       return 'SECTION_PARSED'
     }

@@ -1,6 +1,7 @@
 import { CLIENT_STRINGS as _$ } from '@/assets/data'
 import type { ParsedStat } from './stat-translations'
 import { ModifierType } from './modifiers'
+import { matchesClientString } from './client-string-variants'
 
 export const SCOURGE_LINE = ' (scourge)'
 export const ENCHANT_LINE = ' (enchant)'
@@ -53,36 +54,24 @@ export function parseModInfoLine (line: string): ModifierInfo {
       throw new Error('Invalid regex for mod info line')
     }
 
-    // TODO: 2026/03/08
-    switch (match.groups!.type) {
-      case _$.IMPLICIT_MODIFIER:
-      case _$.CORRUPTED_IMPLICIT:
-        type = ModifierType.Implicit; break
-      case _$.FRACTURED_PREFIX:
-      case _$.FRACTURED_SUFFIX:
-        type = ModifierType.Fractured; break
-      case _$.CRAFTED_PREFIX:
-      case _$.CRAFTED_SUFFIX:
-        type = ModifierType.Crafted; break
+    const typeText = match.groups!.type
+
+    if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT'], typeText, 'modifierType')) {
+      type = ModifierType.Implicit
+    } else if (matchesClientString(['FRACTURED_PREFIX', 'FRACTURED_SUFFIX'], typeText, 'modifierType')) {
+      type = ModifierType.Fractured
+    } else if (matchesClientString(['CRAFTED_PREFIX', 'CRAFTED_SUFFIX'], typeText, 'modifierType')) {
+      type = ModifierType.Crafted
     }
 
-    switch (match.groups!.type) {
-      case _$.PREFIX_MODIFIER:
-      case '▲ 前缀词缀':
-      case _$.FRACTURED_PREFIX:
-      case _$.CRAFTED_PREFIX:
-      case '▲ 工艺前缀':
-        generation = 'prefix'; break
-      case _$.SUFFIX_MODIFIER:
-      case '▽ 后缀词缀':
-      case _$.FRACTURED_SUFFIX:
-      case _$.CRAFTED_SUFFIX:
-      case '▽ 工艺后缀':
-        generation = 'suffix'; break
-      case _$.CORRUPTED_IMPLICIT:
-        generation = 'corrupted'; break
-      case _$.FOULBORN_MODIFIER:
-        generation = 'foulborn'; break
+    if (matchesClientString(['PREFIX_MODIFIER', 'FRACTURED_PREFIX', 'CRAFTED_PREFIX'], typeText, 'modifierGeneration')) {
+      generation = 'prefix'
+    } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText, 'modifierGeneration')) {
+      generation = 'suffix'
+    } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText, 'modifierGeneration')) {
+      generation = 'corrupted'
+    } else if (matchesClientString('FOULBORN_MODIFIER', typeText, 'modifierGeneration')) {
+      generation = 'foulborn'
     }
 
     name = match.groups!.name ?? undefined
