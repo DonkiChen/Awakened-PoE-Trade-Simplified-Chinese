@@ -1,0 +1,18 @@
+# Project Overview
+- Purpose: Chinese-localized fork of Awakened PoE Trade, a desktop Path of Exile trade and overlay helper. This is inferred from the repository name, README title, and the Electron/Vue package split.
+- Primary runtime split:
+  - `main/`: Electron main process, native windowing, shortcuts, overlay lifecycle, updater, packaging.
+  - `renderer/`: Vue 3 + Vite frontend UI, item parsing, widgets, localization, static assets.
+  - `ipc/`: shared TypeScript types and key-code mappings used by both runtimes.
+  - `docs/`: VitePress documentation site.
+  - `Awakened-PoE-Trade-CN-Helper/`: separate helper/data-generation subproject with its own Gradle and nested JS tooling.
+- Internal layout worth knowing:
+  - `renderer/src/assets`, `renderer/src/parser`, `renderer/src/web`
+  - `main/src/host-files`, `main/src/shortcuts`, `main/src/vision`, `main/src/windowing`
+- Tech stack:
+  - TypeScript across the repo
+  - Renderer: Vue 3, Vite 5, vue-tsc, Vue I18n, TailwindCSS, ESLint
+  - Main: Electron 40, electron-builder, electron-updater, TypeScript
+  - Docs: VitePress, Vue, TailwindCSS
+- Architectural guideline: keep feature code close to its runtime domain; overlay UI belongs under `renderer/src/web/overlay/`, while Electron host behavior belongs under `main/src/`.
+- Development note: `main` and `renderer` depend on each other during local development; the app is effectively developed as two coordinated packages.
