@@ -166,7 +166,7 @@ export const defaultConfig = (): Config => ({
   }],
   clientLog: null,
   gameConfig: null,
-  windowTitle: 'Path of Exile',
+  windowTitle: 'Path of Exile;流放之路',
   logKeys: false,
   accountName: '',
   stashScroll: true,
