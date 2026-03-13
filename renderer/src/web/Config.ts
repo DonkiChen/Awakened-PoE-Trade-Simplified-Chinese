@@ -84,8 +84,8 @@ export async function initConfig () {
   pushHostConfig()
 }
 
-export function poeWebApi () {
-  const { language, useIntlSite } = AppConfig()
+export function poeWebApi (config: Pick<Config, 'language' | 'useIntlSite'> = AppConfig()) {
+  const { language, useIntlSite } = config
   if (useIntlSite) {
     return 'www.pathofexile.com'
   }

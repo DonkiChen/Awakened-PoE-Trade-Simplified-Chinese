@@ -2,7 +2,7 @@
   <div class="max-w-md p-2">
     <div class="mb-2" v-if="!leagues.error.value">
       <div class="flex-1 mb-1">{{ t('league') }}
-        <button class="btn" @click="leagues.load" :disabled="leagues.isLoading.value">{{ t('Refresh') }}</button>
+        <button class="btn" @click="refreshLeagues" :disabled="leagues.isLoading.value">{{ t('Refresh') }}</button>
       </div>
       <div v-if="leagues.isLoading.value" class="mb-4">
         <i class="fas fa-info-circle text-gray-600"></i> {{ t('app.leagues_loading') }}</div>
@@ -21,7 +21,7 @@
       <template #name>{{ t('app.leagues_failed') }}</template>
       <p>{{ t('app.leagues_failed_help_alt') }}</p>
       <template #actions>
-        <button class="btn" @click="leagues.load">{{ t('Retry') }}</button>
+        <button class="btn" @click="refreshLeagues">{{ t('Retry') }}</button>
       </template>
     </ui-error-box>
     <div class="mb-2">
@@ -105,7 +105,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, onMounted, shallowRef } from 'vue'
 import { useI18nNs } from '@/web/i18n'
 import UiRadio from '@/web/ui/UiRadio.vue'
 import UiCheckbox from '@/web/ui/UiCheckbox.vue'
@@ -113,7 +113,7 @@ import UiToggle from '@/web/ui/UiToggle.vue'
 import UiErrorBox from '@/web/ui/UiErrorBox.vue'
 import { configModelValue, configProp, findWidget } from '../settings/utils.js'
 import type { PriceCheckWidget } from '@/web/overlay/interfaces'
-import { useLeagues } from '../background/Leagues'
+import { leaguesDependencyKey, useLeagues } from '../background/Leagues'
 
 export default defineComponent({
   name: 'price_check.name',
@@ -122,14 +122,40 @@ export default defineComponent({
   setup (props) {
     const configWidget = computed(() => findWidget<PriceCheckWidget>('price-check', props.config)!)
 
-    const leagues = useLeagues()
+    const sharedLeagues = useLeagues()
+    const localLeagues = useLeagues(props.config)
+    // Keep the original behavior on first open by showing the shared league
+    // state, and switch to the draft-bound state after manual or auto refresh.
+    const leagues = shallowRef(sharedLeagues)
     const { t } = useI18nNs('price_check')
+
+    async function refreshLeagues () {
+      // Refresh/Retry should use the current draft settings without overwriting
+      // the shared league state used by the rest of the app.
+      leagues.value = localLeagues
+      await localLeagues.load()
+    }
+
+    onMounted(() => {
+      const currentDependencyKey = leaguesDependencyKey(props.config)
+      const localDependencyKey = localLeagues.lastAttemptedDependencyKey.value
+      if (localDependencyKey === currentDependencyKey) {
+        leagues.value = localLeagues
+        return
+      }
+
+      const baselineDependencyKey = localDependencyKey ?? sharedLeagues.lastAttemptedDependencyKey.value
+      if (baselineDependencyKey != null && baselineDependencyKey !== currentDependencyKey) {
+        refreshLeagues()
+      }
+    })
 
     return {
       t,
+      refreshLeagues,
       leagueId: configModelValue(() => props.config, 'leagueId'),
       customLeagueId: computed<string>({
-        get: () => !leagues.list.value.some(league => league.id === props.config.leagueId)
+        get: () => !leagues.value.list.value.some(league => league.id === props.config.leagueId)
           ? props.config.leagueId ?? ''
           : '',
         set: (value) => { props.config.leagueId = value }
