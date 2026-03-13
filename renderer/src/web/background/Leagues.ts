@@ -1,6 +1,7 @@
 import { computed, shallowRef, readonly } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { AppConfig, poeWebApi } from '@/web/Config'
+import type { Config } from '@/web/Config'
 import { Host } from './IPC'
 
 // pc-ggg, pc-garena, pc-tencent
@@ -18,41 +19,58 @@ interface League {
   isPopular: boolean
 }
 
-export const useLeagues = createGlobalState(() => {
+type LeaguesConfigSource = Pick<Config, 'leagueId' | 'realm' | 'language' | 'useIntlSite'>
+
+export function leaguesDependencyKey (config: Pick<Config, 'realm' | 'language' | 'useIntlSite'>) {
+  return `${config.realm}|${config.language}|${config.useIntlSite ? 1 : 0}`
+}
+
+function createLeaguesState (configSource?: LeaguesConfigSource) {
   const isLoading = shallowRef(false)
   const error = shallowRef<string | null>(null)
+  const lastAttemptedDependencyKey = shallowRef<string | null>(null)
   const tradeLeagues = shallowRef<League[]>([])
+
+  function getConfig (): LeaguesConfigSource {
+    // The global config object is replaced on save/update, so read it lazily.
+    return configSource ?? AppConfig()
+  }
 
   const selectedId = computed<string | undefined>({
     get () {
       return (tradeLeagues.value.length)
-        ? AppConfig().leagueId
+        ? getConfig().leagueId
         : undefined
     },
     set (id) {
-      AppConfig().leagueId = id
+      getConfig().leagueId = id
     }
   })
 
   const selected = computed(() => {
-    const { leagueId } = AppConfig()
+    const { leagueId, realm } = getConfig()
     if (!tradeLeagues.value || !leagueId) return undefined
     const listed = tradeLeagues.value.find(league => league.id === leagueId)
     return {
       id: leagueId,
-      realm: AppConfig().realm,
+      realm,
       isPopular: !isPrivateLeague(leagueId) && Boolean(listed?.isPopular)
     }
   })
 
   async function load () {
+    const config = getConfig()
     isLoading.value = true
     error.value = null
+    lastAttemptedDependencyKey.value = leaguesDependencyKey(config)
 
     try {
-      const response = await Host.proxy(`${poeWebApi()}/api/leagues?type=main&realm=pc`)
+      // Settings pages can pass a draft config here, so build the request from
+      // the current config source instead of always using AppConfig().
+      const response = await Host.proxy(`${poeWebApi(config)}/api/leagues?type=main&realm=pc`)
       if (!response.ok) throw new Error(JSON.stringify(Object.fromEntries(response.headers)))
       const leagues: ApiLeague[] = await response.json()
+
       tradeLeagues.value = leagues
         .filter(league =>
           !PERMANENT_HC.includes(league.id) &&
@@ -82,12 +100,31 @@ export const useLeagues = createGlobalState(() => {
   return {
     isLoading,
     error,
+    lastAttemptedDependencyKey: readonly(lastAttemptedDependencyKey),
     selectedId,
     selected,
     list: readonly(tradeLeagues),
     load
   }
-})
+}
+
+type LeaguesState = ReturnType<typeof createLeaguesState>
+const useGlobalLeagues = createGlobalState(() => createLeaguesState())
+// Reuse the same draft-bound league state while a settings config clone lives.
+const useScopedLeagues = new WeakMap<LeaguesConfigSource, LeaguesState>()
+
+export function useLeagues (configSource?: LeaguesConfigSource) {
+  if (!configSource) {
+    return useGlobalLeagues()
+  }
+
+  let leagues = useScopedLeagues.get(configSource)
+  if (!leagues) {
+    leagues = createLeaguesState(configSource)
+    useScopedLeagues.set(configSource, leagues)
+  }
+  return leagues
+}
 
 function isPrivateLeague (id: string) {
   if (id.includes('Ruthless')) {

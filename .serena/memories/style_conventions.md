@@ -1,0 +1,18 @@
+# Style And Conventions
+- Use TypeScript throughout.
+- Existing source files use 2-space indentation; match it.
+- Follow `renderer/.eslintrc.js` conventions:
+  - single quotes
+  - `quote-props: consistent-as-needed`
+  - unused variables are treated as errors via `@typescript-eslint/no-unused-vars`
+- Naming:
+  - Vue components use PascalCase, e.g. `WidgetItemSearch.vue`
+  - variables and functions use camelCase
+  - folders are named descriptively by feature/runtime area
+- Code organization:
+  - keep feature code near the runtime that owns it
+  - UI/overlay behavior belongs in renderer paths
+  - Electron host, shortcuts, windowing, updater, packaging belong in main paths
+  - shared IPC contracts stay in `ipc/`
+- There is no special docstring convention called out by the repo; follow surrounding code and keep comments concise and purposeful.
+- Preserve existing project patterns instead of introducing new structure unless there is a strong reason.

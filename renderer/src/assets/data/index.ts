@@ -3,6 +3,22 @@ import type { BaseType, DropEntry, Stat, StatOrGroup, StatMatcher, TranslationDi
 
 export * from './interfaces'
 
+export interface StaticDataPayload {
+  clientStringsRef: TranslationDict
+  itemDrop: DropEntry[]
+  appPatrons: Array<{ from: string, months: number, style: number }>
+}
+
+export interface LanguageDataPayload {
+  clientStrings: TranslationDict
+  itemsNdjson: string
+  itemsNameIndex: Uint32Array
+  itemsRefIndex: Uint32Array
+  statsNdjson: string
+  statsRefIndex: Uint32Array
+  statsMatcherIndex: Uint32Array
+}
+
 export let ITEM_DROP: DropEntry[]
 export let CLIENT_STRINGS: TranslationDict
 export let CLIENT_STRINGS_REF: TranslationDict
@@ -75,11 +91,11 @@ function itemNamesFromLines (items: Generator<BaseType>) {
   }
 }
 
-async function loadItems (language: string) {
-  const ndjson = await (await fetch(`${import.meta.env.BASE_URL}data/${language}/items.ndjson`)).text()
+function loadItems (data: Pick<LanguageDataPayload, 'itemsNdjson' | 'itemsNameIndex' | 'itemsRefIndex'>) {
+  const ndjson = data.itemsNdjson
+  const indexNames = data.itemsNameIndex
+  const indexRefNames = data.itemsRefIndex
   const INDEX_WIDTH = 2
-  const indexNames = new Uint32Array(await (await fetch(`${import.meta.env.BASE_URL}data/${language}/items-name.index.bin`)).arrayBuffer())
-  const indexRefNames = new Uint32Array(await (await fetch(`${import.meta.env.BASE_URL}data/${language}/items-ref.index.bin`)).arrayBuffer())
 
   function commonFind (index: Uint32Array, prop: 'name' | 'refName') {
     return function (ns: BaseType['namespace'], name: string): BaseType[] | undefined {
@@ -108,11 +124,11 @@ async function loadItems (language: string) {
   REPLICA_UNIQUE_NAMES = itemNamesFromLines(ITEMS_ITERATOR('refName":"Replica'))
 }
 
-async function loadStats (language: string) {
-  const ndjson = await (await fetch(`${import.meta.env.BASE_URL}data/${language}/stats.ndjson`)).text()
+function loadStats (data: Pick<LanguageDataPayload, 'statsNdjson' | 'statsRefIndex' | 'statsMatcherIndex'>) {
+  const ndjson = data.statsNdjson
+  const indexRef = data.statsRefIndex
+  const indexMatcher = data.statsMatcherIndex
   const INDEX_WIDTH = 2
-  const indexRef = new Uint32Array(await (await fetch(`${import.meta.env.BASE_URL}data/${language}/stats-ref.index.bin`)).arrayBuffer())
-  const indexMatcher = new Uint32Array(await (await fetch(`${import.meta.env.BASE_URL}data/${language}/stats-matcher.index.bin`)).arrayBuffer())
 
   STAT_BY_REF_V2 = function (ref: string) {
     let start = dataBinarySearch(indexRef, Number(fnv1a(ref, { size: 32 })), 0, INDEX_WIDTH)
@@ -171,6 +187,57 @@ async function loadStats (language: string) {
   }
 }
 
+async function fetchUint32Array (url: string) {
+  const response = await fetch(url)
+  return new Uint32Array(await response.arrayBuffer())
+}
+
+async function importClientStrings (url: string) {
+  const response = await fetch(url)
+  const moduleSource = await response.text()
+  const moduleUrl = URL.createObjectURL(new Blob([moduleSource], { type: 'text/javascript' }))
+
+  try {
+    const module = await import(/* @vite-ignore */moduleUrl)
+    return module.default as TranslationDict
+  } finally {
+    URL.revokeObjectURL(moduleUrl)
+  }
+}
+
+export function hydrateStaticData (data: StaticDataPayload) {
+  CLIENT_STRINGS_REF = data.clientStringsRef
+  ITEM_DROP = data.itemDrop
+  APP_PATRONS = data.appPatrons
+}
+
+export function hydrateLanguageData (data: LanguageDataPayload) {
+  CLIENT_STRINGS = data.clientStrings
+  loadItems(data)
+  loadStats(data)
+}
+
+export function finalizeDataInit (lang: string) {
+  for (const text of DELAYED_STAT_VALIDATION) {
+    const statOrGroup = STAT_BY_REF_V2(text)
+    if (!statOrGroup) {
+      throw new Error(`Cannot find stat: ${text}`)
+    }
+    if (
+      'stats' in statOrGroup &&
+      // other languages are allowed to have unrelated stats grouped with our `ref`
+      lang === 'en' &&
+      statOrGroup.stats.some(stat => stat.ref !== text)
+    ) {
+      // TODO implement `StatCheck` if this causes error later.
+      // This check cannot be delegated to ndjson creation time because only
+      // a subset of groups need to adhere to it (that are seen in `stat()`).
+      throw new Error(`Some stats have different ref text: ${text}`)
+    }
+  }
+  DELAYED_STAT_VALIDATION.clear()
+}
+
 export function pseudoStatByRef (ref: string): Stat | undefined {
   const statOrGroup = STAT_BY_REF_V2(ref)
   if (statOrGroup != null && 'stats' in statOrGroup) {
@@ -192,34 +259,24 @@ export function stat (text: string) {
 }
 
 export async function init (lang: string) {
-  CLIENT_STRINGS_REF = (await import(/* @vite-ignore */`${import.meta.env.BASE_URL}data/en/client_strings.js`)).default
-  ITEM_DROP = await (await fetch(`${import.meta.env.BASE_URL}data/item-drop.json`)).json()
-  APP_PATRONS = await (await fetch(`${import.meta.env.BASE_URL}data/patrons.json`)).json()
+  hydrateStaticData({
+    clientStringsRef: await importClientStrings(`${import.meta.env.BASE_URL}data/en/client_strings.js`),
+    itemDrop: await (await fetch(`${import.meta.env.BASE_URL}data/item-drop.json`)).json(),
+    appPatrons: await (await fetch(`${import.meta.env.BASE_URL}data/patrons.json`)).json()
+  })
 
   await loadForLang(lang)
-
-  for (const text of DELAYED_STAT_VALIDATION) {
-    const statOrGroup = STAT_BY_REF_V2(text)
-    if (!statOrGroup) {
-      throw new Error(`Cannot find stat: ${text}`)
-    }
-    if (
-      'stats' in statOrGroup &&
-      // other languages are allowed to have unrelated stats grouped with our `ref`
-      lang === 'en' &&
-      statOrGroup.stats.some(stat => stat.ref !== text)
-    ) {
-      // TODO implement `StatCheck` if this causes error later.
-      // This check cannot be delegated to ndjson creation time because only
-      // a subset of groups need to adhere to it (that are seen in `stat()`).
-      throw new Error(`Some stats have different ref text: ${text}`)
-    }
-  }
-  DELAYED_STAT_VALIDATION.clear()
+  finalizeDataInit(lang)
 }
 
 export async function loadForLang (lang: string) {
-  CLIENT_STRINGS = (await import(/* @vite-ignore */`${import.meta.env.BASE_URL}data/${lang}/client_strings.js`)).default
-  await loadItems(lang)
-  await loadStats(lang)
+  hydrateLanguageData({
+    clientStrings: await importClientStrings(`${import.meta.env.BASE_URL}data/${lang}/client_strings.js`),
+    itemsNdjson: await (await fetch(`${import.meta.env.BASE_URL}data/${lang}/items.ndjson`)).text(),
+    itemsNameIndex: await fetchUint32Array(`${import.meta.env.BASE_URL}data/${lang}/items-name.index.bin`),
+    itemsRefIndex: await fetchUint32Array(`${import.meta.env.BASE_URL}data/${lang}/items-ref.index.bin`),
+    statsNdjson: await (await fetch(`${import.meta.env.BASE_URL}data/${lang}/stats.ndjson`)).text(),
+    statsRefIndex: await fetchUint32Array(`${import.meta.env.BASE_URL}data/${lang}/stats-ref.index.bin`),
+    statsMatcherIndex: await fetchUint32Array(`${import.meta.env.BASE_URL}data/${lang}/stats-matcher.index.bin`)
+  })
 }

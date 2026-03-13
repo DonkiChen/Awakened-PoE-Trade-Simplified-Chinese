@@ -14,6 +14,7 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedIt
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
+import { execClientStringRegex, matchesClientString } from './client-string-variants'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -38,7 +39,6 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   { virtual: parseMapTier, name: 'parseMapTier' },
   { virtual: normalizeName, name: 'normalizeName' },
   parseVaalGemName,
-  { virtual: handlePatchedItem, name: 'handlePatchedItem' },
   { virtual: findInDatabase, name: 'findInDatabase' },
   // -----------
   parseItemLevel,
@@ -149,17 +149,13 @@ function normalizeName (item: ParserState) {
   if (item.rarity === ItemRarity.Normal ||
     item.rarity === ItemRarity.Rare
   ) {
-    if (item.baseType) {
-      if (_$REF.MAP_BLIGHTED.test(item.baseType)) {
-        item.baseType = _$REF.MAP_BLIGHTED.exec(item.baseType)![1]
-      } else if (_$REF.MAP_BLIGHT_RAVAGED.test(item.baseType)) {
-        item.baseType = _$REF.MAP_BLIGHT_RAVAGED.exec(item.baseType)![1]
-      }
-    } else {
-      if (_$REF.MAP_BLIGHTED.test(item.name)) {
-        item.name = _$REF.MAP_BLIGHTED.exec(item.name)![1]
-      } else if (_$REF.MAP_BLIGHT_RAVAGED.test(item.name)) {
-        item.name = _$REF.MAP_BLIGHT_RAVAGED.exec(item.name)![1]
+    const targetText = item.baseType ?? item.name
+    const blightedMatch = execClientStringRegex(['MAP_BLIGHTED', 'MAP_BLIGHT_RAVAGED'], targetText)
+    if (blightedMatch) {
+      if (item.baseType) {
+        item.baseType = blightedMatch.match[1]
+      } else {
+        item.name = blightedMatch.match[1]
       }
     }
   }
@@ -176,22 +172,6 @@ function normalizeName (item: ParserState) {
     } else if (_$REF.METAMORPH_LIVER.test(item.name)) {
       item.name = 'Metamorph Liver'
     }
-  }
-}
-
-/**
- * 处理 A 大功能补丁导致的无法复用原逻辑的问题
- * @param item
- */
-function handlePatchedItem (item: ParserState) {
-  const mapMatch = item.baseType && item.baseType.match(/地图:(\S+) \S+/)
-  if (item.baseType && mapMatch) {
-    item.baseType = mapMatch[1]
-  }
-
-  const mapNameMatch = item.name && item.name.match(/地图:(\S+) \S+/)
-  if (item.name && mapNameMatch) {
-    item.name = mapNameMatch[1]
   }
 }
 
@@ -239,17 +219,17 @@ function findInDatabase (item: ParserState) {
 
 function parseMapTier (item: ParserState) {
   // TODO blocked by https://www.pathofexile.com/forum/view-thread/3915458
-  const execResult = _$REF.MAP_TIER.exec(item.baseType || item.name)
-  if (!execResult) return
+  const tierMatch = execClientStringRegex('MAP_TIER', item.baseType || item.name)
+  if (!tierMatch) return
 
   item.map = {
-    tier: Number(execResult[1])
+    tier: Number(tierMatch.match[1])
   }
 
   if (item.baseType) {
-    item.baseType = item.baseType.replace(execResult[0], '')
+    item.baseType = item.baseType.replace(tierMatch.match[0], '')
   } else {
-    item.name = item.name.replace(execResult[0], '')
+    item.name = item.name.replace(tierMatch.match[0], '')
   }
 }
 
@@ -793,7 +773,7 @@ function parseMirrored (section: string[], item: ParsedItem) {
 
 function parseSplit (section: string[], item: ParsedItem) {
   if (section.length === 1) {
-    if (section[0] === _$.SPLIT) {
+    if (matchesClientString('SPLIT', section[0])) {
       item.isSplit = true
       return 'SECTION_PARSED'
     }
@@ -848,10 +828,13 @@ function parseSynthesised (section: string[], item: ParserState) {
   if (section.length === 1) {
     if (section[0] === _$.SECTION_SYNTHESISED) {
       item.isSynthesised = true
-      if (item.baseType) {
-        item.baseType = _$REF.ITEM_SYNTHESISED.exec(item.baseType)![1]
-      } else {
-        item.name = _$REF.ITEM_SYNTHESISED.exec(item.name)![1]
+      const synthesisedMatch = execClientStringRegex('ITEM_SYNTHESISED', item.baseType ?? item.name)
+      if (synthesisedMatch) {
+        if (item.baseType) {
+          item.baseType = synthesisedMatch.match[1]
+        } else {
+          item.name = synthesisedMatch.match[1]
+        }
       }
       return 'SECTION_PARSED'
     }
@@ -867,8 +850,9 @@ function parseSuperior (item: ParserState) {
     (item.rarity === ItemRarity.Rare && item.isUnidentified) ||
     (item.rarity === ItemRarity.Unique && item.isUnidentified)
   ) {
-    if (_$REF.ITEM_SUPERIOR.test(item.name)) {
-      item.name = _$REF.ITEM_SUPERIOR.exec(item.name)![1]
+    const superiorMatch = execClientStringRegex('ITEM_SUPERIOR', item.name)
+    if (superiorMatch) {
+      item.name = superiorMatch.match[1]
     }
   }
 }
@@ -876,8 +860,9 @@ function parseSuperior (item: ParserState) {
 function parseFoulborn (item: ParserState) {
   if (item.rarity !== ItemRarity.Unique || item.isUnidentified) return
 
-  if (_$REF.FOULBORN_NAME.test(item.name)) {
-    item.name = _$REF.FOULBORN_NAME.exec(item.name)![1]
+  const foulbornMatch = execClientStringRegex('FOULBORN_NAME', item.name)
+  if (foulbornMatch) {
+    item.name = foulbornMatch.match[1]
     item.isFoulborn = true
   }
 }

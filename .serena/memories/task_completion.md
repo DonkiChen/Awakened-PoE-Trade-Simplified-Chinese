@@ -1,0 +1,21 @@
+# Task Completion Checklist
+- For renderer/UI changes:
+  - run `cd renderer; npm run lint`
+  - run `cd renderer; npm run build`
+- For Electron/main-process changes:
+  - run `cd main; npm run build`
+- If renderer assets/indexes are affected, regenerate with `cd renderer; npm run make-index-files` before validating/building.
+- There is no dedicated root unit-test suite; validation is build-based.
+- Smoke-test locally when changing:
+  - shortcuts
+  - overlays
+  - parsing logic
+  - localization data
+- If docs are changed, preview with `cd docs; npm run dev` as needed.
+- For PRs/hand-off notes, document:
+  - concise behavior change summary
+  - linked issue/context when relevant
+  - screenshots or recordings for UI/overlay changes
+  - manual verification performed
+  - any data regeneration or subproject/submodule updates required
+- Commit history favors short imperative subjects, often with `fix:` or `fix(renderer):` style prefixes.

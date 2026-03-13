@@ -2,6 +2,7 @@ import { CLIENT_STRINGS as _$, STAT_BY_MATCH_STR_V2 } from '@/assets/data'
 import type { StatMatcher, Stat, StatGroup } from '@/assets/data'
 import type { ModifierType } from './modifiers'
 import { type ItemCategory, ARMOUR, WEAPON, HEIST_EQUIPMENT } from './meta'
+import { stripTrailingClientString } from './client-string-variants'
 
 // This file is a little messy and scary,
 // but that's how stats translations are parsed :-D
@@ -35,7 +36,9 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
   outer:
   for (let start = 0; start < lines.length; start += 1) {
     lines[start].replace(/\(高阶多重投射-专擅反击\)/g, '') // 解决军帽的问题
-    if (lines[start].match(LOCALIZED_PAREN_LEFT)) {
+    if (lines[start].match(LOCALIZED_PAREN_LEFT) ||
+        lines[start] === _$.EXARCH_ITEM ||
+        lines[start] === _$.EATER_ITEM) {
       reminderString = true
     }
     if (reminderString && lines[start].match(LOCALIZED_PAREN_RIGHT)) {
@@ -49,10 +52,9 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
     for (let end = start; end < lines.length; end += 1) {
       let str = lines.slice(start, end + 1).join('\n')
 
-      const unscalable = str.endsWith(_$.UNSCALABLE_VALUE)
-      if (unscalable) {
-        str = str.slice(0, -_$.UNSCALABLE_VALUE.length)
-      }
+      const unscalableText = stripTrailingClientString('UNSCALABLE_VALUE', str)
+      const unscalable = unscalableText.matched
+      str = unscalableText.value
 
       const isParsed: boolean = yield { string: str, unscalable }
       if (isParsed) {
