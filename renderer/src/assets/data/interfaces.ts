@@ -205,6 +205,8 @@ export interface TranslationDict {
   ELDRITCH_MOD_R4: string
   ELDRITCH_MOD_R5: string
   ELDRITCH_MOD_R6: string
+  EATER_ITEM: string
+  EXARCH_ITEM: string
   SENTINEL_CHARGE: string
   SHAPER_MODS: string[]
   ELDER_MODS: string[]

@@ -1,4 +1,8 @@
-import { CLIENT_STRINGS as _$ } from '@/assets/data'
+import {
+  CLIENT_STRINGS as _$,
+  CLIENT_STRINGS_REF as _$REF
+} from '@/assets/data'
+import type { TranslationDict } from '@/assets/data'
 
 // Only include keys that need parser-side compatibility variants.
 // Keeping this list narrow reduces type churn when syncing upstream.
@@ -23,6 +27,10 @@ export type ClientStringVariantGroup =
   | 'modifierType'
   | 'modifierGeneration'
   | 'trailing'
+
+export type ClientStringRegexKey = {
+  [K in keyof TranslationDict]: TranslationDict[K] extends RegExp ? K : never
+}[keyof TranslationDict]
 
 type ClientStringVariantMap = Partial<Record<ClientStringVariantKey, readonly string[]>>
 
@@ -100,6 +108,33 @@ export function matchesClientString (
 ): boolean {
   const keys = Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys]
   return keys.some(key => getClientStringVariants(key, group).includes(value))
+}
+
+export function execClientStringRegex (
+  keyOrKeys: ClientStringRegexKey | readonly ClientStringRegexKey[],
+  value: string
+): { key: ClientStringRegexKey, match: RegExpExecArray } | null {
+  const keys = (Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys]) as readonly ClientStringRegexKey[]
+
+  for (const key of keys) {
+    for (const dict of [_$REF, _$] as const) {
+      const regex = dict[key]
+      regex.lastIndex = 0
+      const match = regex.exec(value)
+      if (match) {
+        return { key, match }
+      }
+    }
+  }
+
+  return null
+}
+
+export function testClientStringRegex (
+  keyOrKeys: ClientStringRegexKey | readonly ClientStringRegexKey[],
+  value: string
+): boolean {
+  return execClientStringRegex(keyOrKeys, value) !== null
 }
 
 /**

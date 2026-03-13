@@ -1,4 +1,4 @@
-import { STAT_BY_MATCH_STR_V2 } from '@/assets/data'
+import { CLIENT_STRINGS as _$, STAT_BY_MATCH_STR_V2 } from '@/assets/data'
 import type { StatMatcher, Stat, StatGroup } from '@/assets/data'
 import type { ModifierType } from './modifiers'
 import { type ItemCategory, ARMOUR, WEAPON, HEIST_EQUIPMENT } from './meta'
@@ -36,7 +36,9 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
   outer:
   for (let start = 0; start < lines.length; start += 1) {
     lines[start].replace(/\(高阶多重投射-专擅反击\)/g, '') // 解决军帽的问题
-    if (lines[start].match(LOCALIZED_PAREN_LEFT)) {
+    if (lines[start].match(LOCALIZED_PAREN_LEFT) ||
+        lines[start] === _$.EXARCH_ITEM ||
+        lines[start] === _$.EATER_ITEM) {
       reminderString = true
     }
     if (reminderString && lines[start].match(LOCALIZED_PAREN_RIGHT)) {
