@@ -1,4 +1,4 @@
-import { CLIENT_STRINGS as _$, STAT_BY_MATCH_STR_V2 } from '@/assets/data'
+import { STAT_BY_MATCH_STR_V2 } from '@/assets/data'
 import type { StatMatcher, Stat, StatGroup } from '@/assets/data'
 import type { ModifierType } from './modifiers'
 import { type ItemCategory, ARMOUR, WEAPON, HEIST_EQUIPMENT } from './meta'
