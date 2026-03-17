@@ -40,10 +40,11 @@ const EXACT_VARIANTS: ClientStringVariantMap = {
 
 const MODIFIER_TYPE_VARIANTS: ClientStringVariantMap = {
   IMPLICIT_MODIFIER: ['基底词缀'],
-  FRACTURED_PREFIX: ['分裂 ▲ 前缀词缀', '破碎的 ▲ 前缀词缀'],
-  FRACTURED_SUFFIX: ['分裂 ▽ 后缀词缀', '破碎的 ▽ 后缀词缀'],
-  CRAFTED_PREFIX: ['大师工艺 ▲ 前缀词缀', '大师级 ▲ 前缀词缀'],
-  CRAFTED_SUFFIX: ['大师工艺 ▽ 后缀词缀', '大师级 ▽ 后缀词缀']
+  FRACTURED_PREFIX: ['分裂 ▲ 前缀词缀', '破碎的 ▲ 前缀词缀', '分裂 前缀词缀'],
+  FRACTURED_SUFFIX: ['分裂 ▽ 后缀词缀', '破碎的 ▽ 后缀词缀', '分裂 后缀词缀'],
+  CRAFTED_PREFIX: ['大师工艺 ▲ 前缀词缀', '大师级 ▲ 前缀词缀', '大师 前缀词缀'],
+  CRAFTED_SUFFIX: ['大师工艺 ▽ 后缀词缀', '大师级 ▽ 后缀词缀', '大师 后缀词缀'],
+  CORRUPTED_IMPLICIT: ['腐化基底词缀']
 }
 
 const MODIFIER_GENERATION_VARIANTS: ClientStringVariantMap = {
@@ -52,7 +53,8 @@ const MODIFIER_GENERATION_VARIANTS: ClientStringVariantMap = {
   FRACTURED_PREFIX: MODIFIER_TYPE_VARIANTS.FRACTURED_PREFIX,
   FRACTURED_SUFFIX: MODIFIER_TYPE_VARIANTS.FRACTURED_SUFFIX,
   CRAFTED_PREFIX: MODIFIER_TYPE_VARIANTS.CRAFTED_PREFIX,
-  CRAFTED_SUFFIX: MODIFIER_TYPE_VARIANTS.CRAFTED_SUFFIX
+  CRAFTED_SUFFIX: MODIFIER_TYPE_VARIANTS.CRAFTED_SUFFIX,
+  CORRUPTED_IMPLICIT: ['腐化基底词缀']
 }
 
 const TRAILING_VARIANTS: ClientStringVariantMap = {
