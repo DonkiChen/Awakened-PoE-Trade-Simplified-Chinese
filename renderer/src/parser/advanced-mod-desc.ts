@@ -56,21 +56,21 @@ export function parseModInfoLine (line: string): ModifierInfo {
 
     const typeText = match.groups!.type
 
-    if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT'], typeText, 'modifierType')) {
+    if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT'], typeText)) {
       type = ModifierType.Implicit
-    } else if (matchesClientString(['FRACTURED_PREFIX', 'FRACTURED_SUFFIX'], typeText, 'modifierType')) {
+    } else if (matchesClientString(['FRACTURED_PREFIX', 'FRACTURED_SUFFIX'], typeText)) {
       type = ModifierType.Fractured
-    } else if (matchesClientString(['CRAFTED_PREFIX', 'CRAFTED_SUFFIX'], typeText, 'modifierType')) {
+    } else if (matchesClientString(['CRAFTED_PREFIX', 'CRAFTED_SUFFIX'], typeText)) {
       type = ModifierType.Crafted
     }
 
-    if (matchesClientString(['PREFIX_MODIFIER', 'FRACTURED_PREFIX', 'CRAFTED_PREFIX'], typeText, 'modifierGeneration')) {
+    if (matchesClientString(['PREFIX_MODIFIER', 'FRACTURED_PREFIX', 'CRAFTED_PREFIX'], typeText)) {
       generation = 'prefix'
-    } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText, 'modifierGeneration')) {
+    } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText)) {
       generation = 'suffix'
-    } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText, 'modifierGeneration')) {
+    } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText)) {
       generation = 'corrupted'
-    } else if (matchesClientString('FOULBORN_MODIFIER', typeText, 'modifierGeneration')) {
+    } else if (matchesClientString('FOULBORN_MODIFIER', typeText)) {
       generation = 'foulborn'
     }
 
