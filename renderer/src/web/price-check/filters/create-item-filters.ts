@@ -182,6 +182,12 @@ export function createFilters (
         disabled: false
       }
     }
+    if (item.heistBlueprint?.totalWings) {
+      filters.heistTotalWings = {
+        value: item.heistBlueprint.totalWings,
+        disabled: false
+      }
+    }
   } else if (item.rarity === ItemRarity.Unique && item.info.unique) {
     filters.searchExact = {
       name: item.info.name,
