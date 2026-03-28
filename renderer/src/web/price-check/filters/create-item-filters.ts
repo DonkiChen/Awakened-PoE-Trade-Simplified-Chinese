@@ -62,6 +62,14 @@ export function createFilters (
       disabled: !(item.stackSize && item.stackSize.value > 1 && opts.activateStockFilter)
     }
   }
+
+  if (item.storedExperience) {
+    filters.storedExperience = {
+      value: item.storedExperience,
+      disabled: false
+    }
+  }
+
   if (item.category === ItemCategory.Invitation) {
     filters.searchExact = {
       baseType: item.info.name,

@@ -72,6 +72,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseModifiers, // scourge
   parseModifiers, // implicit
   parseModifiers, // explicit
+  parseLens,
   { virtual: transformToLegacyModifiers, name: 'transformToLegacyModifiers' },
   { virtual: parseFractured, name: 'parseFractured' },
   { virtual: parseBlightedMap, name: 'parseBlightedMap' },
@@ -1061,6 +1062,16 @@ function parseFilledCoffin (section: string[], item: ParsedItem) {
   parseStatsFromMod(lines, item, { info: modInfo, stats: [] })
 
   return 'SECTION_PARSED'
+}
+
+function parseLens (section: string[], item: ParsedItem) {
+  for (const line of section) {
+    if (line.startsWith(_$.STORED_EXPERIENCE)) {
+      item.storedExperience = parseInt(line.slice(_$.STORED_EXPERIENCE.length).replace(/,/g, ''), 10)
+      return 'SECTION_PARSED'
+    }
+  }
+  return 'PARSER_SKIPPED'
 }
 
 function markupConditionParser (text: string) {

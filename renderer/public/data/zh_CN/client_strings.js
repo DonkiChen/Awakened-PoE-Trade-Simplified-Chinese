@@ -28,6 +28,7 @@ export default {
   SOCKETS: '插槽: ',
   QUALITY: '品质: ',
   MEMORY_STRANDS: '回忆束丝: ',
+  STORED_EXPERIENCE: '储存的精华：',
   PHYSICAL_DAMAGE: '物理伤害: ',
   ELEMENTAL_DAMAGE: '火焰，冰霜，闪电伤害: ',
   CRIT_CHANCE: '攻击暴击率: ',
