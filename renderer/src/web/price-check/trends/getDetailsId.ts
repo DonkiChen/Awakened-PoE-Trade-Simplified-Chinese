@@ -27,8 +27,10 @@ export function getDetailsId (item: ParsedItem) {
         ? `${item.mapBlighted} ${item.info.refName}`
         : item.info.refName,
       variant: variant([
-        `T${item.map!.tier}`,
-        (item.rarity !== ItemRarity.Unique) ? 'Gen-18' : null
+        `T${item.map!.tier ?? 0}`,
+        (item.rarity !== ItemRarity.Unique)
+          ? (item.map!.tier) ? 'Gen-24' : 'Atlas'
+          : null
       ])
     }
   }

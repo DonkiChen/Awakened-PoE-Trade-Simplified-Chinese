@@ -21,6 +21,7 @@ export type TradeResponse<T> = (T & { error?: null }) | {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function apiToSatisfySearch (item: ParsedItem, stats: StatFilter[], filters: ItemFilters): 'trade' | 'bulk' {
   if (stats.some(s => !s.disabled)) {
     return 'trade'
@@ -59,7 +60,9 @@ export function adjustRateLimits (clientLimits: Set<RateLimiter>, headers: Heade
   )
 }
 
-function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, stateStr: string): void { /* eslint-disable no-console */
+function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, stateStr: string): void {
+  /* eslint-disable no-console, @typescript-eslint/no-unused-expressions */
+
   const DEBUG = false
   const DESYNC_FIX = AppConfig<PriceCheckWidget>('price-check')!.apiLatencySeconds
 
@@ -120,6 +123,8 @@ function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, st
       rl.wait()
     }
   }
+
+  /* eslint-enable */
 }
 
 export function preventQueueCreation (targets: Array<{ count: number, limiters: Iterable<RateLimiter> }>) {

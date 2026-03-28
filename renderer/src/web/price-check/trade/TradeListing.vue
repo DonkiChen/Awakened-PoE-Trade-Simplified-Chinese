@@ -1,5 +1,8 @@
 <template>
   <div v-if="!error" class="layout-column min-h-0" style="height: auto;">
+    <div v-if="item.info.exchangeable" :class="$style.legacyMessage">
+      {{ t(':legacy_bulk_xchg_msg') }}
+    </div>
     <div class="mb-2 flex pl-2">
       <div class="flex items-baseline text-gray-500 mr-2">
         <span class="mr-1">{{ t(':matched') }}</span>
@@ -144,7 +147,7 @@ function useTradeApi () {
     return out
   })
 
-  async function search (filters: ItemFilters, stats: StatFilter[], item: ParsedItem) {
+  async function search (filters: ItemFilters, stats: StatFilter[]) {
     try {
       searchId += 1
       error.value = null
@@ -153,7 +156,7 @@ function useTradeApi () {
       fetchResults.value = _fetchResults
 
       const _searchId = searchId
-      const request = createTradeRequest(filters, stats, item)
+      const request = createTradeRequest(filters, stats)
       const _searchResult = await requestTradeResultList(request, filters.trade.league)
       if (_searchId !== searchId) {
         return
@@ -164,12 +167,12 @@ function useTradeApi () {
       {
         const r1 = (_searchResult.result.length > 0)
           ? requestResults(_searchResult.id, _searchResult.result.slice(0, 10), { accountName: AppConfig().accountName })
-            .then(results => { _fetchResults.push(...results) })
+              .then(results => { _fetchResults.push(...results) })
           : Promise.resolve()
         const r2 = (_searchResult.result.length > 10)
           ? requestResults(_searchResult.id, _searchResult.result.slice(10, 20), { accountName: AppConfig().accountName })
-            .then(results => r1
-              .then(() => { _fetchResults.push(...results) }))
+              .then(results => r1
+                .then(() => { _fetchResults.push(...results) }))
           : Promise.resolve()
         await Promise.all([r1, r2])
       }
@@ -230,7 +233,7 @@ export default defineComponent({
     function makeTradeLink () {
       return (searchResult.value && (AppConfig().realm === 'pc-ggg'))
         ? `https://${getTradeEndpoint()}/trade/search/${props.filters.trade.league}/${searchResult.value.id}`
-        : `https://${getTradeEndpoint()}/trade/search/${props.filters.trade.league}?q=${JSON.stringify(createTradeRequest(props.filters, props.stats, props.item))}`
+        : `https://${getTradeEndpoint()}/trade/search/${props.filters.trade.league}?q=${JSON.stringify(createTradeRequest(props.filters, props.stats))}`
     }
 
     const { t } = useI18nNs('trade_result')
@@ -250,7 +253,7 @@ export default defineComponent({
           ]
         }
       }),
-      execSearch: () => { search(props.filters, props.stats, props.item) },
+      execSearch: () => { search(props.filters, props.stats) },
       error,
       showSeller: computed(() => widget.value.showSeller),
       makeTradeLink,
@@ -306,5 +309,12 @@ export default defineComponent({
   max-width: none;
   height: 1.25rem;
   vertical-align: bottom;
+}
+
+.legacyMessage {
+  @apply rounded p-2 mb-3;
+  @apply border border-gray-600 bg-gray-700;
+  text-wrap-style: balance;
+  text-align: center;
 }
 </style>

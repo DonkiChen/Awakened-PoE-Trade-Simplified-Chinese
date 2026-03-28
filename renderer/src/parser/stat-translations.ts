@@ -284,7 +284,7 @@ export function _resolveTranslation (
   if (resolve.strat === 'trivial-merge') {
     const withMatchStr = (matchStr.length)
       ? onTradeStats.filter(stat =>
-        stat.matchers.some(m => m.string === matchStr || m.advanced === matchStr))
+          stat.matchers.some(m => m.string === matchStr || m.advanced === matchStr))
       : onTradeStats
     if (!withMatchStr.length) return undefined
     const merged = withMatchStr[0]

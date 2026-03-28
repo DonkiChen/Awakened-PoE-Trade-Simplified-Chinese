@@ -52,18 +52,19 @@ export function findAndResolveByRef (
   return stat
 }
 
-export function explicitStatToNotFilter (opts: {
+export function statToNotFilter (opts: {
   stat: Stat
+  type: ModifierType
   negateString?: boolean
   disabled: StatFilter['disabled']
 }): StatFilter {
   return {
-    tradeId: opts.stat.trade.ids[ModifierType.Explicit],
+    tradeId: opts.stat.trade.ids[opts.type],
     statRef: opts.stat.ref,
     text: (opts.stat.matchers.find(
       matcher => Boolean(matcher.negate) === Boolean(opts.negateString)
     ) ?? opts.stat.matchers[0]).string,
-    tag: FilterTag.Explicit,
+    tag: (opts.type as unknown) as FilterTag,
     sources: [],
     disabled: opts.disabled,
     not: true

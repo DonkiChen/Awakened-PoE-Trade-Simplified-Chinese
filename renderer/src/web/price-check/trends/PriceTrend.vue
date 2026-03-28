@@ -32,8 +32,8 @@
             type="area"
             :options="{
               chart: { sparkline: { enabled: true }, animations: { enabled: false } },
-              stroke: { curve: 'smooth', width: 1, colors: ['#a0aec0' /* gray.500 */] },
-              fill: { colors: ['#4a5568' /* gray.700 */], type: 'solid' },
+              stroke: { curve: 'smooth', width: 1, colors: ['#a0aec0'] /* gray.500 */ },
+              fill: { colors: ['#4a5568'] /* gray.700 */, type: 'solid' },
               tooltip: { enabled: false },
               plotOptions: { area: { fillTo: 'end' } },
               yaxis: {

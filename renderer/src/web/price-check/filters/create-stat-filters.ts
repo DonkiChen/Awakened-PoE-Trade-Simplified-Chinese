@@ -8,6 +8,7 @@ import { applyRules as applyMirroredTabletRules } from './pseudo/reflection-rule
 import { filterItemProp, filterBasePercentile, filterMemoryStrands } from './pseudo/item-property'
 import { mapProps, valdoBadMods } from './pseudo/maps'
 import { applyFlaskHybridMod } from './pseudo/flasks'
+import { applyHeistRules } from './pseudo/heist'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
 import { StatBetter, CLIENT_STRINGS, CLIENT_STRINGS_REF } from '@/assets/data'
 
@@ -116,6 +117,11 @@ export function createExactStatFilters (
 
   if (item.category === ItemCategory.ClusterJewel) {
     applyClusterJewelRules(ctx.filters)
+  } if (
+    item.category === ItemCategory.HeistContract ||
+    item.category === ItemCategory.HeistBlueprint
+  ) {
+    applyHeistRules(ctx)
   } else if (item.category === ItemCategory.Flask) {
     applyFlaskRules(ctx.filters)
     applyFlaskHybridMod(ctx)

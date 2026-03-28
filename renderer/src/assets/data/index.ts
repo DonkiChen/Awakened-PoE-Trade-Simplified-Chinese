@@ -24,18 +24,18 @@ export let CLIENT_STRINGS: TranslationDict
 export let CLIENT_STRINGS_REF: TranslationDict
 export let APP_PATRONS: Array<{ from: string, months: number, style: number }>
 
-export let ITEM_BY_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => undefined
-export let ITEM_BY_REF = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => undefined
-export let ITEM_BY_REF_OR_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => undefined
-export let ITEMS_ITERATOR = function * (includes: string, andIncludes?: string[]): Generator<BaseType> {}
+export let ITEM_BY_TRANSLATED: (ns: BaseType['namespace'], name: string) => BaseType[] | undefined = () => undefined
+export let ITEM_BY_REF: (ns: BaseType['namespace'], name: string) => BaseType[] | undefined = () => undefined
+export let ITEM_BY_REF_OR_TRANSLATED: (ns: BaseType['namespace'], name: string) => BaseType[] | undefined = () => undefined
+export let ITEMS_ITERATOR: (includes: string, andIncludes?: string[]) => Generator<BaseType> = function * () {}
 
-export let ALTQ_GEM_NAMES = function * (): Generator<string> {}
-export let REPLICA_UNIQUE_NAMES = function * (): Generator<string> {}
+export let ALTQ_GEM_NAMES: () => Generator<string> = function * () {}
+export let REPLICA_UNIQUE_NAMES: () => Generator<string> = function * () {}
 
-export let STAT_BY_MATCH_STR = (name: string): { matcher: StatMatcher, stat: Stat } | undefined => undefined
-export let STAT_BY_MATCH_STR_V2 = (name: string): StatOrGroup | undefined => undefined
-export let STAT_BY_REF_V2 = (name: string): StatOrGroup | undefined => undefined
-export let STATS_ITERATOR = function * (includes: string, andIncludes?: string[]): Generator<Stat> {}
+export let STAT_BY_MATCH_STR: (name: string) => { matcher: StatMatcher, stat: Stat } | undefined = () => undefined
+export let STAT_BY_MATCH_STR_V2: (name: string) => StatOrGroup | undefined = () => undefined
+export let STAT_BY_REF_V2: (name: string) => StatOrGroup | undefined = () => undefined
+export let STATS_ITERATOR: (includes: string, andIncludes?: string[]) => Generator<Stat> = function * () {}
 
 function dataBinarySearch (data: Uint32Array, value: number, rowOffset: number, rowSize: number) {
   let left = 0

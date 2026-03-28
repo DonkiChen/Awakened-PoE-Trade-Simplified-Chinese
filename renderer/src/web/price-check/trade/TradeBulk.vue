@@ -174,8 +174,8 @@ function useBulkApi () {
             )
             items.value = _result.value.listed
             const otherHave = (have === 'divine')
-              ? result.value?.xchgChaos?.listed.value!
-              : result.value?.xchgStable?.listed.value!
+              ? result.value!.xchgChaos.listed.value!
+              : result.value!.xchgStable.listed.value!
             // fix best guess we did while making optimistic search
             otherHave.total -= _result.value.total
           } catch (err) {

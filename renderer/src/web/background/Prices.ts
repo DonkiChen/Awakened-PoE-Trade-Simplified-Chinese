@@ -256,7 +256,11 @@ function splitJsonBlob (jsonBlob: string) {
       { ns: 'ITEM', url: 'essences', type: 'Essence' },
       { ns: 'ITEM', url: 'maps', type: 'Map' },
       { ns: 'ITEM', url: 'tattoos', type: 'Tattoo' },
-      { ns: 'ITEM', url: 'omens', type: 'Omen' }, { ns: 'ITEM', url: 'coffins', type: 'Coffin' }, { ns: 'DIVINATION_CARD', url: 'divination-cards', type: 'DivinationCard' },
+      { ns: 'ITEM', url: 'omens', type: 'Omen' }, { ns: 'ITEM', url: 'coffins', type: 'Coffin' }, { ns: 'ITEM', url: 'allflame-embers', type: 'AllflameEmber' },
+      { ns: 'ITEM', url: 'djinn-coins', type: 'DjinnCoin' },
+      { ns: 'ITEM', url: 'astrolabes', type: 'Astrolabe' },
+      { ns: 'ITEM', url: 'runegrafts', type: 'Runegraft' },
+      { ns: 'DIVINATION_CARD', url: 'divination-cards', type: 'DivinationCard' },
       { ns: 'CAPTURED_BEAST', url: 'beasts', type: 'Beast' },
       { ns: 'UNIQUE', url: 'unique-jewels', type: 'UniqueJewel' },
       { ns: 'UNIQUE', url: 'unique-flasks', type: 'UniqueFlask' },
@@ -265,6 +269,7 @@ function splitJsonBlob (jsonBlob: string) {
       { ns: 'UNIQUE', url: 'unique-accessories', type: 'UniqueAccessory' },
       { ns: 'UNIQUE', url: 'unique-maps', type: 'UniqueMap' },
       { ns: 'UNIQUE', url: 'unique-relics', type: 'UniqueRelic' },
+    { ns: 'UNIQUE', url: 'unique-tinctures', type: 'UniqueTincture' },
       { ns: 'GEM', url: 'skill-gems', type: 'SkillGem' }
     ]
 
