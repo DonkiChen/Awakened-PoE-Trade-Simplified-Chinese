@@ -152,7 +152,6 @@ export interface TranslationDict {
   ITEM_SUPERIOR: RegExp
   MAP_BLIGHTED: RegExp
   MAP_BLIGHT_RAVAGED: RegExp
-  MAP_REWARD: string
   INFLUENCE_SHAPER: string
   INFLUENCE_ELDER: string
   INFLUENCE_CRUSADER: string
