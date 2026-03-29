@@ -28,6 +28,7 @@ export default {
   SOCKETS: 'Гнезда: ',
   QUALITY: 'Качество: ',
   MEMORY_STRANDS: 'Пряди воспоминаний: ',
+  STORED_EXPERIENCE: 'Сохранённый опыт: ',
   PHYSICAL_DAMAGE: 'Физический урон: ',
   ELEMENTAL_DAMAGE: 'Урон от стихий: ',
   CRIT_CHANCE: 'Шанс критического удара: ',
@@ -107,6 +108,8 @@ export default {
   ELDRITCH_MOD_R4: 'Превосходный',
   ELDRITCH_MOD_R5: 'Первоклассный',
   ELDRITCH_MOD_R6: 'Безупречный',
+  EATER_ITEM: 'Предмет Пожирателя миров',
+  EXARCH_ITEM: 'Предмет Пламенного экзарха',
   SENTINEL_CHARGE: 'Заряд: ',
   SHAPER_MODS: [
     'изменения',
