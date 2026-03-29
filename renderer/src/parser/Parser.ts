@@ -198,13 +198,6 @@ function findInDatabase (item: ParserState) {
   if (!info?.length) {
     return err('item.unknown')
   }
-  if (info[0].unique) {
-    // 国服 itemType 和 name 都是中文, 导致得再查一下
-    const baseType = ITEM_BY_REF_OR_TRANSLATED('ITEM', item.baseType ?? item.name)
-    if (baseType) {
-      info = info.filter(info => info.unique!.base === baseType[0].name || info.unique!.base === baseType[0].refName)
-    }
-  }
   item.infoVariants = info
   // choose 1st variant, correct one will be picked at the end of parsing
   item.info = info[0]
