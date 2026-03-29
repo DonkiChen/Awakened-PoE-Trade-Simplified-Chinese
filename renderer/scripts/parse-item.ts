@@ -1,7 +1,7 @@
-import { readFile } from 'fs/promises'
-import { initForNode } from '../src/assets/data/node'
-import { parseClipboard } from '../src/parser'
-import type { ParserRealm } from '../src/parser/runtime'
+import {readFile} from 'fs/promises'
+import {initForNode} from '../src/assets/data/node'
+import {parseClipboard, ParsedItem} from '../src/parser'
+import type {ParserRealm} from '../src/parser/runtime'
 import config from './parse-item.config'
 
 interface CliOptions {
@@ -12,9 +12,9 @@ interface CliOptions {
   dataDir?: string
 }
 
-function parseArgs (argv: string[]) {
+function parseArgs(argv: string[]) {
   // Config file is the default; CLI flags only override specific fields.
-  const options: CliOptions = { ...config }
+  const options: CliOptions = {...config}
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]
@@ -38,7 +38,7 @@ function parseArgs (argv: string[]) {
   return options
 }
 
-function readStdin () {
+function readStdin() {
   return new Promise<string>((resolve, reject) => {
     const chunks: Buffer[] = []
     process.stdin.on('data', chunk => chunks.push(Buffer.from(chunk)))
@@ -47,7 +47,7 @@ function readStdin () {
   })
 }
 
-async function readClipboardText (options: CliOptions) {
+async function readClipboardText(options: CliOptions) {
   if (options.file) {
     return await readFile(options.file, 'utf8')
   }
@@ -58,7 +58,7 @@ async function readClipboardText (options: CliOptions) {
   return await readStdin()
 }
 
-async function main () {
+async function main() {
   const options = parseArgs(process.argv.slice(2))
   await initForNode(options.lang, {
     realm: options.realm,
@@ -74,7 +74,13 @@ async function main () {
     return
   }
 
-  console.log(JSON.stringify(parsed.value, null, 2))
+  const simplify = {
+    stats: parsed.value.statsByType
+      .map((it) => it.stat.ref),
+    unknownModifiers: parsed.value.unknownModifiers
+  }
+
+  console.log(JSON.stringify(simplify, null, 2))
 }
 
 main().catch(error => {

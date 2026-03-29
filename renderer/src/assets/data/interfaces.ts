@@ -97,9 +97,9 @@ export interface BaseType {
   }
   gem?: {
     vaal?: true
-    awakened?: true
     transfigured?: true
     normalVariant?: BaseType['refName']
+    maxLevel: number
   }
   armour?: {
     ar?: [min: number, max: number]
@@ -137,6 +137,7 @@ export interface TranslationDict {
   SOCKETS: string
   QUALITY: string
   MEMORY_STRANDS: string
+  STORED_EXPERIENCE: string
   PHYSICAL_DAMAGE: string
   ELEMENTAL_DAMAGE: string
   CRIT_CHANCE: string
@@ -151,7 +152,6 @@ export interface TranslationDict {
   ITEM_SUPERIOR: RegExp
   MAP_BLIGHTED: RegExp
   MAP_BLIGHT_RAVAGED: RegExp
-  MAP_REWARD: string
   INFLUENCE_SHAPER: string
   INFLUENCE_ELDER: string
   INFLUENCE_CRUSADER: string
@@ -177,11 +177,23 @@ export interface TranslationDict {
   QUALITY_PHANTASMAL: RegExp
   AREA_LEVEL: string
   HEIST_WINGS_REVEALED: string
-  HEIST_TARGET: string
+  HEIST_BLUEPRINT_TARGET: string
   HEIST_BLUEPRINT_ENCHANTS: string
   HEIST_BLUEPRINT_TRINKETS: string
   HEIST_BLUEPRINT_GEMS: string
   HEIST_BLUEPRINT_REPLICAS: string
+  HEIST_CONTRACT_JOB: RegExp
+  HEIST_JOB_LOCKPICKING: string
+  HEIST_JOB_BRUTEFORCE: string
+  HEIST_JOB_PERCEPTION: string
+  HEIST_JOB_DEMOLITION: string
+  HEIST_JOB_COUNTERTHAUMATURGY: string
+  HEIST_JOB_TRAPDISARMAMENT: string
+  HEIST_JOB_AGILITY: string
+  HEIST_JOB_DECEPTION: string
+  HEIST_JOB_ENGINEERING: string
+  HEIST_CONTRACT_TARGET: RegExp
+  HEIST_TARGET_PRICELESS: string
   MIRRORED: string
   SPLIT: string
   MODIFIER_LINE: RegExp

@@ -101,7 +101,7 @@ export default defineComponent({
             hide(w.wmId)
           }
         }
-        try { updateImage() } catch (e) {}
+        try { updateImage() } catch {}
       } else {
         for (const w of widgets.value) {
           if (w.wmFlags.includes('hide-on-focus')) {

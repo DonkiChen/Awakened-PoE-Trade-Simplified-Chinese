@@ -1,7 +1,8 @@
 import { stat } from '@/assets/data'
 import { ItemRarity } from '@/parser'
+import { ModifierType } from '@/parser/modifiers'
 import type { FiltersCreationContext } from '../create-stat-filters'
-import { findAndResolveByRef, explicitStatToNotFilter } from './utils'
+import { findAndResolveByRef, statToNotFilter } from './utils'
 
 const STATS = {
   INCR_CHARGE_RECOVERY: stat('#% increased Charge Recovery'),
@@ -16,8 +17,9 @@ export function applyFlaskHybridMod (ctx: FiltersCreationContext) {
   if (!applicable) return
 
   const effectStat = findAndResolveByRef(STATS.INCR_EFFECT, ctx.item.category)
-  const filter = explicitStatToNotFilter({
+  const filter = statToNotFilter({
     stat: effectStat,
+    type: ModifierType.Explicit,
     negateString: true,
     disabled: false
   })

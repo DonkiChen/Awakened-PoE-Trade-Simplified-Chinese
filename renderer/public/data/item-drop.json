@@ -100,8 +100,101 @@
       "UNIQUE::The Vertex // Vaal Mask",
       "UNIQUE::Atziri's Splendour // ES, Sacrificial Garb",
       "UNIQUE::Atziri's Splendour // Evasion/ES/Life, Sacrificial Garb",
+      "UNIQUE::Beauty // Vaal Aspect",
       "DIVINATION_CARD::Alluring Bounty",
       "DIVINATION_CARD::House of Mirrors"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Vaal Temple Map // T0, Atlas"
+    ],
+    "items": [
+      "UNIQUE::Cooperation // Vaal Aspect",
+      "DIVINATION_CARD::Beauty Through Death"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Shaper Guardian Map // T0, Atlas"
+    ],
+    "items": [
+      "ITEM::Fragment of the Minotaur",
+      "ITEM::Fragment of the Chimera",
+      "ITEM::Fragment of the Phoenix",
+      "ITEM::Fragment of the Hydra"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Nightmare Map // T0, Atlas"
+    ],
+    "items": [
+      "UNIQUE::Malachai's Mark // Murder Mitts",
+      "UNIQUE::Manastorm // Lacewood Spirit Shield",
+      "UNIQUE::Yoke of Suffering // Onyx Amulet",
+      "UNIQUE::The Dark Seer // Shadow Sceptre",
+      "UNIQUE::Wraithlord // Bone Circlet"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::The Black Barya"
+    ],
+    "items": [
+      "UNIQUE::The Sands of Time // Tyrant's Sekhem",
+      "UNIQUE::The Broken Elegy // Foul Staff",
+      "UNIQUE::Screams of the Desiccated // Leather Belt"
+    ]
+  },
+  {
+    "query": [
+      "UNIQUE::Fleshrender // Exquisite Blade",
+      "UNIQUE::Khatal's Weeping // Lapis Amulet",
+      "UNIQUE::The Bane of Hope // Maraketh Bow",
+      "UNIQUE::Saresh's Darkness // Chain Belt",
+      "UNIQUE::The Desecrated Chalice // Coronal Maul",
+      "ITEM::Coin of Restoration"
+    ],
+    "items": [
+      "UNIQUE::Skysunder // Exquisite Blade",
+      "UNIQUE::Khatal's Geyser // Lapis Amulet",
+      "UNIQUE::The Flame of Hope // Maraketh Bow",
+      "UNIQUE::Solerai's Radiance // Chain Belt",
+      "UNIQUE::The Sacred Chalice // Coronal Maul"
+    ]
+  },
+  {
+    "query": [
+      "UNIQUE::Skysunder // Exquisite Blade",
+      "UNIQUE::Khatal's Geyser // Lapis Amulet",
+      "UNIQUE::The Flame of Hope // Maraketh Bow",
+      "UNIQUE::Solerai's Radiance // Chain Belt",
+      "UNIQUE::The Sacred Chalice // Coronal Maul",
+      "ITEM::Coin of Desecration"
+    ],
+    "items": [
+      "UNIQUE::Fleshrender // Exquisite Blade",
+      "UNIQUE::Khatal's Weeping // Lapis Amulet",
+      "UNIQUE::The Bane of Hope // Maraketh Bow",
+      "UNIQUE::Saresh's Darkness // Chain Belt",
+      "UNIQUE::The Desecrated Chalice // Coronal Maul"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Hivebrain Gland"
+    ],
+    "items": [
+      "ITEM::Flesh of Xesht",
+      "UNIQUE::Uul-Netol's Vow // Unset Amulet",
+      "UNIQUE::The Sundered Will // Fugitive Ring",
+      "UNIQUE::Hand of the Lords // Carnal Mitts",
+      "UNIQUE::The Grey Wind // Spectral Axe",
+      "UNIQUE::The Will of Xoph // Enthalpic Ring",
+      "UNIQUE::The Will of Tul // Cryonic Ring",
+      "UNIQUE::The Will of Esh // Synaptic Ring",
+      "UNIQUE::The Will of Uul-Netol // Organic Ring"
     ]
   },
   {
@@ -206,7 +299,8 @@
   },
   {
     "query": [
-      "ITEM::Echo of Loneliness"
+      "ITEM::Echo of Loneliness",
+      "ITEM::Memory of Loneliness"
     ],
     "items": [
       "ITEM::Orb of Remembrance",
@@ -219,7 +313,8 @@
   },
   {
     "query": [
-      "ITEM::Echo of Trauma"
+      "ITEM::Echo of Trauma",
+      "ITEM::Memory of Trauma"
     ],
     "items": [
       "ITEM::Orb of Intention",
@@ -232,7 +327,8 @@
   },
   {
     "query": [
-      "ITEM::Echo of Reverence"
+      "ITEM::Echo of Reverence",
+      "ITEM::Memory of Reverence"
     ],
     "items": [
       "ITEM::Orb of Unravelling",
@@ -241,6 +337,42 @@
       "UNIQUE::Seven Teachings // Waxed Garb",
       "UNIQUE::Wine of the Prophet",
       "UNIQUE::Bound By Destiny // Prismatic Jewel"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Lonely Fragment"
+    ],
+    "items": [
+      "UNIQUE::Festering Resentment // Demon Dagger",
+      "UNIQUE::Refuge in Isolation // Paladin Crown",
+      "UNIQUE::Bitter Instinct // Spiny Round Shield",
+      "UNIQUE::Haunting Memories // Turquoise Amulet",
+      "ITEM::Lonely Reliquary Key"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Traumatic Fragment"
+    ],
+    "items": [
+      "UNIQUE::Woespike // Steel Ring",
+      "UNIQUE::Coiling Whisper // Amethyst Ring",
+      "UNIQUE::The Caged Mammoth // Antique Gauntlets",
+      "UNIQUE::Wing of the Wyvern // Imperial Bow",
+      "ITEM::Traumatic Reliquary Key"
+    ]
+  },
+  {
+    "query": [
+      "ITEM::Reverent Fragment"
+    ],
+    "items": [
+      "UNIQUE::The Golden Charlatan // Lion Sword",
+      "UNIQUE::Whispers of Infinity // Seaglass Amulet",
+      "UNIQUE::The Hallowed Monarch // Faithful Helmet",
+      "UNIQUE::Wellwater Phylactery",
+      "ITEM::Reverent Reliquary Key"
     ]
   },
   {
@@ -504,6 +636,24 @@
   },
   {
     "query": [
+      "ITEM::Expedition Logbook",
+      "UNIQUE::Olroth's Charge // Runic Sollerets",
+      "UNIQUE::Faithguard // Runic Helm",
+      "UNIQUE::Medved's Challenge // Runic Gauntlets",
+      "UNIQUE::Nightgrip // Runic Gages",
+      "UNIQUE::Heroic Tragedy // Timeless Jewel"
+    ],
+    "items": [
+      "UNIQUE::Elixir of the Unbroken Circle",
+      "UNIQUE::Vorana's Preparation",
+      "UNIQUE::Starlight Chalice",
+      "UNIQUE::Olroth's Resolve",
+      "UNIQUE::Cadigan's Crown // Runic Crown",
+      "UNIQUE::Vorana's March // Runic Sabatons"
+    ]
+  },
+  {
+    "query": [
       "ITEM::Sacred Blossom"
     ],
     "items": [
@@ -568,11 +718,13 @@
     "query": [
       "ITEM::Ancient Orb",
       "ITEM::Astragali",
-      "ITEM::Voidborn Reliquary Key"
+      "ITEM::Voidborn Reliquary Key",
+      "ITEM::Valdo's Puzzle Box"
     ],
     "items": [
       "UNIQUE::Headhunter // Leather Belt",
       "UNIQUE::Mageblood // Heavy Belt",
+      "UNIQUE::Defiance of Destiny // Paua Amulet",
       "UNIQUE::The Squire // Elegant Round Shield"
     ]
   },
@@ -1286,34 +1438,27 @@
   },
   {
     "query": [
-      "ITEM::Remnant of Corruption"
-    ],
-    "items": [
-      "ITEM::Essence of Insanity",
-      "ITEM::Essence of Horror",
-      "ITEM::Essence of Delirium",
-      "ITEM::Essence of Hysteria"
-    ]
-  },
-  {
-    "query": [
       "ITEM::Essence of Insanity",
       "ITEM::Essence of Horror",
       "ITEM::Essence of Delirium",
       "ITEM::Essence of Hysteria"
     ],
     "items": [
-      "ITEM::Remnant of Corruption"
+      "ITEM::Primal Crystallised Lifeforce"
     ]
   },
   {
     "query": [
-      "ITEM::Sacred Crystallised Lifeforce",
       "ITEM::Primal Crystallised Lifeforce",
       "ITEM::Wild Crystallised Lifeforce",
-      "ITEM::Vivid Crystallised Lifeforce"
+      "ITEM::Vivid Crystallised Lifeforce",
+      "ITEM::Sacred Crystallised Lifeforce"
     ],
-    "items": []
+    "items": [
+      "ITEM::Diviner's Delirium Orb",
+      "ITEM::Faceted Fossil",
+      "ITEM::Golden Oil"
+    ]
   },
   {
     "query": [

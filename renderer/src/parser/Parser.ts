@@ -56,6 +56,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseInfluence,
   parseMap,
   parseSockets,
+  parseHeistContract,
   parseHeistBlueprint,
   parseAreaLevel,
   parseAtzoatlRooms,
@@ -71,6 +72,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseModifiers, // scourge
   parseModifiers, // implicit
   parseModifiers, // explicit
+  parseLens,
   { virtual: transformToLegacyModifiers, name: 'transformToLegacyModifiers' },
   { virtual: parseFractured, name: 'parseFractured' },
   { virtual: parseBlightedMap, name: 'parseBlightedMap' },
@@ -882,6 +884,55 @@ function parseCategoryByHelpText (section: string[], item: ParsedItem) {
   return 'SECTION_SKIPPED'
 }
 
+function parseHeistContract (section: string[], item: ParsedItem) {
+  if (item.category !== ItemCategory.HeistContract) return 'PARSER_SKIPPED'
+
+  parseAreaLevelNested(section, item)
+  if (!item.areaLevel) {
+    return 'SECTION_SKIPPED'
+  }
+
+  item.heistContract = {}
+
+  for (const line of section) {
+    const jobMatch = line.match(_$.HEIST_CONTRACT_JOB)
+    if (jobMatch) {
+      switch (jobMatch.groups!.job) {
+        case _$.HEIST_JOB_LOCKPICKING:
+          item.heistContract.requiredJob = 'Lockpicking'; break
+        case _$.HEIST_JOB_BRUTEFORCE:
+          item.heistContract.requiredJob = 'Brute Force'; break
+        case _$.HEIST_JOB_PERCEPTION:
+          item.heistContract.requiredJob = 'Perception'; break
+        case _$.HEIST_JOB_DEMOLITION:
+          item.heistContract.requiredJob = 'Demolition'; break
+        case _$.HEIST_JOB_COUNTERTHAUMATURGY:
+          item.heistContract.requiredJob = 'Counter-Thaumaturgy'; break
+        case _$.HEIST_JOB_TRAPDISARMAMENT:
+          item.heistContract.requiredJob = 'Trap Disarmament'; break
+        case _$.HEIST_JOB_AGILITY:
+          item.heistContract.requiredJob = 'Agility'; break
+        case _$.HEIST_JOB_DECEPTION:
+          item.heistContract.requiredJob = 'Deception'; break
+        case _$.HEIST_JOB_ENGINEERING:
+          item.heistContract.requiredJob = 'Engineering'; break
+      }
+      item.heistContract.jobLevel = Number(jobMatch.groups!.level)
+      continue
+    }
+
+    const targetMatch = line.match(_$.HEIST_CONTRACT_TARGET)
+    if (targetMatch) {
+      if (targetMatch[1] === _$.HEIST_TARGET_PRICELESS) {
+        item.heistContract.targetValue = 'Priceless'
+      }
+      continue
+    }
+  }
+
+  return 'SECTION_PARSED'
+}
+
 function parseHeistBlueprint (section: string[], item: ParsedItem) {
   if (item.category !== ItemCategory.HeistBlueprint) return 'PARSER_SKIPPED'
 
@@ -890,23 +941,25 @@ function parseHeistBlueprint (section: string[], item: ParsedItem) {
     return 'SECTION_SKIPPED'
   }
 
-  item.heist = {}
+  item.heistBlueprint = {}
 
   for (const line of section) {
-    if (line.startsWith(_$.HEIST_TARGET)) {
-      const targetText = line.slice(_$.HEIST_TARGET.length)
+    if (line.startsWith(_$.HEIST_BLUEPRINT_TARGET)) {
+      const targetText = line.slice(_$.HEIST_BLUEPRINT_TARGET.length)
       switch (targetText) {
         case _$.HEIST_BLUEPRINT_ENCHANTS:
-          item.heist.target = 'Enchants'; break
+          item.heistBlueprint.target = 'Enchants'; break
         case _$.HEIST_BLUEPRINT_GEMS:
-          item.heist.target = 'Gems'; break
+          item.heistBlueprint.target = 'Gems'; break
         case _$.HEIST_BLUEPRINT_REPLICAS:
-          item.heist.target = 'Replicas'; break
+          item.heistBlueprint.target = 'Replicas'; break
         case _$.HEIST_BLUEPRINT_TRINKETS:
-          item.heist.target = 'Trinkets'; break
+          item.heistBlueprint.target = 'Trinkets'; break
       }
     } else if (line.startsWith(_$.HEIST_WINGS_REVEALED)) {
-      item.heist.wingsRevealed = parseInt(line.slice(_$.HEIST_WINGS_REVEALED.length), 10)
+      const wings = line.slice(_$.HEIST_WINGS_REVEALED.length).split('/')
+      item.heistBlueprint.wingsRevealed = parseInt(wings[0], 10)
+      item.heistBlueprint.totalWings = parseInt(wings[1], 10)
     }
   }
 
@@ -1009,6 +1062,16 @@ function parseFilledCoffin (section: string[], item: ParsedItem) {
   parseStatsFromMod(lines, item, { info: modInfo, stats: [] })
 
   return 'SECTION_PARSED'
+}
+
+function parseLens (section: string[], item: ParsedItem) {
+  for (const line of section) {
+    if (line.startsWith(_$.STORED_EXPERIENCE)) {
+      item.storedExperience = parseInt(line.slice(_$.STORED_EXPERIENCE.length).replace(/,/g, ''), 10)
+      return 'SECTION_PARSED'
+    }
+  }
+  return 'PARSER_SKIPPED'
 }
 
 function markupConditionParser (text: string) {

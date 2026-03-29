@@ -83,7 +83,9 @@ export interface ItemFilters {
   }
   areaLevel?: FilterNumeric
   heistWingsRevealed?: FilterNumeric
+  heistTotalWings?: FilterNumeric
   sentinelCharge?: FilterNumeric
+  storedExperience?: FilterNumeric
   trade: {
     offline: boolean
     onlineInLeague: boolean
@@ -127,7 +129,7 @@ export interface StatFilter {
   disabled: boolean // NOTE: mutable in UI
 }
 
-export const INTERNAL_TRADE_IDS = [
+const _INTERNAL_TRADE_IDS = [
   'item.base_percentile',
   'item.memory_strands',
   'item.armour',
@@ -143,10 +145,21 @@ export const INTERNAL_TRADE_IDS = [
   'item.has_empty_modifier',
   'item.map_item_quantity',
   'item.map_item_rarity',
-  'item.map_pack_size'
+  'item.map_pack_size',
+  'item.heist_job_lockpicking',
+  'item.heist_job_bruteforce',
+  'item.heist_job_perception',
+  'item.heist_job_demolition',
+  'item.heist_job_counterthaumaturgy',
+  'item.heist_job_trapdisarmament',
+  'item.heist_job_agility',
+  'item.heist_job_deception',
+  'item.heist_job_engineering',
+  'item.heist_target_priceless'
 ] as const
 
-export type InternalTradeId = typeof INTERNAL_TRADE_IDS[number]
+export type InternalTradeId = typeof _INTERNAL_TRADE_IDS[number]
+export const INTERNAL_TRADE_IDS = _INTERNAL_TRADE_IDS as readonly string[]
 
 export enum ItemHasEmptyModifier {
   Any = 0,
