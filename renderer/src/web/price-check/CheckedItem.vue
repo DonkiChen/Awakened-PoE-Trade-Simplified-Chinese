@@ -35,7 +35,7 @@
         :get-link="makeTradeLink" />
     </div>
     <stack-value :filters="itemFilters" :item="item"/>
-    <div v-if="true" class="mt-auto border border-dashed p-2">
+    <div class="mt-auto border border-dashed p-2">
       <div class="mb-1"><a href="https://patreon.com/awakened_poe_trade" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank">{{ t('Support development on') }} <img class="inline h-5" src="/images/Patreon.svg"></a></div>
       <div class="mb-1"><a href="https://afdian.com/a/donkichen/plan" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank">{{ t('Support development CN on') }} <img class="inline h-5" src="/images/aifadain.png"></a></div>
       <div class="mb-1"><a href="https://gitee.com/hhzxxx/exilence-next-tx-release" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank">推荐使用国服收益统计插件，点击此文本可跳转</a></div>

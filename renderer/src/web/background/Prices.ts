@@ -83,7 +83,7 @@ export const usePoeninja = createGlobalState(() => {
           response = await Host.proxy(jsonurl, {
             signal: downloadController.signal
           })
-        } catch (e) {
+        } catch {
           response = await Host.proxy(jsonurl.replace('pub-feb51ef2e03741399e6a3d2d09a07601.r2.dev', 'gitee.com/hhzxxx/exilence-next-tx-release/raw/master'), {
             signal: downloadController.signal
           })
@@ -269,7 +269,7 @@ function splitJsonBlob (jsonBlob: string) {
       { ns: 'UNIQUE', url: 'unique-accessories', type: 'UniqueAccessory' },
       { ns: 'UNIQUE', url: 'unique-maps', type: 'UniqueMap' },
       { ns: 'UNIQUE', url: 'unique-relics', type: 'UniqueRelic' },
-    { ns: 'UNIQUE', url: 'unique-tinctures', type: 'UniqueTincture' },
+      { ns: 'UNIQUE', url: 'unique-tinctures', type: 'UniqueTincture' },
       { ns: 'GEM', url: 'skill-gems', type: 'SkillGem' }
     ]
 

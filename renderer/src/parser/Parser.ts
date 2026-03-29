@@ -957,7 +957,7 @@ function parseHeistBlueprint (section: string[], item: ParsedItem) {
           item.heistBlueprint.target = 'Trinkets'; break
       }
     } else if (line.startsWith(_$.HEIST_WINGS_REVEALED)) {
-      const wings = line.slice(_$.HEIST_WINGS_REVEALED.length).split("/")
+      const wings = line.slice(_$.HEIST_WINGS_REVEALED.length).split('/')
       item.heistBlueprint.wingsRevealed = parseInt(wings[0], 10)
       item.heistBlueprint.totalWings = parseInt(wings[1], 10)
     }
