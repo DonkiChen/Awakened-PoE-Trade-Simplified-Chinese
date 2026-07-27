@@ -120,6 +120,8 @@ export default {
   DELVE_MODS: ['地心的', '地下之', '地下的'],
   VEILED_MODS: ['天选的', '次序之'],
   INCURSION_MODS: ['古铁雷兹的', '肖佩克的', '托钵塔特的', '塔卡提的', '马塔特尔的', '马塔特尔之', '奇塔夸雷特的', '奇塔夸雷特之', '塔卡提之', '古铁雷兹之', '普华特之'],
+  ESSENCE_MODS: ['精髓之', '精髓的', '精髓'],
+  INFAMOUS_MODS: ['恶名之', '万恶的'],
   FOIL_UNIQUE: '古藏传奇',
   UNMODIFIABLE: '基底词缀不能改变',
   FOULBORN_NAME: /^秽生(.*)$/,

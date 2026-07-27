@@ -58,18 +58,38 @@ function createLeaguesState (configSource?: LeaguesConfigSource) {
     }
   })
 
-  async function load () {
+  async function load (
+    builtinBrowser?: { webview: Element, close: () => void }
+  ) {
     const config = getConfig()
     isLoading.value = true
     error.value = null
     lastAttemptedDependencyKey.value = leaguesDependencyKey(config)
 
     try {
-      // Settings pages can pass a draft config here, so build the request from
-      // the current config source instead of always using AppConfig().
-      const response = await Host.proxy(`${poeWebApi(config)}/api/leagues?type=main&realm=pc`)
-      if (!response.ok) throw new Error(JSON.stringify(Object.fromEntries(response.headers)))
-      const leagues: ApiLeague[] = await response.json()
+      let leagues: ApiLeague[] | undefined
+      try {
+        // Settings pages can pass a draft config here, so build the request from
+        // the current config source instead of always using AppConfig().
+        const response = await Host.proxy(`${poeWebApi(config)}/api/leagues?type=main&realm=pc`)
+        if (!response.ok) throw new Error(JSON.stringify(Object.fromEntries(response.headers)))
+        leagues = await response.json() as ApiLeague[]
+      } catch (e) {
+        // when you click the "Retry" and has the built-in browser open
+        interface WebviewTag extends Element {
+          executeJavaScript (code: string): Promise<unknown>
+        }
+        if (builtinBrowser) {
+          const webview = builtinBrowser.webview as WebviewTag
+          try {
+            const bodyText = await webview.executeJavaScript('document.body.innerText')
+            leagues = JSON.parse(bodyText as string)
+            builtinBrowser.close()
+          } catch {}
+        }
+
+        if (!leagues) throw e
+      }
 
       tradeLeagues.value = leagues
         .filter(league =>

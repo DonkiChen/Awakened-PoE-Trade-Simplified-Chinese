@@ -1,11 +1,12 @@
 import { Result, ok, err } from 'neverthrow'
 import {
   CLIENT_STRINGS as _$,
-  CLIENT_STRINGS_REF as _$REF,
   ITEM_BY_TRANSLATED,
   ITEM_BY_REF,
   STAT_BY_MATCH_STR,
-  BaseType, ITEM_BY_REF_OR_TRANSLATED
+  StatBetter,
+  BaseType,
+  ITEM_BY_REF_OR_TRANSLATED
 } from '@/assets/data'
 import { ModifierType, sumStatsByModType } from './modifiers'
 import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg } from './stat-translations'
@@ -163,15 +164,15 @@ function normalizeName (item: ParserState) {
   }
 
   if (item.category === ItemCategory.MetamorphSample) {
-    if (_$REF.METAMORPH_BRAIN.test(item.name)) {
+    if (_$.METAMORPH_BRAIN.test(item.name)) {
       item.name = 'Metamorph Brain'
-    } else if (_$REF.METAMORPH_EYE.test(item.name)) {
+    } else if (_$.METAMORPH_EYE.test(item.name)) {
       item.name = 'Metamorph Eye'
-    } else if (_$REF.METAMORPH_LUNG.test(item.name)) {
+    } else if (_$.METAMORPH_LUNG.test(item.name)) {
       item.name = 'Metamorph Lung'
-    } else if (_$REF.METAMORPH_HEART.test(item.name)) {
+    } else if (_$.METAMORPH_HEART.test(item.name)) {
       item.name = 'Metamorph Heart'
-    } else if (_$REF.METAMORPH_LIVER.test(item.name)) {
+    } else if (_$.METAMORPH_LIVER.test(item.name)) {
       item.name = 'Metamorph Liver'
     }
   }
@@ -197,6 +198,13 @@ function findInDatabase (item: ParserState) {
   }
   if (!info?.length) {
     return err('item.unknown')
+  }
+  if (info[0].unique) {
+    const baseTypes = ITEM_BY_TRANSLATED('ITEM', item.baseType!)
+    if (!baseTypes?.length) return err('item.unknown')
+
+    const baseTypeRef = baseTypes[0].refName
+    info = info.filter(info => info.unique!.base === baseTypeRef)
   }
   item.infoVariants = info
   // choose 1st variant, correct one will be picked at the end of parsing
@@ -680,7 +688,7 @@ function parseLogbookArea (section: string[], item: ParsedItem) {
 
   // skip Area, parse Faction
   const faction = STAT_BY_MATCH_STR(section[1].replace(/\([\w\s']+?\)/g, ''))
-  if (!faction) return 'SECTION_SKIPPED'
+  if (!faction || !faction.stat.ref.startsWith('Has Logbook Faction:')) return 'SECTION_SKIPPED'
 
   const areaMods: ParsedModifier[] = [{
     info: { tags: [], type: ModifierType.Pseudo },
@@ -693,14 +701,13 @@ function parseLogbookArea (section: string[], item: ParsedItem) {
   const { modType, lines } = parseModType(section.slice(2))
   for (const line of lines) {
     const found = STAT_BY_MATCH_STR(line)
-    if (found && found.stat.ref === 'Area contains an Expedition Boss (#)') {
-      const roll = found.matcher.value!
+    // Area contains an Expedition Boss (#)
+    if (found && found.stat.better === StatBetter.NotComparable) {
       areaMods.push({
         info: { tags: [], type: modType },
         stats: [{
           stat: found.stat,
-          translation: found.matcher,
-          roll: { value: roll, min: roll, max: roll, dp: false, unscalable: true }
+          translation: found.matcher
         }]
       })
     }

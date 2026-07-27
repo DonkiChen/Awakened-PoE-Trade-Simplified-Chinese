@@ -94,7 +94,7 @@ export function poeWebApi (config: Pick<Config, 'language' | 'useIntlSite'> = Ap
     case 'ru': return 'ru.pathofexile.com'
     case 'cmn-Hant': return 'pathofexile.tw'
     case 'zh_CN': return 'poe.game.qq.com'
-    case 'ko': return 'poe.game.daum.net'
+    case 'ko': return 'poe.kakaogames.com'
   }
 }
 
