@@ -1,11 +1,12 @@
 {
   "name": "Awakened-PoE-Trade-Simplified-Chinese",
-  "version": "3.28.104",
+  "version": "3.29.101",
   "private": true,
   "scripts": {
     "dev": "node build/script.mjs",
     "build": "tsc --noEmit && node build/script.mjs --prod",
-    "package": "electron-builder build"
+    "package": "electron-builder build",
+    "postinstall": "patch-package --patch-dir build"
   },
   "author": {
     "name": "Alexander Drozdov and HongChen and DonkiChen"
@@ -17,20 +18,24 @@
   "main": "dist/main.js",
   "dependencies": {
     "@donkichen/electron-overlay-window": "1.0.0",
-    "uiohook-napi": "1.5.4"
+    "uiohook-napi": "1.5.5"
   },
   "devDependencies": {
     "@types/ini": "^4.1.1",
-    "@types/node": "^24.10.9",
+    "@types/node": "^24.12.2",
     "@types/ws": "^8.18.1",
     "@wokwi/bmp-ts": "^3.0.0",
     "comlink": "^4.4.2",
-    "electron": "40.8.0",
-    "electron-builder": "26.4.0",
-    "electron-updater": "^6.7.3",
-    "esbuild": "^0.27.2",
+    "electron": "^40.10.6",
+    "electron-builder": "^26.9.0",
+    "electron-updater": "^6.8.3",
+    "esbuild": "^0.28.0",
     "ini": "^6.0.0",
-    "typescript": "^5.9.3",
-    "ws": "^8.19.0"
+    "patch-package": "^8.0.1",
+    "typescript": "^6.0.2",
+    "ws": "^8.20.0"
+  },
+  "allowScripts": {
+    "electron": true
   }
 }

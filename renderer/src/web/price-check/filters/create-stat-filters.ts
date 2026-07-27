@@ -205,15 +205,11 @@ export function calculatedStatToFilter (
         ? FilterTag.Enchant
         : FilterTag.Variant,
       oils: decodeOils(calc),
-      sources,
+      sources: sources,
       option: {
         value: sources[0].contributes!.value
       },
       disabled: false
-    }
-
-    if (filter.oils) {
-      filter.disabled = true
     }
   }
 
@@ -229,9 +225,16 @@ export function calculatedStatToFilter (
     text: translation.string,
     tag: (type as unknown) as FilterTag,
     oils: decodeOils(calc),
-    sources,
+    sources: sources,
     roll: undefined,
     disabled: true
+  }
+
+  if (calc.stat.better === StatBetter.NotComparable) {
+    if (type !== ModifierType.Enchant) {
+      filter.tag = FilterTag.Variant
+    }
+    filter.disabled = false
   }
 
   if (type === ModifierType.Implicit) {
@@ -250,34 +253,38 @@ export function calculatedStatToFilter (
       }
     } else if (sources.some(s => s.modifier.info.generation === 'foulborn')) {
       filter.tag = FilterTag.Foulborn
-    } else if ((sources.some(s => CLIENT_STRINGS.SHAPER_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.SHAPER_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.SHAPER_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.SHAPER_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Shaper
-    } else if ((sources.some(s => CLIENT_STRINGS.ELDER_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.ELDER_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.ELDER_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.ELDER_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Elder
-    } else if ((sources.some(s => CLIENT_STRINGS.HUNTER_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.HUNTER_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.HUNTER_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.HUNTER_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Hunter
-    } else if ((sources.some(s => CLIENT_STRINGS.WARLORD_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.WARLORD_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.WARLORD_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.WARLORD_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Warlord
-    } else if ((sources.some(s => CLIENT_STRINGS.REDEEMER_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.REDEEMER_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.REDEEMER_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.REDEEMER_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Redeemer
-    } else if ((sources.some(s => CLIENT_STRINGS.CRUSADER_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.CRUSADER_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.CRUSADER_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.CRUSADER_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Crusader
-    } else if ((sources.some(s => CLIENT_STRINGS.DELVE_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.DELVE_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.DELVE_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.DELVE_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Delve
-    } else if ((sources.some(s => CLIENT_STRINGS.VEILED_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.VEILED_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.VEILED_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.VEILED_MODS.includes(s.modifier.info.name!))) {
       // can't drop from ground, so don't show
       // filter.tag = FilterTag.Unveiled
-    } else if ((sources.some(s => CLIENT_STRINGS.INCURSION_MODS.includes(s.modifier.info.name!))) ||
-        (sources.some(s => CLIENT_STRINGS_REF.INCURSION_MODS.includes(s.modifier.info.name!)))) {
+    } else if (sources.some(s => CLIENT_STRINGS.INCURSION_MODS.includes(s.modifier.info.name!)) ||
+        sources.some(s => CLIENT_STRINGS_REF.INCURSION_MODS.includes(s.modifier.info.name!))) {
       filter.tag = FilterTag.Incursion
+    } else if (sources.some(s => CLIENT_STRINGS.ESSENCE_MODS.includes(s.modifier.info.name!))) {
+      filter.tag = FilterTag.Essence
+    } else if (sources.some(s => CLIENT_STRINGS.INFAMOUS_MODS.includes(s.modifier.info.name!))) {
+      filter.tag = FilterTag.Infamous
     }
   }
 
@@ -343,7 +350,7 @@ export function calculatedStatToFilter (
       bounds: (item.rarity === ItemRarity.Unique && roll.min !== roll.max && calc.stat.better !== StatBetter.NotComparable)
         ? filterBounds
         : undefined,
-      dp,
+      dp: dp,
       isNegated: false,
       tradeInvert: calc.stat.trade.inverted,
       goodness

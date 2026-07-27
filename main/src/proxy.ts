@@ -8,6 +8,7 @@ export const PROXY_HOSTS = [
   {host: 'ru.pathofexile.com', official: true},
   {host: 'pathofexile.tw', official: true},
   {host: 'poe.game.daum.net', official: true},
+  {host: 'poe.kakaogames.com', official: true},
   {host: 'poe.ninja', official: false},
   {host: 'www.poeprices.info', official: false},
   { host: 'poe.game.qq.com', official: true },
