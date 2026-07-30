@@ -1,6 +1,6 @@
 import {
-  CLIENT_STRINGS as _$,
-  CLIENT_STRINGS_REF as _$REF
+  CLIENT_STRINGS as clientStrings,
+  CLIENT_STRINGS_REF as referenceClientStrings
 } from '@/assets/data'
 import type { TranslationDict } from '@/assets/data'
 
@@ -18,15 +18,17 @@ export type ClientStringVariantKey =
   | 'FOULBORN_MODIFIER'
   | 'SPLIT'
   | 'UNSCALABLE_VALUE'
+  | 'MEMORY_STRANDS'
 
 export type ClientStringRegexKey = {
   [K in keyof TranslationDict]: TranslationDict[K] extends RegExp ? K : never
 }[keyof TranslationDict]
 
-type ClientStringVariantMap = Partial<Record<ClientStringVariantKey, readonly string[]>>
+type ClientStringAliasMap = Partial<Record<ClientStringVariantKey, readonly string[]>>
+type ClientStringStripResult = { matched: boolean, value: string }
 
 // Parser-only compatibility aliases supplement localized client strings.
-const CLIENT_STRING_VARIANTS: ClientStringVariantMap = {
+const PARSER_CLIENT_STRING_ALIASES: ClientStringAliasMap = {
   SPLIT: ['分裂(Split)'],
   PREFIX_MODIFIER: ['▲ 前缀词缀'],
   SUFFIX_MODIFIER: ['▽ 后缀词缀'],
@@ -36,7 +38,8 @@ const CLIENT_STRING_VARIANTS: ClientStringVariantMap = {
   CRAFTED_PREFIX: ['大师工艺 ▲ 前缀词缀', '大师级 ▲ 前缀词缀', '大师 前缀词缀'],
   CRAFTED_SUFFIX: ['大师工艺 ▽ 后缀词缀', '大师级 ▽ 后缀词缀', '大师 后缀词缀'],
   CORRUPTED_IMPLICIT: ['腐化基底词缀'],
-  UNSCALABLE_VALUE: [' — 数值不可估量', ' — 数值不可调整']
+  UNSCALABLE_VALUE: [' — 数值不可估量', ' — 数值不可调整'],
+  MEMORY_STRANDS: ['记忆丝缕: ']
 }
 
 /**
@@ -53,7 +56,12 @@ const CLIENT_STRING_VARIANTS: ClientStringVariantMap = {
 export function getClientStringVariants (
   key: ClientStringVariantKey
 ): readonly string[] {
-  return [_$[key], ...(CLIENT_STRING_VARIANTS[key] ?? [])]
+  return [clientStrings[key], ...(PARSER_CLIENT_STRING_ALIASES[key] ?? [])]
+}
+
+function getSortedClientStringVariants (key: ClientStringVariantKey): string[] {
+  return [...getClientStringVariants(key)]
+    .sort((left, right) => right.length - left.length)
 }
 
 /**
@@ -80,10 +88,12 @@ export function execClientStringRegex (
   value: string
 ): { key: ClientStringRegexKey, match: RegExpExecArray } | null {
   const keys = (Array.isArray(keyOrKeys) ? keyOrKeys : [keyOrKeys]) as readonly ClientStringRegexKey[]
+  // These dictionaries are initialized after this module is loaded.
+  const dictionaries = [referenceClientStrings, clientStrings] as const
 
   for (const key of keys) {
-    for (const dict of [_$REF, _$] as const) {
-      const regex = dict[key]
+    for (const dictionary of dictionaries) {
+      const regex = dictionary[key]
       regex.lastIndex = 0
       const match = regex.exec(value)
       if (match) {
@@ -113,15 +123,36 @@ export function testClientStringRegex (
 export function stripTrailingClientString (
   key: ClientStringVariantKey,
   value: string
-): { matched: boolean, value: string } {
-  const variants = [...getClientStringVariants(key)]
-    .sort((left, right) => right.length - left.length)
+): ClientStringStripResult {
+  const variants = getSortedClientStringVariants(key)
 
   for (const variant of variants) {
     if (value.endsWith(variant)) {
       return {
         matched: true,
         value: value.slice(0, -variant.length)
+      }
+    }
+  }
+
+  return { matched: false, value }
+}
+
+/**
+ * Removes a leading canonical or compatibility string and tells the caller
+ * whether a heading was stripped.
+ */
+export function stripLeadingClientString (
+  key: ClientStringVariantKey,
+  value: string
+): ClientStringStripResult {
+  const variants = getSortedClientStringVariants(key)
+
+  for (const variant of variants) {
+    if (value.startsWith(variant)) {
+      return {
+        matched: true,
+        value: value.slice(variant.length)
       }
     }
   }

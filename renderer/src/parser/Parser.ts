@@ -15,7 +15,7 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedIt
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
-import { execClientStringRegex, matchesClientString } from './client-string-variants'
+import { execClientStringRegex, matchesClientString, stripLeadingClientString } from './client-string-variants'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -592,8 +592,9 @@ function parseQualityNested (section: string[], item: ParsedItem): boolean {
 
 function parseMemoryStrandsNested (section: string[], item: ParsedItem): boolean {
   for (const line of section) {
-    if (line.startsWith(_$.MEMORY_STRANDS)) {
-      item.memoryStrands = parseInt(line.slice(_$.MEMORY_STRANDS.length), 10)
+    const memoryStrands = stripLeadingClientString('MEMORY_STRANDS', line)
+    if (memoryStrands.matched) {
+      item.memoryStrands = parseInt(memoryStrands.value, 10)
       return true
     }
   }
