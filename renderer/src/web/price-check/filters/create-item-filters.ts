@@ -258,7 +258,7 @@ export function createFilters (
   if (item.sockets?.white) {
     filters.whiteSockets = {
       value: item.sockets.white,
-      disabled: false
+      disabled: true
     }
   }
 
