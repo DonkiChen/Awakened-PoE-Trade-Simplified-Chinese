@@ -44,6 +44,13 @@ export interface ParsedItem {
     moreCurrency?: number
     moreDivCards?: number
   }
+  chart?: {
+    area?: string
+    itemQuantity?: number
+    packSize?: number
+    sulphur?: number
+    shape?: string
+  }
   gemLevel?: number
   imbuedGem?: boolean
   areaLevel?: number

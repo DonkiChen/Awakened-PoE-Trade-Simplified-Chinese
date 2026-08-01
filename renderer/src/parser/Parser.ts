@@ -56,6 +56,9 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseFoil,
   parseInfluence,
   parseMap,
+  parseChartProperties,
+  parseChartShape,
+  parseChartUnrevealed,
   parseSockets,
   parseHeistContract,
   parseHeistBlueprint,
@@ -274,6 +277,69 @@ function parseMap (section: string[], item: ParsedItem) {
   }
 
   return isParsed
+}
+
+function parseChartProperties (section: string[], item: ParsedItem) {
+  if (item.category !== ItemCategory.Chart) return 'PARSER_SKIPPED'
+
+  let isParsed: SectionParseResult = 'SECTION_SKIPPED'
+
+  for (const line of section) {
+    if (line.startsWith(_$.AREA_LEVEL)) {
+      item.areaLevel = parseInt(line.slice(_$.AREA_LEVEL.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
+      item.chart ??= {}
+      item.chart.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
+      item.chart ??= {}
+      item.chart.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (_$.CHART_SULPHUR && line.startsWith(_$.CHART_SULPHUR)) {
+      item.chart ??= {}
+      item.chart.sulphur = parseInt(line.slice(_$.CHART_SULPHUR.length), 10)
+      isParsed = 'SECTION_PARSED'
+    }
+  }
+
+  if (isParsed === 'SECTION_PARSED') {
+    const chartArea = section.find(line =>
+      !line.startsWith(_$.AREA_LEVEL) &&
+      !line.startsWith(_$.MAP_ITEM_QUANTITY) &&
+      !line.startsWith(_$.MAP_MONSTER_PACK_SIZE) &&
+      (!_$.CHART_SULPHUR || !line.startsWith(_$.CHART_SULPHUR)) &&
+      (!_$.CHART_SHAPE || !line.startsWith(_$.CHART_SHAPE)) &&
+      line !== _$.CHART_UNREVEALED
+    )
+    if (chartArea) {
+      item.chart ??= {}
+      item.chart.area = chartArea.replace(/\s*\([^()]*\)\s*$/, '').trim()
+    }
+  }
+
+  return isParsed
+}
+
+function parseChartShape (section: string[], item: ParsedItem) {
+  const chartShape = _$.CHART_SHAPE
+  if (item.category !== ItemCategory.Chart || !chartShape) return 'PARSER_SKIPPED'
+
+  const line = section.find(line => line.startsWith(chartShape))
+  if (!line) return 'SECTION_SKIPPED'
+
+  item.chart ??= {}
+  item.chart.shape = line.slice(chartShape.length).trim()
+  return 'SECTION_PARSED'
+}
+
+function parseChartUnrevealed (section: string[], item: ParsedItem) {
+  const chartUnrevealed = _$.CHART_UNREVEALED
+  if (item.category !== ItemCategory.Chart || !chartUnrevealed) return 'PARSER_SKIPPED'
+
+  return section.includes(chartUnrevealed)
+    ? 'SECTION_PARSED'
+    : 'SECTION_SKIPPED'
 }
 
 function parseBlightedMap (item: ParsedItem) {

@@ -1,6 +1,6 @@
 import type { ItemFilters } from './interfaces'
 import { ParsedItem, ItemCategory, ItemRarity } from '@/parser'
-import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM } from '@/parser/meta'
+import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM, MAP_LIKE_ITEM } from '@/parser/meta'
 import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
@@ -125,7 +125,7 @@ export function createFilters (
     return filters
   }
 
-  if (item.category === ItemCategory.Map) {
+  if (MAP_LIKE_ITEM.has(item.category!)) {
     if (item.rarity === ItemRarity.Unique && item.info.unique) {
       filters.searchExact = {
         name: item.info.name,
@@ -139,8 +139,8 @@ export function createFilters (
       }
     }
 
-    if (item.info.refName === 'Map' || item.info.unique?.base === 'Map') {
-      filters.discriminator = { trade: 'map' }
+    if (item.category === ItemCategory.Map && (item.info.refName === 'Map' || item.info.unique?.base === 'Map')) {
+      filters.discriminator = { trade: 'map', disabled: false }
     }
 
     if (item.mapBlighted) {
@@ -154,7 +154,30 @@ export function createFilters (
       }
     }
 
-    if (item.map!.tier) {
+    if (
+      item.category === ItemCategory.Chart &&
+      item.chart?.area &&
+      item.info.tradeDisc &&
+      item.info.tradeType &&
+      item.info.disc?.sectionText &&
+      item.rawText.includes(item.info.disc.sectionText)
+    ) {
+      filters.discriminator = {
+        value: item.chart.area,
+        trade: item.info.tradeDisc,
+        option: item.info.tradeType,
+        disabled: false
+      }
+    }
+
+    if (item.category === ItemCategory.Chart && item.areaLevel != null) {
+      filters.areaLevel = {
+        value: item.areaLevel,
+        disabled: false
+      }
+    }
+
+    if (item.category === ItemCategory.Map && item.map?.tier) {
       filters.mapTier = {
         value: item.map!.tier,
         disabled: false
@@ -363,7 +386,7 @@ export function createFilters (
   if (item.itemLevel) {
     if (
       item.rarity !== ItemRarity.Unique &&
-      item.category !== ItemCategory.Map &&
+      !MAP_LIKE_ITEM.has(item.category!) &&
       item.category !== ItemCategory.Jewel && /* https://pathofexile.gamepedia.com/Jewel#Affixes */
       item.category !== ItemCategory.HeistBlueprint &&
       item.category !== ItemCategory.HeistContract &&
@@ -471,7 +494,8 @@ function createGemFilters (
       baseTypeTrade: t(opts, normalGem)
     }
     filters.discriminator = {
-      trade: item.info.tradeDisc!
+      trade: item.info.tradeDisc!,
+      disabled: false
     }
   }
 

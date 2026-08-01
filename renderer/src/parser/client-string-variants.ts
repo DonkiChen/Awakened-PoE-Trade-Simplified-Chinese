@@ -21,7 +21,7 @@ export type ClientStringVariantKey =
   | 'MEMORY_STRANDS'
 
 export type ClientStringRegexKey = {
-  [K in keyof TranslationDict]: TranslationDict[K] extends RegExp ? K : never
+  [K in keyof TranslationDict]-?: NonNullable<TranslationDict[K]> extends RegExp ? K : never
 }[keyof TranslationDict]
 
 type ClientStringAliasMap = Partial<Record<ClientStringVariantKey, readonly string[]>>

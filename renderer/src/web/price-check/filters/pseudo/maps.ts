@@ -1,5 +1,6 @@
 import { stat, pseudoStatByRef } from '@/assets/data'
 import { ItemRarity } from '@/parser/ParsedItem'
+import { ItemCategory } from '@/parser/meta'
 import { ModifierType } from '@/parser/modifiers'
 import { FiltersCreationContext } from '../create-stat-filters'
 import { noSourcePseudoToFilter, propToFilter } from './item-property'
@@ -19,6 +20,37 @@ const VALDO_LETHAL_STATS = [
 
 export function mapProps (ctx: FiltersCreationContext): void {
   const { item } = ctx
+  if (item.category === ItemCategory.Chart) {
+    if (item.chart?.itemQuantity != null) {
+      ctx.filters.push(propToFilter({
+        ref: 'Item Quantity: +#%',
+        tradeId: 'item.map_item_quantity',
+        roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.chart.itemQuantity },
+        sources: [],
+        disabled: true
+      }, ctx))
+    }
+    if (item.chart?.packSize != null) {
+      ctx.filters.push(propToFilter({
+        ref: 'Monster Pack Size: +#%',
+        tradeId: 'item.map_pack_size',
+        roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.chart.packSize },
+        sources: [],
+        disabled: true
+      }, ctx))
+    }
+    if (item.chart?.sulphur != null) {
+      ctx.filters.push(propToFilter({
+        ref: "Dead Man's Sulphur: +#%",
+        tradeId: 'item.chart_sulphur',
+        roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.chart.sulphur },
+        sources: [],
+        disabled: true
+      }, ctx))
+    }
+    return
+  }
+
   if (!item.map || item.mapBlighted || item.mapCompletionReward || item.rarity === ItemRarity.Unique) return
 
   const hasMoreDrops = Boolean(item.map.moreMaps || item.map.moreScarabs || item.map.moreCurrency || item.map.moreDivCards)

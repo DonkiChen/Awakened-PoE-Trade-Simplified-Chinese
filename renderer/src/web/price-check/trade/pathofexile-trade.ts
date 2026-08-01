@@ -11,6 +11,7 @@ import { Cache } from './Cache'
 
 export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Map, 'map'],
+  [ItemCategory.Chart, 'chart'],
   [ItemCategory.AbyssJewel, 'jewel.abyss'],
   [ItemCategory.Amulet, 'accessory.amulet'],
   [ItemCategory.Belt, 'accessory.belt'],
@@ -165,6 +166,7 @@ interface TradeRequest {
           map_iiq?: FilterRange
           map_iir?: FilterRange
           map_packsize?: FilterRange
+          chart_sulphur?: FilterRange
           map_blighted?: FilterBoolean
           map_uberblighted?: FilterBoolean
           area_level?: FilterRange
@@ -520,6 +522,10 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[]) {
         propSet(query.filters, 'map_filters.filters.map_packsize.min', typeof input.min === 'number' ? input.min : undefined)
         propSet(query.filters, 'map_filters.filters.map_packsize.max', typeof input.max === 'number' ? input.max : undefined)
         break
+      case 'item.chart_sulphur':
+        propSet(query.filters, 'map_filters.filters.chart_sulphur.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.chart_sulphur.max', typeof input.max === 'number' ? input.max : undefined)
+        break
       case 'item.heist_job_agility':
         propSet(query.filters, 'heist_filters.filters.heist_agility.min', typeof input.min === 'number' ? input.min : 1)
         propSet(query.filters, 'heist_filters.filters.heist_agility.max', typeof input.max === 'number' ? input.max : undefined)
@@ -745,12 +751,12 @@ function tradeIdToQuery (id: string, stat: Pick<StatFilter, 'roll' | 'option' | 
 }
 
 function nameToQuery (name: string, filters: ItemFilters) {
-  if (!filters.discriminator) {
+  if (!filters.discriminator || filters.discriminator.disabled) {
     return name
   } else {
     return {
       discriminator: filters.discriminator.trade,
-      option: name
+      option: filters.discriminator.option ?? name
     }
   }
 }
