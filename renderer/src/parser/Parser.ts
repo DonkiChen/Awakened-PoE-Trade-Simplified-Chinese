@@ -15,7 +15,7 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedIt
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
-import { execClientStringRegex, matchesClientString } from './client-string-variants'
+import { execClientStringRegex, matchesClientString, stripLeadingClientString } from './client-string-variants'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -56,6 +56,9 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseFoil,
   parseInfluence,
   parseMap,
+  parseChartProperties,
+  parseChartShape,
+  parseChartUnrevealed,
   parseSockets,
   parseHeistContract,
   parseHeistBlueprint,
@@ -200,11 +203,13 @@ function findInDatabase (item: ParserState) {
     return err('item.unknown')
   }
   if (info[0].unique) {
-    const baseTypes = ITEM_BY_TRANSLATED('ITEM', item.baseType!)
-    if (!baseTypes?.length) return err('item.unknown')
-
-    const baseTypeRef = baseTypes[0].refName
-    info = info.filter(info => info.unique!.base === baseTypeRef)
+    info = info.filter(unique => {
+      const baseRef = unique.unique?.base
+      return baseRef != null && ITEM_BY_REF('ITEM', baseRef)?.some(base =>
+        base.name === item.baseType
+      )
+    })
+    if (!info.length) return err('item.unknown')
   }
   item.infoVariants = info
   // choose 1st variant, correct one will be picked at the end of parsing
@@ -274,6 +279,69 @@ function parseMap (section: string[], item: ParsedItem) {
   }
 
   return isParsed
+}
+
+function parseChartProperties (section: string[], item: ParsedItem) {
+  if (item.category !== ItemCategory.Chart) return 'PARSER_SKIPPED'
+
+  let isParsed: SectionParseResult = 'SECTION_SKIPPED'
+
+  for (const line of section) {
+    if (line.startsWith(_$.AREA_LEVEL)) {
+      item.areaLevel = parseInt(line.slice(_$.AREA_LEVEL.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
+      item.chart ??= {}
+      item.chart.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
+      item.chart ??= {}
+      item.chart.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
+      isParsed = 'SECTION_PARSED'
+    } else if (_$.CHART_SULPHUR && line.startsWith(_$.CHART_SULPHUR)) {
+      item.chart ??= {}
+      item.chart.sulphur = parseInt(line.slice(_$.CHART_SULPHUR.length), 10)
+      isParsed = 'SECTION_PARSED'
+    }
+  }
+
+  if (isParsed === 'SECTION_PARSED') {
+    const chartArea = section.find(line =>
+      !line.startsWith(_$.AREA_LEVEL) &&
+      !line.startsWith(_$.MAP_ITEM_QUANTITY) &&
+      !line.startsWith(_$.MAP_MONSTER_PACK_SIZE) &&
+      (!_$.CHART_SULPHUR || !line.startsWith(_$.CHART_SULPHUR)) &&
+      (!_$.CHART_SHAPE || !line.startsWith(_$.CHART_SHAPE)) &&
+      line !== _$.CHART_UNREVEALED
+    )
+    if (chartArea) {
+      item.chart ??= {}
+      item.chart.area = chartArea.replace(/\s*\([^()]*\)\s*$/, '').trim()
+    }
+  }
+
+  return isParsed
+}
+
+function parseChartShape (section: string[], item: ParsedItem) {
+  const chartShape = _$.CHART_SHAPE
+  if (item.category !== ItemCategory.Chart || !chartShape) return 'PARSER_SKIPPED'
+
+  const line = section.find(line => line.startsWith(chartShape))
+  if (!line) return 'SECTION_SKIPPED'
+
+  item.chart ??= {}
+  item.chart.shape = line.slice(chartShape.length).trim()
+  return 'SECTION_PARSED'
+}
+
+function parseChartUnrevealed (section: string[], item: ParsedItem) {
+  const chartUnrevealed = _$.CHART_UNREVEALED
+  if (item.category !== ItemCategory.Chart || !chartUnrevealed) return 'PARSER_SKIPPED'
+
+  return section.includes(chartUnrevealed)
+    ? 'SECTION_PARSED'
+    : 'SECTION_SKIPPED'
 }
 
 function parseBlightedMap (item: ParsedItem) {
@@ -592,8 +660,9 @@ function parseQualityNested (section: string[], item: ParsedItem): boolean {
 
 function parseMemoryStrandsNested (section: string[], item: ParsedItem): boolean {
   for (const line of section) {
-    if (line.startsWith(_$.MEMORY_STRANDS)) {
-      item.memoryStrands = parseInt(line.slice(_$.MEMORY_STRANDS.length), 10)
+    const memoryStrands = stripLeadingClientString('MEMORY_STRANDS', line)
+    if (memoryStrands.matched) {
+      item.memoryStrands = parseInt(memoryStrands.value, 10)
       return true
     }
   }

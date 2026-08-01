@@ -69,6 +69,7 @@ export interface BaseType {
   w?: number
   h?: number
   tradeTag?: string
+  tradeType?: string
   exchangeable?: true
   tradeDisc?: string
   disc?: {
@@ -126,6 +127,9 @@ export interface TranslationDict {
   MAP_MORE_CURRENCY: string
   MAP_MORE_DIVINATION_CARDS: string
   MAP_COMPLETION_REWARD: RegExp
+  CHART_SULPHUR?: string
+  CHART_SHAPE?: string
+  CHART_UNREVEALED?: string
   RARITY: string
   ITEM_CLASS: string
   ITEM_LEVEL: string

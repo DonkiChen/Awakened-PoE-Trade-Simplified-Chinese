@@ -11,6 +11,7 @@ import { applyFlaskHybridMod } from './pseudo/flasks'
 import { applyHeistRules } from './pseudo/heist'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
 import { StatBetter, CLIENT_STRINGS, CLIENT_STRINGS_REF } from '@/assets/data'
+import { MAP_LIKE_ITEM } from '@/parser/meta'
 
 export interface FiltersCreationContext {
   readonly item: ParsedItem
@@ -47,7 +48,7 @@ export function createExactStatFilters (
 
   if (item.rarity === ItemRarity.Magic && (
     item.category !== ItemCategory.ClusterJewel &&
-    item.category !== ItemCategory.Map &&
+    !MAP_LIKE_ITEM.has(item.category!) &&
     item.category !== ItemCategory.HeistContract &&
     item.category !== ItemCategory.HeistBlueprint &&
     item.category !== ItemCategory.Sentinel
@@ -63,7 +64,7 @@ export function createExactStatFilters (
 
   const ctx: FiltersCreationContext = {
     item,
-    searchInRange: (item.category !== ItemCategory.Map)
+    searchInRange: (!MAP_LIKE_ITEM.has(item.category!))
       ? Math.min(2, opts.searchStatRange)
       : opts.searchStatRange,
     filters: [],
@@ -87,7 +88,7 @@ export function createExactStatFilters (
     applyMirroredTabletRules(ctx.filters)
     return ctx.filters
   }
-  if (item.category === ItemCategory.Map) {
+  if (MAP_LIKE_ITEM.has(item.category!)) {
     for (const filter of ctx.filters) {
       if (filter.tag !== FilterTag.Property && filter.tag !== FilterTag.Pseudo) {
         filter.disabled = false

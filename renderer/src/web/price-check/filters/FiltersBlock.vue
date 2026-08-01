@@ -17,16 +17,16 @@
         :filter="filters.sentinelCharge" :name="t('item.sentinel_charge')" />
       <filter-btn-logical v-if="filters.mapBlighted" readonly
         :filter="{ disabled: false }" :text="filters.mapBlighted.value" />
-      <filter-btn-logical v-if="filters.discriminator?.value" readonly
-        :filter="{ disabled: false }" :text="filters.discriminator.value" />
+      <filter-btn-logical v-if="filters.discriminator?.value"
+        :filter="filters.discriminator"
+        :readonly="!filters.discriminator.option"
+        :text="filters.discriminator.value" />
       <filter-btn-numeric v-if="filters.storedExperience"
         :filter="filters.storedExperience" :name="t('item.stored_experience')" />
       <filter-btn-numeric v-if="filters.itemLevel"
         :filter="filters.itemLevel" :name="t('item.item_level')" />
       <filter-btn-numeric v-if="filters.stackSize"
         :filter="filters.stackSize" :name="t('item.stock')" />
-      <filter-btn-numeric v-if="filters.whiteSockets"
-        :filter="filters.whiteSockets" :name="t('item.white_sockets')" />
       <filter-btn-numeric v-if="filters.redSockets"
         :filter="filters.redSockets" :name="t('item.red_sockets')" />
       <filter-btn-numeric v-if="filters.greenSockets"
@@ -109,6 +109,7 @@ import FilterBtnLogical from './FilterBtnLogical.vue'
 import UnknownModifier from './UnknownModifier.vue'
 import { ItemFilters, StatFilter } from './interfaces'
 import { ParsedItem, ItemRarity, ItemCategory } from '@/parser'
+import { MAP_LIKE_ITEM } from '@/parser/meta'
 
 export default defineComponent({
   name: 'FiltersBlock',
@@ -151,7 +152,7 @@ export default defineComponent({
     const showUnknownMods = computed(() =>
       props.item.unknownModifiers.length &&
       props.item.category !== ItemCategory.Sentinel &&
-      props.item.category !== ItemCategory.Map
+      !MAP_LIKE_ITEM.has(props.item.category!)
     )
 
     const { t } = useI18n()

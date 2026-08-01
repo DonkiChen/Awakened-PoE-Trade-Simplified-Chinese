@@ -50,6 +50,7 @@ export default {
 import { computed, inject, ref } from 'vue'
 import { MainProcess } from '@/web/background/IPC'
 import { ItemCategory, ItemRarity, parseClipboard, ParsedItem } from '@/parser'
+import { MAP_LIKE_ITEM } from '@/parser/meta'
 import { registerActions } from './hotkeyable-actions'
 import type { WidgetManager } from '../overlay/interfaces'
 
@@ -101,7 +102,7 @@ const isMapLike = computed(() => {
   if (!item.value) return false
   const { category, rarity, info: { refName } } = item.value
   return (
-    (category === ItemCategory.Map && rarity !== ItemRarity.Unique) ||
+    (category != null && MAP_LIKE_ITEM.has(category) && rarity !== ItemRarity.Unique) ||
     category === ItemCategory.HeistContract ||
     category === ItemCategory.HeistBlueprint ||
     category === ItemCategory.Invitation ||

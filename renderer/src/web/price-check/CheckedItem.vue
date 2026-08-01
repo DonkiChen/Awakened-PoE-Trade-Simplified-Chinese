@@ -52,6 +52,7 @@
 import { defineComponent, PropType, watch, ref, nextTick, computed, ComponentPublicInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ItemRarity, ItemCategory, ParsedItem } from '@/parser'
+import { MAP_LIKE_ITEM } from '@/parser/meta'
 import TradeListing from './trade/TradeListing.vue'
 import TradeBulk from './trade/TradeBulk.vue'
 import TradeLinks from './trade/TradeLinks.vue'
@@ -129,7 +130,7 @@ export default defineComponent({
       } else {
         doSearch.value = Boolean(
           (item.rarity === ItemRarity.Unique) ||
-          (item.category === ItemCategory.Map) ||
+          MAP_LIKE_ITEM.has(item.category!) ||
           (item.category === ItemCategory.HeistContract) ||
           (item.category === ItemCategory.HeistBlueprint) ||
           (item.category === ItemCategory.SanctumRelic) ||
@@ -186,7 +187,7 @@ export default defineComponent({
       if (presets.value.active === 'filters.preset_base_item') return false
 
       return props.item.rarity === ItemRarity.Rare &&
-        props.item.category !== ItemCategory.Map &&
+        !MAP_LIKE_ITEM.has(props.item.category!) &&
         props.item.category !== ItemCategory.CapturedBeast &&
         props.item.category !== ItemCategory.HeistContract &&
         props.item.category !== ItemCategory.HeistBlueprint &&

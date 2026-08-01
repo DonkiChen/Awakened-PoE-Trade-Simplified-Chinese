@@ -1,23 +1,22 @@
-import { ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
-import { parserRealm } from './runtime'
+import { ITEM_BY_REF_OR_TRANSLATED } from '@/assets/data'
 
 export function magicBasetype (name: string) {
-  const realm = parserRealm()
-  const sep = (realm !== 'pc-ggg') ? '' : ' '
-  const words = name.split(sep)
+  const candidates = new Set<string>()
 
-  const perm: string[] = words.flatMap((_, start) =>
-    Array(words.length - start).fill(undefined)
-      .map((_, idx) => words
-        .slice(start, start + idx + 1)
-        .join(sep)
-      )
-  )
+  for (const sep of [' ', '']) {
+    const words = name.split(sep).filter(Boolean)
 
-  const result = perm
-    .map(name => {
-      const result = (realm !== 'pc-ggg') ? ITEM_BY_TRANSLATED('ITEM', name) : ITEM_BY_REF('ITEM', name)
-      return { name, found: (result && result[0].craftable) }
+    for (let start = 0; start < words.length; start += 1) {
+      for (let end = start + 1; end <= words.length; end += 1) {
+        candidates.add(words.slice(start, end).join(sep))
+      }
+    }
+  }
+
+  const result = [...candidates]
+    .map(candidate => {
+      const item = ITEM_BY_REF_OR_TRANSLATED('ITEM', candidate)
+      return { name: candidate, found: item?.[0]?.craftable }
     })
     .filter(res => res.found)
     .sort((a, b) => b.name.length - a.name.length)
