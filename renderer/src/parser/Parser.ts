@@ -203,11 +203,13 @@ function findInDatabase (item: ParserState) {
     return err('item.unknown')
   }
   if (info[0].unique) {
-    const baseTypes = ITEM_BY_TRANSLATED('ITEM', item.baseType!)
-    if (!baseTypes?.length) return err('item.unknown')
-
-    const baseTypeRef = baseTypes[0].refName
-    info = info.filter(info => info.unique!.base === baseTypeRef)
+    info = info.filter(unique => {
+      const baseRef = unique.unique?.base
+      return baseRef != null && ITEM_BY_REF('ITEM', baseRef)?.some(base =>
+        base.name === item.baseType
+      )
+    })
+    if (!info.length) return err('item.unknown')
   }
   item.infoVariants = info
   // choose 1st variant, correct one will be picked at the end of parsing
