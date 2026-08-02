@@ -17,6 +17,7 @@ export default {
   MAP_MORE_SCARABS: 'More Scarabs: ',
   MAP_MORE_CURRENCY: 'More Currency: ',
   MAP_MORE_DIVINATION_CARDS: 'More Divination Cards: ',
+  MAP_AREA: 'Map Area: ',
   MAP_COMPLETION_REWARD: /^Reward: Foil (.*)$/,
   CHART_SULPHUR: "Dead Man's Sulphur: ",
   CHART_SHAPE: 'Chart Shape: ',
@@ -129,6 +130,8 @@ export default {
   UNMODIFIABLE: 'Unmodifiable',
   FOULBORN_NAME: /^Foulborn (.*)$/,
   FOULBORN_MODIFIER: 'Foulborn Unique Modifier',
+  VESTIGIAL_NAME: /^Vestigial (.*)$/,
+  VESTIGIAL_IMPLICIT: 'Vestigial Implicit Modifier',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

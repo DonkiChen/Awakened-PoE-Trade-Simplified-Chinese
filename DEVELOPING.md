@@ -13,36 +13,37 @@ The most up-to-date instructions can always be derived from CI:
 
 [.github/workflows/main.yml](https://github.com/SnosMe/awakened-poe-trade/blob/master/.github/workflows/main.yml)
 
-Here's what that looks like as of 2023-12-03.
+Here's what that looks like as of 2026-08-01.
 
 ```shell
 cd renderer
-yarn install
-yarn make-index-files
-yarn dev
+npm ci
+npm run make-index-files
+npm run dev
 
 # In a second shell
 cd main
-yarn install
+npm ci
 # If u got this error: Error: listen EACCES: permission denied 127.0.0.1:8584 on Windows,
 # You can run these command to resolve:
 # 1. net stop winnat
 # 2. net start winnat
 # see: https://github.com/electerm/electerm/issues/2548
-yarn dev
+npm run dev
 ```
 
 # How to build
 
 ```shell
 cd renderer
-yarn install
-yarn make-index-files
-yarn build
+npm ci
+npm run make-index-files
+npm run build
 
 cd ../main
-yarn build
+npm ci
+npm run build
 # We want to sign with a distribution certificate to ensure other users can
 # install without errors
-CSC_NAME="Certificate name in Keychain" yarn package
+CSC_NAME="Certificate name in Keychain" npm run package
 ```

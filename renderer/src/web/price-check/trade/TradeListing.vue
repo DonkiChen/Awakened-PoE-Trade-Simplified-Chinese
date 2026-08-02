@@ -85,6 +85,7 @@
   <ui-error-box v-else>
     <template #name>{{ t(':error') }}</template>
     <p>Error: {{ error }}</p>
+    <p>{{ t('app.leagues_failed_help') }}</p>
     <template #actions>
       <button class="btn" @click="execSearch">{{ t('Retry') }}</button>
       <button class="btn" @click="openTradeLink">{{ t('Browser') }}</button>
@@ -209,6 +210,7 @@ function useTradeApi () {
 
 export default defineComponent({
   components: { OnlineFilter, TradeLinks, UiErrorBox },
+  emits: ['reset'],
   props: {
     filters: {
       type: Object as PropType<ItemFilters>,
@@ -223,7 +225,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup (props) {
+  setup (props, ctx) {
     const widget = computed(() => AppConfig<PriceCheckWidget>('price-check')!)
 
     watch(() => props.item, (item) => {
@@ -263,6 +265,7 @@ export default defineComponent({
       makeTradeLink,
       openTradeLink () {
         showBrowser(makeTradeLink())
+        ctx.emit('reset')
       },
       realm: AppConfig().realm
     }

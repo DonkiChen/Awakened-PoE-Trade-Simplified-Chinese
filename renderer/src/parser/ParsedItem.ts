@@ -51,6 +51,10 @@ export interface ParsedItem {
     sulphur?: number
     shape?: string
   }
+  scryingOrb?: {
+    area: string
+    tradeType?: string
+  }
   gemLevel?: number
   imbuedGem?: boolean
   areaLevel?: number
@@ -79,6 +83,7 @@ export interface ParsedItem {
   isVeiled?: boolean
   isFoil?: boolean
   isFoulborn?: boolean
+  isVestigial?: boolean
   statsByType: StatCalculated[]
   newMods: ParsedModifier[]
   unknownModifiers: Array<{

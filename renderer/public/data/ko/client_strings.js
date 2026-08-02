@@ -18,6 +18,7 @@ export default {
   MAP_MORE_CURRENCY: '화폐 더 많음: ',
   MAP_MORE_DIVINATION_CARDS: '점술 카드 증폭: ',
   MAP_COMPLETION_REWARD: /^보상: 반짝이 (.*)$/,
+  MAP_AREA: 'Map Area: ',
   RARITY: '아이템 희귀도: ',
   ITEM_CLASS: '아이템 종류: ',
   ITEM_LEVEL: '아이템 레벨: ',
@@ -126,6 +127,8 @@ export default {
   UNMODIFIABLE: '속성 부여 불가',
   FOULBORN_NAME: /^삿된 (.*)$/,
   FOULBORN_MODIFIER: '삿된 고유 속성',
+  VESTIGIAL_NAME: /^흔적 (.*)$/,
+  VESTIGIAL_IMPLICIT: '흔적 고정 속성',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

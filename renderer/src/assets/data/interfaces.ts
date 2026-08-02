@@ -126,6 +126,7 @@ export interface TranslationDict {
   MAP_MORE_SCARABS: string
   MAP_MORE_CURRENCY: string
   MAP_MORE_DIVINATION_CARDS: string
+  MAP_AREA: string
   MAP_COMPLETION_REWARD: RegExp
   CHART_SULPHUR?: string
   CHART_SHAPE?: string
@@ -238,6 +239,8 @@ export interface TranslationDict {
   UNMODIFIABLE: string
   FOULBORN_NAME: RegExp
   FOULBORN_MODIFIER: string
+  VESTIGIAL_NAME: RegExp
+  VESTIGIAL_IMPLICIT: string
   // ---
   CHAT_SYSTEM: RegExp
   CHAT_TRADE: RegExp

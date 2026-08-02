@@ -18,6 +18,7 @@ export default {
   MAP_MORE_CURRENCY: 'Больше валюты: ',
   MAP_MORE_DIVINATION_CARDS: 'Больше гадальных карт: ',
   MAP_COMPLETION_REWARD: /^Награда: Особая (.*)$/,
+  MAP_AREA: 'Map Area: ',
   RARITY: 'Редкость: ',
   ITEM_CLASS: 'Класс предмета: ',
   ITEM_LEVEL: 'Уровень предмета: ',
@@ -165,6 +166,8 @@ export default {
   UNMODIFIABLE: 'Неизменяемый',
   FOULBORN_NAME: /^(?:Нечестивый|Нечестивая|Нечестивое|Нечестивые) (.*)$/,
   FOULBORN_MODIFIER: 'Нечестивое уникальное свойство',
+  VESTIGIAL_NAME: /^Вырожденный: (.*)$/,
+  VESTIGIAL_IMPLICIT: 'Собственное свойство вояжа',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

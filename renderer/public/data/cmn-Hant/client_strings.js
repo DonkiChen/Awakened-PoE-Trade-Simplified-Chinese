@@ -17,6 +17,7 @@ export default {
   MAP_MORE_SCARABS: '更多聖甲蟲: ',
   MAP_MORE_CURRENCY: '更多通貨: ',
   MAP_MORE_DIVINATION_CARDS: '更多命運卡: ',
+  MAP_AREA: 'Map Area: ',
   MAP_COMPLETION_REWARD: /^獎勵: 貼模 \((.*)\)$/,
   RARITY: '稀有度: ',
   ITEM_CLASS: '物品種類: ',
@@ -126,6 +127,8 @@ export default {
   UNMODIFIABLE: '不可調整的',
   FOULBORN_NAME: /^穢生 (.*)$/,
   FOULBORN_MODIFIER: 'Foulborn Unique Modifier',
+  VESTIGIAL_NAME: /^殘存 (.*)$/,
+  VESTIGIAL_IMPLICIT: '殘存固定詞綴',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

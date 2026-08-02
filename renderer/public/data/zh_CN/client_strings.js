@@ -17,6 +17,7 @@ export default {
   MAP_MORE_SCARABS: '更多圣甲虫: ',
   MAP_MORE_CURRENCY: '更多通货: ',
   MAP_MORE_DIVINATION_CARDS: '更多命运卡: ',
+  MAP_AREA: '地图区域: ',
   MAP_COMPLETION_REWARD: /^(?:任务)?奖励: 烫金 (.*)$/,
   CHART_SULPHUR: '亡者硫磺: ',
   CHART_SHAPE: '海图形状： ',
@@ -129,6 +130,8 @@ export default {
   UNMODIFIABLE: '基底词缀不能改变',
   FOULBORN_NAME: /^秽生(.*)$/,
   FOULBORN_MODIFIER: '秽生传奇词缀',
+  VESTIGIAL_NAME: /^退化(.*)$/,
+  VESTIGIAL_IMPLICIT: '退化基底词缀',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,
