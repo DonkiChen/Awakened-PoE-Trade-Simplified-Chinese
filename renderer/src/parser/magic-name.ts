@@ -1,19 +1,18 @@
 import { ITEM_BY_REF_OR_TRANSLATED } from '@/assets/data'
 
 export function magicBasetype (name: string) {
-  const candidates = new Set<string>()
+  const separator = name.includes(' ') ? ' ' : ''
+  const words = name.split(separator).filter(Boolean)
 
-  for (const sep of [' ', '']) {
-    const words = name.split(sep).filter(Boolean)
+  const candidates = words.flatMap((_, start) =>
+    Array(words.length - start).fill(undefined)
+      .map((_, index) => words
+        .slice(start, start + index + 1)
+        .join(separator)
+      )
+  )
 
-    for (let start = 0; start < words.length; start += 1) {
-      for (let end = start + 1; end <= words.length; end += 1) {
-        candidates.add(words.slice(start, end).join(sep))
-      }
-    }
-  }
-
-  const result = [...candidates]
+  const result = candidates
     .map(candidate => {
       const item = ITEM_BY_REF_OR_TRANSLATED('ITEM', candidate)
       return { name: candidate, found: item?.[0]?.craftable }
