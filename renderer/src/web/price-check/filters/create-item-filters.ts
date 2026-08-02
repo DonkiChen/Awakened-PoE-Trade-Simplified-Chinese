@@ -97,7 +97,16 @@ export function createFilters (
       baseType: item.info.name,
       baseTypeTrade: t(opts, item.info)
     }
-    if (item.info.refName === 'Chronicle of Atzoatl') {
+    if (item.info.refName === 'Scrying Orb' && item.scryingOrb?.tradeType && item.info.tradeDisc) {
+      // Keep the localized area in the label, but use the numeric trade type
+      // as the discriminator option sent to the trade API.
+      filters.searchExact.baseType = `${item.info.name}(${item.scryingOrb.area})`
+      filters.discriminator = {
+        trade: item.info.tradeDisc,
+        option: item.scryingOrb.tradeType,
+        disabled: false
+      }
+    } else if (item.info.refName === 'Chronicle of Atzoatl') {
       filters.areaLevel = {
         value: floorToBracket(item.areaLevel!, [1, 68, 73, 75, 78, 80]),
         disabled: false

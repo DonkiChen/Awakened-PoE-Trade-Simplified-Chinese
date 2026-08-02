@@ -51,6 +51,10 @@ export interface ParsedItem {
     sulphur?: number
     shape?: string
   }
+  scryingOrb?: {
+    area: string
+    tradeType?: string
+  }
   gemLevel?: number
   imbuedGem?: boolean
   areaLevel?: number

@@ -42,6 +42,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseVaalGemName,
   { virtual: findInDatabase, name: 'findInDatabase' },
   // -----------
+  parseScryingOrbArea,
   parseItemLevel,
   parseTalismanTier,
   parseGem,
@@ -344,6 +345,32 @@ function parseChartUnrevealed (section: string[], item: ParsedItem) {
     : 'SECTION_SKIPPED'
 }
 
+function parseScryingOrbArea (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Scrying Orb') return 'PARSER_SKIPPED'
+
+  const mapArea = _$.MAP_AREA
+  const line = mapArea && section.find(line => line.startsWith(mapArea))
+  if (!line) {
+    // Older or partially translated client strings may still use a localized
+    // label that is not present in the parser dictionary.
+    if (section.length !== 1) return 'SECTION_SKIPPED'
+    const separator = section[0].indexOf(':') >= 0
+      ? section[0].indexOf(':')
+      : section[0].indexOf('：')
+    if (separator < 0) return 'SECTION_SKIPPED'
+
+    const area = section[0].slice(separator + 1).trim()
+    if (!area) return 'SECTION_SKIPPED'
+    item.scryingOrb = { area }
+    return 'SECTION_PARSED'
+  }
+
+  const area = line.slice(mapArea.length).trim()
+  if (!area) return 'SECTION_SKIPPED'
+  item.scryingOrb = { area }
+  return 'SECTION_PARSED'
+}
+
 function parseBlightedMap (item: ParsedItem) {
   if (item.category !== ItemCategory.Map) return
 
@@ -367,7 +394,31 @@ function parseFractured (item: ParserState) {
   }
 }
 
+function pickScryingOrbVariant (item: ParserState) {
+  const area = item.scryingOrb?.area
+  if (!area) return err('item.unknown')
+
+  const variant = item.infoVariants.find(variant => {
+    if (variant.tradeDisc !== 'scrying_orb') return false
+
+    const sectionText = variant.disc?.sectionText?.trim()
+    return sectionText === area ||
+      (sectionText != null && item.rawText.includes(sectionText))
+  })
+  if (!variant) return err('item.unknown')
+
+  item.info = variant
+  item.scryingOrb = {
+    area,
+    tradeType: variant.tradeType
+  }
+}
+
 function pickCorrectVariant (item: ParserState) {
+  if (item.info.refName === 'Scrying Orb') {
+    return pickScryingOrbVariant(item)
+  }
+
   if (!item.info.disc) return
 
   for (const variant of item.infoVariants) {

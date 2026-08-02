@@ -17,6 +17,7 @@ export default {
   MAP_MORE_SCARABS: '更多圣甲虫: ',
   MAP_MORE_CURRENCY: '更多通货: ',
   MAP_MORE_DIVINATION_CARDS: '更多命运卡: ',
+  MAP_AREA: '地图区域: ',
   MAP_COMPLETION_REWARD: /^(?:任务)?奖励: 烫金 (.*)$/,
   CHART_SULPHUR: '亡者硫磺: ',
   CHART_SHAPE: '海图形状： ',

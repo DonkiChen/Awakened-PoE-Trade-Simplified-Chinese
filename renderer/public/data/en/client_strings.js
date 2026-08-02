@@ -17,6 +17,7 @@ export default {
   MAP_MORE_SCARABS: 'More Scarabs: ',
   MAP_MORE_CURRENCY: 'More Currency: ',
   MAP_MORE_DIVINATION_CARDS: 'More Divination Cards: ',
+  MAP_AREA: 'Map Area: ',
   MAP_COMPLETION_REWARD: /^Reward: Foil (.*)$/,
   CHART_SULPHUR: "Dead Man's Sulphur: ",
   CHART_SHAPE: 'Chart Shape: ',
