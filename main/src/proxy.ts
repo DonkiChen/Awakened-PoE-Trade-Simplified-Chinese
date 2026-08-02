@@ -1,6 +1,6 @@
 import type {Server,IncomingMessage,ServerResponse} from 'http'
 import * as https from 'https'
-import {app, net} from 'electron'
+import {app, net, session} from 'electron'
 import type {Logger} from './RemoteLogger'
 
 export const PROXY_HOSTS = [

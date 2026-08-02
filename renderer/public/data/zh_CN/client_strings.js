@@ -130,6 +130,8 @@ export default {
   UNMODIFIABLE: '基底词缀不能改变',
   FOULBORN_NAME: /^秽生(.*)$/,
   FOULBORN_MODIFIER: '秽生传奇词缀',
+  VESTIGIAL_NAME: /^退化(.*)$/,
+  VESTIGIAL_IMPLICIT: '退化基底词缀',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

@@ -265,6 +265,7 @@ export default defineComponent({
       makeTradeLink,
       openTradeLink () {
         showBrowser(makeTradeLink())
+        ctx.emit('reset')
       },
       realm: AppConfig().realm
     }

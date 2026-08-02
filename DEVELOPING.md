@@ -23,13 +23,13 @@ npm run dev
 
 # In a second shell
 cd main
-yarn install
+npm ci
 # If u got this error: Error: listen EACCES: permission denied 127.0.0.1:8584 on Windows,
 # You can run these command to resolve:
 # 1. net stop winnat
 # 2. net start winnat
 # see: https://github.com/electerm/electerm/issues/2548
-yarn dev
+npm run dev
 ```
 
 # How to build

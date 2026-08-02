@@ -56,7 +56,7 @@ export function parseModInfoLine (line: string): ModifierInfo {
 
     const typeText = match.groups!.type
 
-    if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT'], typeText)) {
+    if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT', 'VESTIGIAL_IMPLICIT'], typeText)) {
       type = ModifierType.Implicit
     } else if (matchesClientString(['FRACTURED_PREFIX', 'FRACTURED_SUFFIX'], typeText)) {
       type = ModifierType.Fractured
@@ -72,6 +72,8 @@ export function parseModInfoLine (line: string): ModifierInfo {
       generation = 'corrupted'
     } else if (matchesClientString('FOULBORN_MODIFIER', typeText)) {
       generation = 'foulborn'
+    } else if (matchesClientString('VESTIGIAL_IMPLICIT', typeText)) {
+      generation = 'vestigial'
     }
 
     name = match.groups!.name ?? undefined

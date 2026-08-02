@@ -35,6 +35,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseUnidentified,
   { virtual: parseSuperior, name: 'parseSuperior' },
   { virtual: parseFoulborn, name: 'parseFoulborn' },
+  { virtual: parseVestigial, name: 'parseVestigial' },
   parseSynthesised,
   parseCategoryByHelpText,
   { virtual: parseMapTier, name: 'parseMapTier' },
