@@ -989,6 +989,15 @@ function parseFoulborn (item: ParserState) {
   }
 }
 
+function parseVestigial (item: ParserState) {
+  if (item.rarity !== ItemRarity.Unique || !item.baseType) return
+
+  if (_$.VESTIGIAL_NAME.test(item.baseType)) {
+    item.baseType = _$.VESTIGIAL_NAME.exec(item.baseType)![1]
+    item.isVestigial = true
+  }
+}
+
 function parseCategoryByHelpText (section: string[], item: ParsedItem) {
   if (section[0] === _$.BEAST_HELP) {
     item.category = ItemCategory.CapturedBeast

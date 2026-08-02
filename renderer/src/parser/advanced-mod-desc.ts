@@ -14,7 +14,7 @@ export interface ParsedModifier {
 
 export interface ModifierInfo {
   type: ModifierType
-  generation?: 'suffix' | 'prefix' | 'corrupted' | 'eldritch' | 'foulborn'
+  generation?: 'suffix' | 'prefix' | 'corrupted' | 'eldritch' | 'foulborn' | 'vestigial'
   name?: string
   tier?: number
   rank?: number
