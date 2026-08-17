@@ -2,7 +2,6 @@ import { shallowRef, watch, readonly } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { Host } from '@/web/background/IPC'
 import { useLeagues } from './Leagues'
-// import { BaseType, CLIENT_STRINGS as _$, ITEM_BY_REF } from '@/assets/data'
 import pako from 'pako'
 import { Buffer } from 'buffer'
 
@@ -149,36 +148,8 @@ export const usePoeninja = createGlobalState(() => {
         }
       }
     } else {
-      // FIXME: 这段代码会导致无法查宝石, 暂时注释
-      // const qualities = new Map([
-      //   ['anomalous', _$.QUALITY_ANOMALOUS.toString().slice(2, 5)],
-      //   ['divergent', _$.QUALITY_DIVERGENT.toString().slice(2, 5)],
-      //   ['phantasmal', _$.QUALITY_PHANTASMAL.toString().slice(2, 5)]
-      // ])
-      //
-      // let itemName: string
-      // let isVariantGem: boolean = false
-      // itemName = query.name
-      // if (query.ns === 'GEM' && query.variant === '1') {
-      //   itemName = query.name.split(' ').slice(1).join(' ')
-      //   isVariantGem = true
-      // }
-      // const item = ITEM_BY_REF(query.ns as BaseType['namespace'], itemName)![0]
-      //
-      // for (const { name, calculated, searchCode, history } of PRICES_DB_CN) {
-      //   if (name === (isVariantGem ? qualities.get(query.name.split(' ')![0].toLowerCase()) as string + item.name : item.name)) {
-      //     const info: NinjaDenseInfo = {
-      //       chaos: calculated,
-      //       graph: Array.from(history, e => e ? (e - calculated) / calculated : null),
-      //       name,
-      //       variant: query.variant
-      //     }
-      //     return {
-      //       ...info,
-      //       url: `${searchCode}`
-      //     }
-      //   }
-      // }
+      // Tencent gem variants currently cannot be mapped reliably, so keep
+      // price lookup disabled while retaining its download database.
     }
     return null
   }
@@ -256,10 +227,14 @@ function splitJsonBlob (jsonBlob: string) {
       { ns: 'ITEM', url: 'essences', type: 'Essence' },
       { ns: 'ITEM', url: 'maps', type: 'Map' },
       { ns: 'ITEM', url: 'tattoos', type: 'Tattoo' },
-      { ns: 'ITEM', url: 'omens', type: 'Omen' }, { ns: 'ITEM', url: 'coffins', type: 'Coffin' }, { ns: 'ITEM', url: 'allflame-embers', type: 'AllflameEmber' },
+      { ns: 'ITEM', url: 'omens', type: 'Omen' },
+      { ns: 'ITEM', url: 'coffins', type: 'Coffin' },
+      { ns: 'ITEM', url: 'allflame-embers', type: 'AllflameEmber' },
       { ns: 'ITEM', url: 'djinn-coins', type: 'DjinnCoin' },
       { ns: 'ITEM', url: 'astrolabes', type: 'Astrolabe' },
       { ns: 'ITEM', url: 'runegrafts', type: 'Runegraft' },
+      { ns: 'ITEM', url: 'ducats', type: 'Ducat' },
+      { ns: 'ITEM', url: 'enshrouding-crystals', type: 'EnshroudingCrystal' },
       { ns: 'DIVINATION_CARD', url: 'divination-cards', type: 'DivinationCard' },
       { ns: 'CAPTURED_BEAST', url: 'beasts', type: 'Beast' },
       { ns: 'UNIQUE', url: 'unique-jewels', type: 'UniqueJewel' },

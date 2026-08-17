@@ -1,11 +1,12 @@
 import fnv1a from '@sindresorhus/fnv1a'
-import type { BaseType, DropEntry, Stat, StatOrGroup, StatMatcher, TranslationDict } from './interfaces'
+import type { BaseType, DropEntry, MercenaryBuild, Stat, StatOrGroup, StatMatcher, TranslationDict } from './interfaces'
 
 export * from './interfaces'
 
 export interface StaticDataPayload {
   clientStringsRef: TranslationDict
   itemDrop: DropEntry[]
+  mercenaryBuilds: MercenaryBuild[]
   appPatrons: Array<{ from: string, months: number, style: number }>
 }
 
@@ -20,6 +21,7 @@ export interface LanguageDataPayload {
 }
 
 export let ITEM_DROP: DropEntry[]
+export let MERCENARY_BUILDS: MercenaryBuild[]
 export let CLIENT_STRINGS: TranslationDict
 export let CLIENT_STRINGS_REF: TranslationDict
 export let APP_PATRONS: Array<{ from: string, months: number, style: number }>
@@ -116,7 +118,27 @@ function loadItems (data: Pick<LanguageDataPayload, 'itemsNdjson' | 'itemsNameIn
     }
   }
 
-  ITEM_BY_TRANSLATED = commonFind(indexNames, 'name')
+  const findTranslated = commonFind(indexNames, 'name')
+  const areaByTradeDisc = new Map<string, BaseType>()
+  const areaAliases = new Map<string, BaseType>()
+  const iterateItems = ndjsonFindLines<BaseType>(ndjson)
+
+  for (const area of iterateItems('"namespace":"AREA"')) {
+    if (area.tradeDisc) areaByTradeDisc.set(area.tradeDisc, area)
+  }
+  // Legacy localized Scrying Orb variants carry AREA names keyed by trade id.
+  for (const orb of iterateItems('"refName":"Scrying Orb"')) {
+    const area = orb.tradeType ? areaByTradeDisc.get(orb.tradeType) : undefined
+    const alias = orb.disc?.sectionText?.replace(/\s*(?:\[|【).*$/, '').trim()
+    if (area && alias) areaAliases.set(alias, area)
+  }
+
+  ITEM_BY_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => {
+    const match = findTranslated(ns, name)
+    if (match || ns !== 'AREA') return match
+    const area = areaAliases.get(name.trim())
+    return area ? [area] : undefined
+  }
   ITEM_BY_REF = commonFind(indexRefNames, 'refName')
   ITEM_BY_REF_OR_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => ITEM_BY_REF(ns, name) ?? ITEM_BY_TRANSLATED(ns, name)
   ITEMS_ITERATOR = ndjsonFindLines<BaseType>(ndjson)
@@ -208,6 +230,7 @@ async function importClientStrings (url: string) {
 export function hydrateStaticData (data: StaticDataPayload) {
   CLIENT_STRINGS_REF = data.clientStringsRef
   ITEM_DROP = data.itemDrop
+  MERCENARY_BUILDS = data.mercenaryBuilds
   APP_PATRONS = data.appPatrons
 }
 
@@ -262,6 +285,7 @@ export async function init (lang: string) {
   hydrateStaticData({
     clientStringsRef: await importClientStrings(`${import.meta.env.BASE_URL}data/en/client_strings.js`),
     itemDrop: await (await fetch(`${import.meta.env.BASE_URL}data/item-drop.json`)).json(),
+    mercenaryBuilds: await (await fetch(`${import.meta.env.BASE_URL}data/mercenary-builds.json`)).json(),
     appPatrons: await (await fetch(`${import.meta.env.BASE_URL}data/patrons.json`)).json()
   })
 

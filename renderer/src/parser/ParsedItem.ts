@@ -1,6 +1,7 @@
 import type { ModifierType, StatCalculated } from './modifiers'
 import type { ParsedModifier } from './advanced-mod-desc'
-import type { BaseType } from '@/assets/data'
+import type { ParsedStat } from './stat-translations'
+import type { BaseType, MercenaryBuild } from '@/assets/data'
 import { ItemCategory } from './meta'
 
 export enum ItemRarity {
@@ -22,6 +23,7 @@ export enum ItemInfluence {
 export interface ParsedItem {
   rarity?: ItemRarity
   itemLevel?: number
+
   armourAR?: number
   armourEV?: number
   armourES?: number
@@ -32,32 +34,35 @@ export interface ParsedItem {
   weaponAS?: number
   weaponPHYSICAL?: number
   weaponELEMENTAL?: number
+
+  mapArea?: BaseType
+  areaLevel?: number
+  areaItemQuantity?: number
+  areaItemRarity?: number
+  areaPackSize?: number
   mapBlighted?: 'Blighted' | 'Blight-ravaged'
-  mapCompletionReward?: string
-  map?: {
-    tier: number | undefined
-    itemQuantity?: number
-    itemRarity?: number
-    packSize?: number
-    moreMaps?: number
-    moreScarabs?: number
-    moreCurrency?: number
-    moreDivCards?: number
+  mapCompletionReward?: BaseType
+  mapTier?: number
+  mapMoreMaps?: number
+  mapMoreScarabs?: number
+  mapMoreCurrency?: number
+  mapMoreDivCards?: number
+  heistBlueprint?: {
+    wingsRevealed?: number
+    totalWings?: number
+    target?: 'Enchants' | 'Trinkets' | 'Gems' | 'Replicas'
   }
-  chart?: {
-    area?: string
-    itemQuantity?: number
-    packSize?: number
-    sulphur?: number
-    shape?: string
+  heistContract?: {
+    requiredJob?: 'Lockpicking' | 'Brute Force' | 'Perception' | 'Demolition' | 'Counter-Thaumaturgy' | 'Trap Disarmament' | 'Agility' | 'Deception' | 'Engineering'
+    jobLevel?: number
+    targetValue?: 'Priceless'
   }
-  scryingOrb?: {
-    area: string
-    tradeType?: string
-  }
+  logbookAreaMods?: ParsedModifier[][]
+  chartSulphur?: number
   gemLevel?: number
   imbuedGem?: boolean
-  areaLevel?: number
+  mercenaryBuild?: MercenaryBuild
+  mercenarySkills?: ParsedStat[][]
   talismanTier?: number
   memoryStrands?: number
   storedExperience?: number
@@ -76,7 +81,6 @@ export interface ParsedItem {
   isMirrored?: boolean
   isSplit?: boolean
   influences: ItemInfluence[]
-  logbookAreaMods?: ParsedModifier[][]
   sentinelCharge?: number
   isSynthesised?: boolean
   isFractured?: boolean
@@ -90,16 +94,6 @@ export interface ParsedItem {
     text: string
     type: ModifierType
   }>
-  heistBlueprint?: {
-    wingsRevealed?: number
-    totalWings?: number
-    target?: 'Enchants' | 'Trinkets' | 'Gems' | 'Replicas'
-  }
-  heistContract?: {
-    requiredJob?: 'Lockpicking' | 'Brute Force' | 'Perception' | 'Demolition' | 'Counter-Thaumaturgy' | 'Trap Disarmament' | 'Agility' | 'Deception' | 'Engineering'
-    jobLevel?: number
-    targetValue?: 'Priceless'
-  }
   category?: ItemCategory
   info: BaseType
   rawText: string
