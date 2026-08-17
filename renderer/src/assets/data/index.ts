@@ -118,27 +118,7 @@ function loadItems (data: Pick<LanguageDataPayload, 'itemsNdjson' | 'itemsNameIn
     }
   }
 
-  const findTranslated = commonFind(indexNames, 'name')
-  const areaByTradeDisc = new Map<string, BaseType>()
-  const areaAliases = new Map<string, BaseType>()
-  const iterateItems = ndjsonFindLines<BaseType>(ndjson)
-
-  for (const area of iterateItems('"namespace":"AREA"')) {
-    if (area.tradeDisc) areaByTradeDisc.set(area.tradeDisc, area)
-  }
-  // Legacy localized Scrying Orb variants carry AREA names keyed by trade id.
-  for (const orb of iterateItems('"refName":"Scrying Orb"')) {
-    const area = orb.tradeType ? areaByTradeDisc.get(orb.tradeType) : undefined
-    const alias = orb.disc?.sectionText?.replace(/\s*(?:\[|【).*$/, '').trim()
-    if (area && alias) areaAliases.set(alias, area)
-  }
-
-  ITEM_BY_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => {
-    const match = findTranslated(ns, name)
-    if (match || ns !== 'AREA') return match
-    const area = areaAliases.get(name.trim())
-    return area ? [area] : undefined
-  }
+  ITEM_BY_TRANSLATED = commonFind(indexNames, 'name')
   ITEM_BY_REF = commonFind(indexRefNames, 'refName')
   ITEM_BY_REF_OR_TRANSLATED = (ns: BaseType['namespace'], name: string): BaseType[] | undefined => ITEM_BY_REF(ns, name) ?? ITEM_BY_TRANSLATED(ns, name)
   ITEMS_ITERATOR = ndjsonFindLines<BaseType>(ndjson)

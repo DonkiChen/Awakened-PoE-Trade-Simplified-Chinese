@@ -72,7 +72,6 @@ export interface BaseType {
   w?: number
   h?: number
   tradeTag?: string
-  tradeType?: string
   exchangeable?: true
   tradeDisc?: string
   disc?: {
