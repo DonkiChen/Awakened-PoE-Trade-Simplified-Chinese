@@ -1070,7 +1070,11 @@ function parseChart (section: string[], item: ParsedItem) {
     return 'SECTION_SKIPPED'
   }
 
-  const areaInfo = ITEM_BY_REF_OR_TRANSLATED('AREA', section[0])
+  const areaName = section[0]
+  const bracketName = areaName.match(/\((.*?)\)/)?.[1]
+  const areaInfo =
+    (bracketName && ITEM_BY_REF_OR_TRANSLATED('AREA', bracketName)) ??
+    ITEM_BY_REF_OR_TRANSLATED('AREA', areaName)
   if (!areaInfo) throw new Error('Unknown Area name.')
   item.mapArea = areaInfo[0]
 
