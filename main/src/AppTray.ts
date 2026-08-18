@@ -67,26 +67,14 @@ export class AppTray {
       {
         label: '支持简中作者',
         click: () => {
-          shell.openExternal('https://afdian.net/a/APTSimplifiedChinese/plan')
+          shell.openExternal('https://afdian.com/a/donkichen/plan')
         }
       },
       { type: 'separator' },
       {
-        label: 'KOOK(原开黑啦)流放之路频道',
+        label: 'POE-APT简中交流 QQ 群',
         click: () => {
-          shell.openExternal('https://www.kookapp.cn/app/channels/2724791411633812')
-        }
-      },
-      {
-        label: 'QQ流放之路频道',
-        click: () => {
-          shell.openExternal('https://qun.qq.com/qqweb/qunpro/share?appChannel=share&inviteCode=1XW9B3zlwiq#/pc')
-        }
-      },
-      {
-        label: '简中查价器交流群(QQ群)',
-        click: () => {
-          shell.openExternal('https://jq.qq.com/?_wv=1027&k=Rxtjg63F')
+          shell.openExternal('http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=R0fQ9Z1SoytPE0UISBboW4SsNE-QNmzz&authKey=RNAcTMTtw3yT5kgH%2F9Ghj1qU%2FyNg%2BHqMekBkhJ%2Buvc5xn%2Beo6DuokpDaU8cKg2Kj&noverify=0&group_code=1051162675F')
         }
       },
       { type: 'separator' },
