@@ -202,7 +202,7 @@
 {"name":"密草神殿[马雷格罗]","refName":"Overgrown Shrine","namespace":"AREA","tradeDisc":"26468","icon":""}
 {"name":"神域之殿","refName":"Palace","namespace":"AREA","tradeDisc":"51878","icon":""}
 {"name":"神域之殿[D哥双形态]","refName":"Palace","namespace":"AREA","tradeDisc":"51878","icon":""}
-{"name":" 寂夜林苑","refName":"Park","namespace":"AREA","tradeDisc":"32613","icon":""}
+{"name":"寂夜林苑","refName":"Park","namespace":"AREA","tradeDisc":"32613","icon":""}
 {"name":"寂夜林苑[激光雨雕像]","refName":"Park","namespace":"AREA","tradeDisc":"32613","icon":""}
 {"name":"远洋深渊","refName":"Pelagic Abyss","namespace":"AREA","tradeDisc":"PelagicAbyss","icon":"","area":{"special":true}}
 {"name":"隐晦牢狱","refName":"Pen","namespace":"AREA","tradeDisc":"19828","icon":""}
