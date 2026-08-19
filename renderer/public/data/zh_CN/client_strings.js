@@ -24,7 +24,7 @@ export default {
   CHART_UNREVEALED: '航行词缀将在完成测绘后揭示',
   SCRYING_MAP_AREA: '地图区域: ',
   MERCENARY_LEVEL: '佣兵等级: ',
-  MERCENARY_BUILD: '流派: ',
+  MERCENARY_BUILD: 'BD构建: ',
   RARITY: '稀 有 度: ',
   ITEM_CLASS: '物品类别: ',
   ITEM_LEVEL: '物品等级: ',

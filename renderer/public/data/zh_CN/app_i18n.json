@@ -60,7 +60,7 @@
     "has_empty_prefix": "空前缀",
     "has_empty_suffix": "空后缀",
     "mercenary_6link": "与 {0} 个 3 阶辅助技能形成六连",
-    "complexity_hint": "查询此物品通常需要启用内置浏览器并登录账号。",
+    "complexity_hint": "查询此物品通常需要启用内置浏览器并登录账号。国服玩家可能无法打开内置浏览器。",
     "item_level": "物品等级: {0}",
     "stock": "堆叠数量: {0}",
     "map_tier": "地图等阶: {0}",
