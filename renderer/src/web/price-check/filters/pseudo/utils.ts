@@ -42,10 +42,11 @@ function _findAndResolveByRef (
 
 export function findAndResolveByRef (
   name: string,
+  modType: ModifierType,
   itemCategory: ItemCategory | undefined,
   hint?: ResolveHint
 ): Stat {
-  const stat = _findAndResolveByRef(name, ModifierType.Explicit, itemCategory, hint)
+  const stat = _findAndResolveByRef(name, modType, itemCategory, hint)
   if (!stat) {
     throw new Error(`Unexpected stat shape: ${name}`)
   }
@@ -68,5 +69,18 @@ export function statToNotFilter (opts: {
     sources: [],
     disabled: opts.disabled,
     not: true
+  }
+}
+
+export function metaNotFilter (opts: {
+  disabled: StatFilter['disabled']
+}): StatFilter {
+  return {
+    tradeId: ['item.not_group'],
+    statRef: 'Not',
+    text: 'Not',
+    tag: FilterTag.FilterGroup,
+    sources: [],
+    disabled: opts.disabled
   }
 }

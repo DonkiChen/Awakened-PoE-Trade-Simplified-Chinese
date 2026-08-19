@@ -6,10 +6,11 @@ import {
   STAT_BY_MATCH_STR,
   StatBetter,
   BaseType,
-  ITEM_BY_REF_OR_TRANSLATED
+  ITEM_BY_REF_OR_TRANSLATED,
+  ITEMS_ITERATOR
 } from '@/assets/data'
 import { ModifierType, sumStatsByModType } from './modifiers'
-import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg } from './stat-translations'
+import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg, ParsedStat } from './stat-translations'
 import { ItemCategory, ACCESSORY } from './meta'
 import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedItem'
 import { magicBasetype } from './magic-name'
@@ -40,13 +41,12 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseCategoryByHelpText,
   { virtual: parseMapTier, name: 'parseMapTier' },
   { virtual: normalizeName, name: 'normalizeName' },
-  parseVaalGemName,
   { virtual: findInDatabase, name: 'findInDatabase' },
   // -----------
-  parseScryingOrbArea,
   parseItemLevel,
   parseTalismanTier,
   parseGem,
+  parseVaalGem,
   parseArmour,
   parseWeapon,
   parseAccessory,
@@ -58,12 +58,10 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseFoil,
   parseInfluence,
   parseMap,
-  parseChartProperties,
-  parseChartShape,
-  parseChartUnrevealed,
   parseSockets,
   parseHeistContract,
   parseHeistBlueprint,
+  parseChart,
   parseAreaLevel,
   parseAtzoatlRooms,
   parseMirroredTablet,
@@ -71,9 +69,17 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseMirrored,
   parseSplit,
   parseSentinelCharge,
+  parseScryingOrb,
+  parseMercenary,
   parseLogbookArea,
   parseLogbookArea,
   parseLogbookArea,
+  parseMercenaryGems,
+  parseMercenaryGems,
+  parseMercenaryGems,
+  parseMercenaryGems,
+  parseMercenaryGems,
+  parseMercenaryGems,
   parseModifiers, // enchant
   parseModifiers, // scourge
   parseModifiers, // implicit
@@ -82,6 +88,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   { virtual: transformToLegacyModifiers, name: 'transformToLegacyModifiers' },
   { virtual: parseFractured, name: 'parseFractured' },
   { virtual: parseBlightedMap, name: 'parseBlightedMap' },
+  { virtual: resolveMercenaryBuild, name: 'resolveMercenaryBuild' },
   { virtual: pickCorrectVariant, name: 'pickCorrectVariant' },
   { virtual: calcBasePercentile, name: 'calcBasePercentile' }
 ]
@@ -208,7 +215,7 @@ function findInDatabase (item: ParserState) {
     info = info.filter(unique => {
       const baseRef = unique.unique?.base
       return baseRef != null && ITEM_BY_REF('ITEM', baseRef)?.some(base =>
-        base.name === item.baseType
+        base.name === item.baseType || base.refName === item.baseType
       )
     })
     if (!info.length) return err('item.unknown')
@@ -232,9 +239,7 @@ function parseMapTier (item: ParserState) {
   const tierMatch = execClientStringRegex('MAP_TIER', item.baseType || item.name)
   if (!tierMatch) return
 
-  item.map = {
-    tier: Number(tierMatch.match[1])
-  }
+  item.mapTier = Number(tierMatch.match[1])
 
   if (item.baseType) {
     item.baseType = item.baseType.replace(tierMatch.match[0], '')
@@ -243,133 +248,50 @@ function parseMapTier (item: ParserState) {
   }
 }
 
+function parseAreaPropNested (line: string, item: ParsedItem): boolean {
+  if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
+    item.areaItemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
+    return true
+  } else if (line.startsWith(_$.MAP_ITEM_RARITY)) {
+    item.areaItemRarity = parseInt(line.slice(_$.MAP_ITEM_RARITY.length), 10)
+    return true
+  } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
+    item.areaPackSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
+    return true
+  }
+  return false
+}
+
 function parseMap (section: string[], item: ParsedItem) {
   if (item.category !== ItemCategory.Map) return 'PARSER_SKIPPED'
 
-  if (!item.map) {
-    item.map = { tier: undefined }
-  }
-
   let isParsed: SectionParseResult = 'SECTION_SKIPPED'
 
   for (const line of section) {
-    if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
-      item.map.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
-      isParsed = 'SECTION_PARSED'
-    } else if (line.startsWith(_$.MAP_ITEM_RARITY)) {
-      item.map.itemRarity = parseInt(line.slice(_$.MAP_ITEM_RARITY.length), 10)
-      isParsed = 'SECTION_PARSED'
-    } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
-      item.map.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
+    if (parseAreaPropNested(line, item)) {
       isParsed = 'SECTION_PARSED'
     } else if (line.startsWith(_$.MAP_MORE_MAPS)) {
-      item.map.moreMaps = parseInt(line.slice(_$.MAP_MORE_MAPS.length), 10)
+      item.mapMoreMaps = parseInt(line.slice(_$.MAP_MORE_MAPS.length), 10)
       isParsed = 'SECTION_PARSED'
     } else if (line.startsWith(_$.MAP_MORE_SCARABS)) {
-      item.map.moreScarabs = parseInt(line.slice(_$.MAP_MORE_SCARABS.length), 10)
+      item.mapMoreScarabs = parseInt(line.slice(_$.MAP_MORE_SCARABS.length), 10)
       isParsed = 'SECTION_PARSED'
     } else if (line.startsWith(_$.MAP_MORE_CURRENCY)) {
-      item.map.moreCurrency = parseInt(line.slice(_$.MAP_MORE_CURRENCY.length), 10)
+      item.mapMoreCurrency = parseInt(line.slice(_$.MAP_MORE_CURRENCY.length), 10)
       isParsed = 'SECTION_PARSED'
     } else if (line.startsWith(_$.MAP_MORE_DIVINATION_CARDS)) {
-      item.map.moreDivCards = parseInt(line.slice(_$.MAP_MORE_DIVINATION_CARDS.length), 10)
+      item.mapMoreDivCards = parseInt(line.slice(_$.MAP_MORE_DIVINATION_CARDS.length), 10)
       isParsed = 'SECTION_PARSED'
     } else if (_$.MAP_COMPLETION_REWARD.test(line)) {
-      item.mapCompletionReward = _$.MAP_COMPLETION_REWARD.exec(line)![1]
+      const rewardName = _$.MAP_COMPLETION_REWARD.exec(line)![1]
+      const rewardInfo = ITEM_BY_REF_OR_TRANSLATED('UNIQUE', rewardName)
+      if (!rewardInfo) throw new Error('Unknown Unique Item.')
+      item.mapCompletionReward = rewardInfo[0]
       isParsed = 'SECTION_PARSED'
     }
   }
 
   return isParsed
-}
-
-function parseChartProperties (section: string[], item: ParsedItem) {
-  if (item.category !== ItemCategory.Chart) return 'PARSER_SKIPPED'
-
-  let isParsed: SectionParseResult = 'SECTION_SKIPPED'
-
-  for (const line of section) {
-    if (line.startsWith(_$.AREA_LEVEL)) {
-      item.areaLevel = parseInt(line.slice(_$.AREA_LEVEL.length), 10)
-      isParsed = 'SECTION_PARSED'
-    } else if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
-      item.chart ??= {}
-      item.chart.itemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
-      isParsed = 'SECTION_PARSED'
-    } else if (line.startsWith(_$.MAP_MONSTER_PACK_SIZE)) {
-      item.chart ??= {}
-      item.chart.packSize = parseInt(line.slice(_$.MAP_MONSTER_PACK_SIZE.length), 10)
-      isParsed = 'SECTION_PARSED'
-    } else if (_$.CHART_SULPHUR && line.startsWith(_$.CHART_SULPHUR)) {
-      item.chart ??= {}
-      item.chart.sulphur = parseInt(line.slice(_$.CHART_SULPHUR.length), 10)
-      isParsed = 'SECTION_PARSED'
-    }
-  }
-
-  if (isParsed === 'SECTION_PARSED') {
-    const chartArea = section.find(line =>
-      !line.startsWith(_$.AREA_LEVEL) &&
-      !line.startsWith(_$.MAP_ITEM_QUANTITY) &&
-      !line.startsWith(_$.MAP_MONSTER_PACK_SIZE) &&
-      (!_$.CHART_SULPHUR || !line.startsWith(_$.CHART_SULPHUR)) &&
-      (!_$.CHART_SHAPE || !line.startsWith(_$.CHART_SHAPE)) &&
-      line !== _$.CHART_UNREVEALED
-    )
-    if (chartArea) {
-      item.chart ??= {}
-      item.chart.area = chartArea.replace(/\s*\([^()]*\)\s*$/, '').trim()
-    }
-  }
-
-  return isParsed
-}
-
-function parseChartShape (section: string[], item: ParsedItem) {
-  const chartShape = _$.CHART_SHAPE
-  if (item.category !== ItemCategory.Chart || !chartShape) return 'PARSER_SKIPPED'
-
-  const line = section.find(line => line.startsWith(chartShape))
-  if (!line) return 'SECTION_SKIPPED'
-
-  item.chart ??= {}
-  item.chart.shape = line.slice(chartShape.length).trim()
-  return 'SECTION_PARSED'
-}
-
-function parseChartUnrevealed (section: string[], item: ParsedItem) {
-  const chartUnrevealed = _$.CHART_UNREVEALED
-  if (item.category !== ItemCategory.Chart || !chartUnrevealed) return 'PARSER_SKIPPED'
-
-  return section.includes(chartUnrevealed)
-    ? 'SECTION_PARSED'
-    : 'SECTION_SKIPPED'
-}
-
-function parseScryingOrbArea (section: string[], item: ParsedItem) {
-  if (item.info.refName !== 'Scrying Orb') return 'PARSER_SKIPPED'
-
-  const mapArea = _$.MAP_AREA
-  const line = mapArea && section.find(line => line.startsWith(mapArea))
-  if (!line) {
-    // Older or partially translated client strings may still use a localized
-    // label that is not present in the parser dictionary.
-    if (section.length !== 1) return 'SECTION_SKIPPED'
-    const separator = section[0].indexOf(':') >= 0
-      ? section[0].indexOf(':')
-      : section[0].indexOf('：')
-    if (separator < 0) return 'SECTION_SKIPPED'
-
-    const area = section[0].slice(separator + 1).trim()
-    if (!area) return 'SECTION_SKIPPED'
-    item.scryingOrb = { area }
-    return 'SECTION_PARSED'
-  }
-
-  const area = line.slice(mapArea.length).trim()
-  if (!area) return 'SECTION_SKIPPED'
-  item.scryingOrb = { area }
-  return 'SECTION_PARSED'
 }
 
 function parseBlightedMap (item: ParsedItem) {
@@ -395,31 +317,7 @@ function parseFractured (item: ParserState) {
   }
 }
 
-function pickScryingOrbVariant (item: ParserState) {
-  const area = item.scryingOrb?.area
-  if (!area) return err('item.unknown')
-
-  const variant = item.infoVariants.find(variant => {
-    if (variant.tradeDisc !== 'scrying_orb') return false
-
-    const sectionText = variant.disc?.sectionText?.trim()
-    return sectionText === area ||
-      (sectionText != null && item.rawText.includes(sectionText))
-  })
-  if (!variant) return err('item.unknown')
-
-  item.info = variant
-  item.scryingOrb = {
-    area,
-    tradeType: variant.tradeType
-  }
-}
-
 function pickCorrectVariant (item: ParserState) {
-  if (item.info.refName === 'Scrying Orb') {
-    return pickScryingOrbVariant(item)
-  }
-
   if (!item.info.disc) return
 
   for (const variant of item.infoVariants) {
@@ -430,10 +328,10 @@ function pickCorrectVariant (item: ParserState) {
     if (cond.propES && !item.armourES) continue
 
     if (cond.mapTier) {
-      if (!item.map?.tier) continue
-      if (cond.mapTier === 'W' && !(item.map.tier <= 5)) continue
-      if (cond.mapTier === 'Y' && !(item.map.tier >= 6 && item.map.tier <= 10)) continue
-      if (cond.mapTier === 'R' && !(item.map.tier >= 11)) continue
+      if (!item.mapTier) continue
+      if (cond.mapTier === 'W' && !(item.mapTier <= 5)) continue
+      if (cond.mapTier === 'Y' && !(item.mapTier >= 6 && item.mapTier <= 10)) continue
+      if (cond.mapTier === 'R' && !(item.mapTier >= 11)) continue
     }
 
     if (cond.hasImplicit && !item.statsByType.some(calc =>
@@ -603,17 +501,13 @@ function parseTalismanTier (section: string[], item: ParsedItem) {
   return 'SECTION_SKIPPED'
 }
 
-function parseVaalGemName (section: string[], item: ParserState) {
+function parseVaalGem (section: string[], item: ParserState) {
   if (item.category !== ItemCategory.Gem) return 'PARSER_SKIPPED'
 
-  // TODO blocked by https://www.pathofexile.com/forum/view-thread/3231236
   if (section.length === 1) {
-    let gemName: string | undefined
-    if (ITEM_BY_TRANSLATED('GEM', section[0])) {
-      gemName = section[0]
-    }
-    if (gemName) {
-      item.name = ITEM_BY_TRANSLATED('GEM', gemName)![0].refName
+    const gemInfo = ITEM_BY_TRANSLATED('GEM', section[0])
+    if (gemInfo) {
+      item.vaalGem = gemInfo[0]
       return 'SECTION_PARSED'
     }
   }
@@ -794,7 +688,7 @@ function parseWeapon (section: string[], item: ParsedItem) {
 }
 
 function parseAccessory (section: string[], item: ParsedItem) {
-  if (!item.category || !ACCESSORY.has(item.category)) return 'PARSER_SKIPPED'
+  if (!ACCESSORY.has(item.category!) && item.category !== ItemCategory.Quiver) return 'PARSER_SKIPPED'
 
   if (parseMemoryStrandsNested(section, item)) {
     return 'SECTION_PARSED'
@@ -841,6 +735,77 @@ function parseLogbookArea (section: string[], item: ParsedItem) {
   }
 
   return 'SECTION_PARSED'
+}
+
+function parseMercenary (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Mercenary Warrant') return 'PARSER_SKIPPED'
+
+  for (const line of section) {
+    if (line.startsWith(_$.MERCENARY_LEVEL)) {
+      item.itemLevel = Number(line.slice(_$.MERCENARY_LEVEL.length))
+    } else if (line.startsWith(_$.MERCENARY_BUILD)) {
+      const buildText = line.slice(_$.MERCENARY_BUILD.length)
+      let buildInfo = ITEM_BY_TRANSLATED('MERCENARY_BUILD', buildText) ?? ITEM_BY_REF('MERCENARY_BUILD', buildText)
+      if (!buildInfo) continue
+
+      if (typeof buildInfo[0].mercenaryBuild === 'string') {
+        buildInfo = ITEM_BY_REF('MERCENARY_BUILD', buildInfo[0].mercenaryBuild) ?? []
+      }
+      if (buildInfo.length) item.mercenaryBuild = buildInfo[0]
+    }
+  }
+
+  if (item.mercenaryBuild) {
+    return 'SECTION_PARSED'
+  }
+  return 'SECTION_SKIPPED'
+}
+
+function parseMercenaryGems (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Mercenary Warrant') return 'PARSER_SKIPPED'
+
+  const skill = tryParseTranslation({ string: section[0], unscalable: true }, ModifierType.Pseudo, ItemCategory.MercenaryWarrant)
+  if (!skill) return 'SECTION_SKIPPED'
+
+  const group: ParsedStat[] = [skill]
+
+  for (const line of section.slice(1)) {
+    const support = tryParseTranslation({ string: line, unscalable: true }, ModifierType.Pseudo, ItemCategory.MercenaryWarrant)
+    if (support) {
+      group.push(support)
+    }
+    if (!support || (support.stat.mercenary!.syntheticFamily && support.stat.mercenary!.tier !== 3)) {
+      item.unknownModifiers.push({
+        text: `${line} [${section[0]}]`,
+        type: ModifierType.Pseudo
+      })
+    }
+  }
+
+  if (!item.mercenarySkills) {
+    item.mercenarySkills = []
+  }
+  item.mercenarySkills.push(group)
+
+  return 'SECTION_PARSED'
+}
+
+function resolveMercenaryBuild (item: ParsedItem) {
+  if (item.info.refName !== 'Mercenary Warrant' || item.mercenaryBuild || !item.mercenarySkills?.length) return
+
+  const build = Array.from(ITEMS_ITERATOR('"namespace":"MERCENARY_BUILD"')).find(build => {
+    if (!build.mercenaryBuild || typeof build.mercenaryBuild === 'string') return false
+    const primarySkills = build.mercenaryBuild.skills.filter(skill => skill.type === 'primary')
+    return primarySkills.every(skill =>
+      item.mercenarySkills!.some((group, idx) =>
+        group[0].stat.ref === skill.name &&
+        idx < primarySkills.length
+      )
+    )
+  })
+
+  if (!build) throw new Error('Unknown Mercenary Build.')
+  item.mercenaryBuild = build
 }
 
 function parseModifiers (section: string[], item: ParsedItem) {
@@ -947,6 +912,30 @@ function parseSentinelCharge (section: string[], item: ParsedItem) {
   return 'SECTION_SKIPPED'
 }
 
+function parseScryingOrb (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Scrying Orb') return 'PARSER_SKIPPED'
+
+  if (section.length === 1) {
+    const line = section[0]
+    let areaName: string | undefined
+    if (line.startsWith(_$.SCRYING_MAP_AREA)) {
+      areaName = line.slice(_$.SCRYING_MAP_AREA.length).trim()
+    } else if (_$.MAP_AREA && line.startsWith(_$.MAP_AREA)) {
+      areaName = line.slice(_$.MAP_AREA.length).trim()
+    } else {
+      const separator = Math.max(line.indexOf(':'), line.indexOf('：'))
+      if (separator >= 0) areaName = line.slice(separator + 1).trim()
+    }
+    if (!areaName) return 'SECTION_SKIPPED'
+
+    const areaInfo = ITEM_BY_REF_OR_TRANSLATED('AREA', areaName)
+    if (!areaInfo) throw new Error('Unknown Area name.')
+    item.mapArea = areaInfo[0]
+    return 'SECTION_PARSED'
+  }
+  return 'SECTION_SKIPPED'
+}
+
 function parseSynthesised (section: string[], item: ParserState) {
   if (section.length === 1) {
     if (section[0] === _$.SECTION_SYNTHESISED) {
@@ -1017,8 +1006,7 @@ function parseCategoryByHelpText (section: string[], item: ParsedItem) {
 function parseHeistContract (section: string[], item: ParsedItem) {
   if (item.category !== ItemCategory.HeistContract) return 'PARSER_SKIPPED'
 
-  parseAreaLevelNested(section, item)
-  if (!item.areaLevel) {
+  if (!parseAreaLevelNested(section, item)) {
     return 'SECTION_SKIPPED'
   }
 
@@ -1066,8 +1054,7 @@ function parseHeistContract (section: string[], item: ParsedItem) {
 function parseHeistBlueprint (section: string[], item: ParsedItem) {
   if (item.category !== ItemCategory.HeistBlueprint) return 'PARSER_SKIPPED'
 
-  parseAreaLevelNested(section, item)
-  if (!item.areaLevel) {
+  if (!parseAreaLevelNested(section, item)) {
     return 'SECTION_SKIPPED'
   }
 
@@ -1087,22 +1074,49 @@ function parseHeistBlueprint (section: string[], item: ParsedItem) {
           item.heistBlueprint.target = 'Trinkets'; break
       }
     } else if (line.startsWith(_$.HEIST_WINGS_REVEALED)) {
-      const wings = line.slice(_$.HEIST_WINGS_REVEALED.length).split('/')
-      item.heistBlueprint.wingsRevealed = parseInt(wings[0], 10)
-      item.heistBlueprint.totalWings = parseInt(wings[1], 10)
+      const [revealed, total] = line.slice(_$.HEIST_WINGS_REVEALED.length).split('/')
+      item.heistBlueprint.wingsRevealed = parseInt(revealed, 10)
+      item.heistBlueprint.wingsTotal = parseInt(total, 10)
     }
   }
 
   return 'SECTION_PARSED'
 }
 
-function parseAreaLevelNested (section: string[], item: ParsedItem) {
+function parseChart (section: string[], item: ParsedItem) {
+  if (item.category !== ItemCategory.Chart) return 'PARSER_SKIPPED'
+
+  if (!parseAreaLevelNested(section, item)) {
+    return 'SECTION_SKIPPED'
+  }
+
+  const areaName = section[0]
+  const bracketName = areaName.match(/\((.*?)\)/)?.[1]
+  const areaInfo =
+    (bracketName && ITEM_BY_REF_OR_TRANSLATED('AREA', bracketName)) ??
+    ITEM_BY_REF_OR_TRANSLATED('AREA', areaName)
+  if (!areaInfo) throw new Error('Unknown Area name.')
+  item.mapArea = areaInfo[0]
+
+  for (const line of section) {
+    if (parseAreaPropNested(line, item)) {
+      // line parsed
+    } else if (line.startsWith(_$.CHART_SULPHUR)) {
+      item.chartSulphur = parseInt(line.slice(_$.CHART_SULPHUR.length), 10)
+    }
+  }
+
+  return 'SECTION_PARSED'
+}
+
+function parseAreaLevelNested (section: string[], item: ParsedItem): boolean {
   for (const line of section) {
     if (line.startsWith(_$.AREA_LEVEL)) {
       item.areaLevel = Number(line.slice(_$.AREA_LEVEL.length))
-      break
+      return true
     }
   }
+  return false
 }
 
 function parseAreaLevel (section: string[], item: ParsedItem) {
@@ -1113,11 +1127,11 @@ function parseAreaLevel (section: string[], item: ParsedItem) {
     item.info.refName !== 'Forbidden Tome'
   ) return 'PARSER_SKIPPED'
 
-  parseAreaLevelNested(section, item)
+  if (!parseAreaLevelNested(section, item)) {
+    return 'SECTION_SKIPPED'
+  }
 
-  return (item.areaLevel)
-    ? 'SECTION_PARSED'
-    : 'SECTION_SKIPPED'
+  return 'SECTION_PARSED'
 }
 
 function parseAtzoatlRooms (section: string[], item: ParsedItem) {

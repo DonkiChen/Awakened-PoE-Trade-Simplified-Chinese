@@ -36,8 +36,12 @@
       <trade-links v-if="tradeAPI === 'trade'"
         :get-link="makeTradeLink" />
     </div>
+    <p v-if="showComplexityHint" :class="$style.complexityHint">
+      <i class="fas fa-info-circle" />
+      {{ t('item.complexity_hint') }}
+    </p>
     <stack-value :filters="itemFilters" :item="item"/>
-    <div class="mt-auto border border-dashed p-2">
+    <div v-if="showSupportLinks" class="mt-auto border border-dashed p-2">
       <div class="mb-1"><a href="https://patreon.com/awakened_poe_trade" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank">{{ t('Support development on') }} <img class="inline h-5" src="/images/Patreon.svg"></a></div>
       <div class="mb-1"><a href="https://afdian.com/a/donkichen/plan" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank">{{ t('Support development CN on') }} <img class="inline h-5" src="/images/aifadain.png"></a></div>
       <div class="mb-1"><a href="https://gitee.com/hhzxxx/exilence-next-tx-release" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank">推荐使用国服收益统计插件，点击此文本可跳转</a></div>
@@ -54,7 +58,6 @@
 import { defineComponent, PropType, watch, ref, nextTick, computed, ComponentPublicInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ItemRarity, ItemCategory, ParsedItem } from '@/parser'
-import { MAP_LIKE_ITEM } from '@/parser/meta'
 import TradeListing from './trade/TradeListing.vue'
 import TradeBulk from './trade/TradeBulk.vue'
 import TradeLinks from './trade/TradeLinks.vue'
@@ -132,13 +135,15 @@ export default defineComponent({
       } else {
         doSearch.value = Boolean(
           (item.rarity === ItemRarity.Unique) ||
-          MAP_LIKE_ITEM.has(item.category!) ||
+          (presets.value.active === 'filters.preset_bulk') ||
+          (item.mapCompletionReward) ||
           (item.category === ItemCategory.HeistContract) ||
           (item.category === ItemCategory.HeistBlueprint) ||
           (item.category === ItemCategory.SanctumRelic) ||
           (item.category === ItemCategory.Charm) ||
           (item.category === ItemCategory.Idol) ||
-          (!CATEGORY_TO_TRADE_ID.has(item.category!)) ||
+          (!CATEGORY_TO_TRADE_ID.has(item.category!) &&
+            item.info.refName !== 'Mercenary Warrant') ||
           (item.isUnidentified) ||
           (item.isVeiled)
         )
@@ -189,10 +194,11 @@ export default defineComponent({
       if (presets.value.active === 'filters.preset_base_item') return false
 
       return props.item.rarity === ItemRarity.Rare &&
-        !MAP_LIKE_ITEM.has(props.item.category!) &&
+        props.item.category !== ItemCategory.Map &&
         props.item.category !== ItemCategory.CapturedBeast &&
         props.item.category !== ItemCategory.HeistContract &&
         props.item.category !== ItemCategory.HeistBlueprint &&
+        props.item.category !== ItemCategory.Chart &&
         props.item.category !== ItemCategory.Invitation &&
         props.item.info.refName !== 'Expedition Logbook' &&
         !props.item.isUnidentified
@@ -241,6 +247,8 @@ export default defineComponent({
       show,
       handleSearchMouseenter,
       showSupportLinks,
+      showComplexityHint: computed(() => !widget.value.builtinBrowser && !doSearch.value &&
+        props.item.info.refName === 'Mercenary Warrant'),
       presets: computed(() => presets.value.presets.map(preset =>
         ({ id: preset.id, active: (preset.id === presets.value.active) }))),
       selectPreset (id: string) {
@@ -256,3 +264,20 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="postcss" module>
+.complexityHint {
+  display: flex;
+  align-items: baseline;
+  gap: theme('spacing.2');
+  margin-top: theme('spacing.4');
+  padding: theme('spacing.2') theme('spacing.4') theme('spacing.2') theme('spacing.3');
+  border-radius: theme('borderRadius.DEFAULT');
+  background: theme('colors.gray.900');
+  text-wrap-style: pretty;
+
+  & > i {
+    color: theme('colors.gray.600');
+  }
+}
+</style>

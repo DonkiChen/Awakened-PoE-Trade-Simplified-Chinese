@@ -1,6 +1,5 @@
 export enum ItemCategory {
   Map = 'Map',
-  Chart = 'Chart',
   CapturedBeast = 'Captured Beast',
   MetamorphSample = 'Metamorph Sample',
   Helmet = 'Helmet',
@@ -50,7 +49,9 @@ export enum ItemCategory {
   Tincture = 'Tincture',
   Charm = 'Charm',
   Idol = 'Idol',
-  Graft = 'Graft'
+  Graft = 'Graft',
+  Chart = 'Chart',
+  MercenaryWarrant = 'Mercenary Warrant'
 }
 
 export const MAP_LIKE_ITEM = new Set([
@@ -124,5 +125,6 @@ export const CONSUMABLE_CRAFTABLE_ITEM = new Set([
   ItemCategory.HeistContract,
   ItemCategory.Invitation,
   ItemCategory.MemoryLine,
-  ItemCategory.ExpeditionLogbook
+  ItemCategory.ExpeditionLogbook,
+  ItemCategory.Chart
 ])

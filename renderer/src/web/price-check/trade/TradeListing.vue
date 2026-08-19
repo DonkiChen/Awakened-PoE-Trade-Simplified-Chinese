@@ -21,6 +21,9 @@
             <th :class="$style.tableHeading">
               <div class="px-2">{{ t(':price') }}</div>
             </th>
+            <th v-if="realm === 'pc-tencent'" :class="$style.tableHeading">
+              <div class="px-2">{{ t('精准') }}</div>
+            </th>
             <th v-if="item.stackSize" :class="$style.tableHeading">
               <div class="px-2">{{ t(':stock') }}</div>
             </th>
@@ -60,6 +63,7 @@
                   <i v-if="!result.hasNote" class="fas fa-question" />
                 </span>
               </td>
+              <td v-if="realm === 'pc-tencent'" class="px-2 whitespace-nowrap text-right">{{ result.priceType === '=a/b/o' ? '是' : '否' }}</td>
               <td v-if="item.stackSize" class="px-2 text-right">{{ result.stackSize }}</td>
               <td v-if="filters.itemLevel" class="px-2 whitespace-nowrap text-right">{{ result.itemLevel }}</td>
               <td v-if="item.category === 'Gem'" class="pl-2 whitespace-nowrap">{{ result.level }}</td>
@@ -84,8 +88,8 @@
   </div>
   <ui-error-box v-else>
     <template #name>{{ t(':error') }}</template>
-    <p>Error: {{ error }}</p>
-    <p>{{ t('app.leagues_failed_help') }}</p>
+    <p v-if="error.includes('JSON')">{{ t('app.leagues_failed_help') }}</p>
+    <p v-else>Error: {{ error }}</p>
     <template #actions>
       <button class="btn" @click="execSearch">{{ t('Retry') }}</button>
       <button class="btn" @click="openTradeLink">{{ t('Browser') }}</button>
@@ -101,7 +105,7 @@ import { requestTradeResultList, requestResults, createTradeRequest, PricingResu
 import { getTradeEndpoint } from './common'
 import { AppConfig } from '@/web/Config'
 import { PriceCheckWidget } from '@/web/overlay/interfaces'
-import { ItemFilters, StatFilter } from '../filters/interfaces'
+import { ItemFilters, FilterOrGroup } from '../filters/interfaces'
 import { ParsedItem } from '@/parser'
 import { artificialSlowdown } from './artificial-slowdown'
 import OnlineFilter from './OnlineFilter.vue'
@@ -116,6 +120,7 @@ const MIN_GROUPED = 10
 
 function useTradeApi () {
   let searchId = 0
+  let collapseMerchant = false
   const error = shallowRef<string | null>(null)
   const searchResult = shallowRef<SearchResult | null>(null)
   const fetchResults = shallowRef<PricingResult[]>([])
@@ -124,7 +129,7 @@ function useTradeApi () {
     const out: Array<PricingResult & { listedTimes: number }> = []
     for (const result of fetchResults.value) {
       if (result == null) break
-      if (out.length === 0 || result.hasFee) {
+      if (out.length === 0 || (result.hasFee && !collapseMerchant)) {
         out.push({ listedTimes: 1, ...result })
         continue
       }
@@ -152,7 +157,7 @@ function useTradeApi () {
     return out
   })
 
-  async function search (filters: ItemFilters, stats: StatFilter[]) {
+  async function search (filters: ItemFilters, stats: FilterOrGroup[]) {
     try {
       searchId += 1
       error.value = null
@@ -167,6 +172,7 @@ function useTradeApi () {
         return
       }
       searchResult.value = _searchResult
+      collapseMerchant = filters.trade.collapseMerchant
 
       // first two req are parallel, then sequential on demand
       {
@@ -217,7 +223,7 @@ export default defineComponent({
       required: true
     },
     stats: {
-      type: Array as PropType<StatFilter[]>,
+      type: Array as PropType<FilterOrGroup[]>,
       required: true
     },
     item: {

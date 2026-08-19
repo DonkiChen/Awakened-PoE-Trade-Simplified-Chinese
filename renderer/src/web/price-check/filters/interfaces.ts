@@ -5,7 +5,7 @@ import type { ParsedItem } from '@/parser/ParsedItem'
 export interface FilterPreset {
   id: string
   filters: ItemFilters
-  stats: StatFilter[]
+  stats: FilterOrGroup[]
 }
 
 interface SearchFilter {
@@ -13,18 +13,17 @@ interface SearchFilter {
   nameTrade?: string
   baseType?: string
   baseTypeTrade?: string
+  discriminatorTrade?: string
   category?: ItemCategory
 }
 
+interface SearchFilterSub extends SearchFilter {
+  sub?: SearchFilter & { disabled: boolean }
+}
+
 export interface ItemFilters {
-  searchExact: SearchFilter
-  searchRelaxed?: SearchFilter & { disabled: boolean }
-  discriminator?: {
-    value?: string
-    trade: string
-    option?: string
-    disabled: boolean
-  }
+  searchExact: SearchFilterSub
+  searchRelaxed?: SearchFilterSub & { disabled: boolean }
   rarity?: {
     value: string
     disabled: boolean
@@ -68,7 +67,6 @@ export interface ItemFilters {
   quality?: FilterNumeric
   gemLevel?: FilterNumeric
   mapTier?: FilterNumeric
-  mapReward?: string
   mapBlighted?: {
     value: NonNullable<ParsedItem['mapBlighted']>
   }
@@ -87,8 +85,6 @@ export interface ItemFilters {
     disabled: boolean
   }
   areaLevel?: FilterNumeric
-  heistWingsRevealed?: FilterNumeric
-  heistTotalWings?: FilterNumeric
   sentinelCharge?: FilterNumeric
   storedExperience?: FilterNumeric
   trade: {
@@ -99,6 +95,7 @@ export interface ItemFilters {
     currency: string | undefined
     league: string
     collapseListings: 'api' | 'app'
+    collapseMerchant: boolean
   }
 }
 
@@ -108,12 +105,25 @@ export interface FilterNumeric {
   disabled: boolean
 }
 
+export type FilterOrGroup =
+  | StatFilter
+  | FilterGroup
+
+export interface FilterGroup {
+  group: 'not' | 'mercenary'
+  expanded: boolean // NOTE: mutable in UI
+  meta: StatFilter
+  stats: StatFilter[]
+}
+
 export interface StatFilter {
+  group?: never
   tradeId: string[]
   statRef: string
   text: string
   tag: FilterTag
   oils?: string[]
+  mercenary?: { icon?: string, tier?: number }
   sources: StatCalculated['sources']
   not?: true
   roll?: {
@@ -135,6 +145,7 @@ export interface StatFilter {
 }
 
 const _INTERNAL_TRADE_IDS = [
+  'item.not_group',
   'item.base_percentile',
   'item.memory_strands',
   'item.armour',
@@ -148,10 +159,10 @@ const _INTERNAL_TRADE_IDS = [
   'item.crit',
   'item.aps',
   'item.has_empty_modifier',
+  'item.mercenary_6link',
   'item.map_item_quantity',
   'item.map_item_rarity',
   'item.map_pack_size',
-  'item.chart_sulphur',
   'item.heist_job_lockpicking',
   'item.heist_job_bruteforce',
   'item.heist_job_perception',
@@ -161,7 +172,10 @@ const _INTERNAL_TRADE_IDS = [
   'item.heist_job_agility',
   'item.heist_job_deception',
   'item.heist_job_engineering',
-  'item.heist_target_priceless'
+  'item.heist_target_priceless',
+  'item.heist_wings_revealed',
+  'item.heist_wings_total',
+  'item.chart_sulphur'
 ] as const
 
 export type InternalTradeId = typeof _INTERNAL_TRADE_IDS[number]
@@ -198,5 +212,11 @@ export enum FilterTag {
   Unveiled = 'explicit-veiled',
   Incursion = 'explicit-incursion',
   Infamous = 'explicit-infamous',
-  Essence = 'explicit-essence'
+  Essence = 'explicit-essence',
+  Brick = 'brick',
+  MercenaryPrimary = 'mercenary-primary',
+  MercenarySecondary = 'mercenary-secondary',
+  MercenaryUtility = 'mercenary-utility',
+  MercenarySupport = 'mercenary-support',
+  FilterGroup = 'filter-group'
 }

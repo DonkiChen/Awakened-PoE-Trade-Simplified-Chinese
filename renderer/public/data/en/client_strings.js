@@ -19,7 +19,6 @@ export default {
   MAP_MORE_DIVINATION_CARDS: 'More Divination Cards: ',
   MAP_AREA: 'Map Area: ',
   MAP_COMPLETION_REWARD: /^Reward: Foil (.*)$/,
-  CHART_SULPHUR: "Dead Man's Sulphur: ",
   CHART_SHAPE: 'Chart Shape: ',
   CHART_UNREVEALED: 'Voyage Modifier will be revealed once Charted',
   RARITY: 'Rarity: ',
@@ -132,6 +131,10 @@ export default {
   FOULBORN_MODIFIER: 'Foulborn Unique Modifier',
   VESTIGIAL_NAME: /^Vestigial (.*)$/,
   VESTIGIAL_IMPLICIT: 'Vestigial Implicit Modifier',
+  SCRYING_MAP_AREA: 'Map Area: ',
+  CHART_SULPHUR: "Dead Man's Sulphur: ",
+  MERCENARY_LEVEL: 'Mercenary Level: ',
+  MERCENARY_BUILD: 'Build: ',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

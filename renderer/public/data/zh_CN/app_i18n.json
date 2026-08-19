@@ -38,6 +38,7 @@
   "Divergent": "分歧",
   "Phantasmal": "魅影",
   "item": {
+    "not_group": "以下均不包含",
     "prop_quality": "品质:{0}%",
     "base_percentile": "基础百分比: {0}%",
     "armour": "护甲: {0}",
@@ -58,6 +59,8 @@
     "has_empty_affix": "空词缀",
     "has_empty_prefix": "空前缀",
     "has_empty_suffix": "空后缀",
+    "mercenary_6link": "与 {0} 个 3 阶辅助技能形成六连",
+    "complexity_hint": "查询此物品通常需要启用内置浏览器并登录账号。国服玩家可能无法打开内置浏览器。",
     "item_level": "物品等级: {0}",
     "stock": "堆叠数量: {0}",
     "map_tier": "地图等阶: {0}",
@@ -73,7 +76,7 @@
     "heist_job_engineering": "需要 工程学 (Level {0})",
     "heist_target_priceless": "赏金目标: 无价之宝",
     "heist_wings_revealed": "侧厅解锁: {0}",
-    "heist_total_wings": "总侧厅: {0}",
+    "heist_wings_total": "总侧厅: {0}",
     "linked_sockets": "链接: {0}",
     "white_sockets": "白孔: {0}",
     "quality": "品质: {0}",
@@ -155,7 +158,8 @@
     "tincture": "酊剂",
     "azmeri_charm": "咒符",
     "idol": "雕像",
-    "graft": "移植物"
+    "graft": "移植物",
+    "chart": "海图"
   },
   "filters": {
     "selected_some": "词缀: {0}/{1}",
@@ -165,8 +169,10 @@
     "mods_toggle": "Mods",
     "empty": "找不到词缀",
     "tier": "等阶: {0}",
+    "tier_gilded": "独特",
     "preset_pseudo": "伪属性",
     "preset_base_item": "物品基底",
+    "preset_bulk": "批量",
     "hide_const_roll": "Roll is not variable",
     "hide_ele_dps": "元素伤害不是主要DPS来源",
     "hide_phys_dps": "物理伤害不是主要DPS来源",
@@ -187,7 +193,7 @@
     "tag_vestigial": "退化",
     "tag_eldritch": "古灵",
     "tag_pseudo": "伪属性",
-    "tag_not": "not",
+    "tag_not": "不包含",
     "tag_explicit": "随机",
     "tag_explicit_shaper": "塑界者",
     "tag_explicit_elder": "裂界者",
@@ -197,7 +203,14 @@
     "tag_explicit_warlord": "督军",
     "tag_explicit_delve": "地心",
     "tag_explicit_veiled": "隐匿",
-    "tag_explicit_incursion": "穿越"
+    "tag_explicit_incursion": "穿越",
+    "tag_explicit_infamous": "佣兵",
+    "tag_explicit_essence": "精髓",
+    "tag_brick": "废词缀",
+    "tag_mercenary_primary": "主要",
+    "tag_mercenary_secondary": "次要",
+    "tag_mercenary_utility": "辅助",
+    "tag_filter_group": "词缀组"
   },
   "online_filter": {
     "offline_toggle": "在线&离线",

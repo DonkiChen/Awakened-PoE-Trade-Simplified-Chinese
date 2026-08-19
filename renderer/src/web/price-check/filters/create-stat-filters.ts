@@ -6,12 +6,11 @@ import { filterPseudo } from './pseudo'
 import { applyRules as applyAtzoatlRules } from './pseudo/atzoatl-rules'
 import { applyRules as applyMirroredTabletRules } from './pseudo/reflection-rules'
 import { filterItemProp, filterBasePercentile, filterMemoryStrands } from './pseudo/item-property'
-import { mapProps, valdoBadMods } from './pseudo/maps'
+import { mapProps, valdoBadMods, chartProps } from './pseudo/maps'
 import { applyFlaskHybridMod } from './pseudo/flasks'
 import { applyHeistRules } from './pseudo/heist'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
 import { StatBetter, CLIENT_STRINGS, CLIENT_STRINGS_REF } from '@/assets/data'
-import { MAP_LIKE_ITEM } from '@/parser/meta'
 
 export interface FiltersCreationContext {
   readonly item: ParsedItem
@@ -23,7 +22,7 @@ export interface FiltersCreationContext {
 export function createExactStatFilters (
   item: ParsedItem,
   statsByType: StatCalculated[],
-  opts: { searchStatRange: number }
+  opts: { searchStatRange: number, mode?: 'props' | 'bulk' }
 ): StatFilter[] {
   if (
     item.mapBlighted ||
@@ -41,16 +40,18 @@ export function createExactStatFilters (
     !item.influences.length &&
     !item.isFractured &&
     item.category !== ItemCategory.Tincture &&
-    item.category !== ItemCategory.Idol
+    item.category !== ItemCategory.Idol &&
+    item.category !== ItemCategory.Chart
   ) {
     keepByType.push(ModifierType.Implicit)
   }
 
   if (item.rarity === ItemRarity.Magic && (
     item.category !== ItemCategory.ClusterJewel &&
-    !MAP_LIKE_ITEM.has(item.category!) &&
+    item.category !== ItemCategory.Map &&
     item.category !== ItemCategory.HeistContract &&
     item.category !== ItemCategory.HeistBlueprint &&
+    item.category !== ItemCategory.Chart &&
     item.category !== ItemCategory.Sentinel
   )) {
     keepByType.push(ModifierType.Explicit)
@@ -64,7 +65,7 @@ export function createExactStatFilters (
 
   const ctx: FiltersCreationContext = {
     item,
-    searchInRange: (!MAP_LIKE_ITEM.has(item.category!))
+    searchInRange: (opts.mode !== 'props')
       ? Math.min(2, opts.searchStatRange)
       : opts.searchStatRange,
     filters: [],
@@ -73,7 +74,8 @@ export function createExactStatFilters (
 
   filterBasePercentile(ctx)
   filterMemoryStrands(ctx)
-  mapProps(ctx)
+  mapProps(opts.mode === 'bulk', ctx)
+  chartProps(opts.mode === 'bulk', ctx)
   valdoBadMods(ctx)
 
   ctx.filters.push(
@@ -88,7 +90,7 @@ export function createExactStatFilters (
     applyMirroredTabletRules(ctx.filters)
     return ctx.filters
   }
-  if (MAP_LIKE_ITEM.has(item.category!)) {
+  if (item.category === ItemCategory.Map || item.category === ItemCategory.Chart) {
     for (const filter of ctx.filters) {
       if (filter.tag !== FilterTag.Property && filter.tag !== FilterTag.Pseudo) {
         filter.disabled = false
@@ -235,7 +237,9 @@ export function calculatedStatToFilter (
     if (type !== ModifierType.Enchant) {
       filter.tag = FilterTag.Variant
     }
-    filter.disabled = false
+    if (!filter.oils) {
+      filter.disabled = false
+    }
   }
 
   if (type === ModifierType.Implicit) {
