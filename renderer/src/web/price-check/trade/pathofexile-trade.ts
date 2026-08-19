@@ -437,6 +437,8 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
   for (const stat of stats) {
     if (stat.group || !stat.tradeId[0].startsWith('item.')) continue
 
+    if (stat.disabled) continue
+
     if (stat.tradeId[0] === 'item.has_empty_modifier') {
       const TARGET_ID = {
         CRAFTED_MODIFIERS: pseudoStatByRef(TOTAL_MODS_TEXT.CRAFTED_MODIFIERS[stat.option!.value])!.trade.ids[ModifierType.Pseudo][0],
@@ -447,25 +449,23 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
       query.stats.push({
         type: 'count',
         value: { min: 1, max: 1 },
-        disabled: stat.disabled,
+        disabled: false,
         filters: [
-          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: stat.disabled },
-          { id: TARGET_ID.CRAFTED_MODIFIERS, value: { min: 1, max: undefined }, disabled: stat.disabled }
+          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: false },
+          { id: TARGET_ID.CRAFTED_MODIFIERS, value: { min: 1, max: undefined }, disabled: false }
         ]
       })
 
       query.stats.push({
         type: 'count',
         value: { min: 1, max: 1 },
-        disabled: stat.disabled,
+        disabled: false,
         filters: [
-          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: stat.disabled },
-          { id: TARGET_ID.TOTAL_MODIFIERS, value: { min: 6, max: undefined }, disabled: stat.disabled }
+          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: false },
+          { id: TARGET_ID.TOTAL_MODIFIERS, value: { min: 6, max: undefined }, disabled: false }
         ]
       })
     }
-
-    if (stat.disabled) continue
 
     const input = stat.roll!
     switch (stat.tradeId[0] as InternalTradeId) {
@@ -593,26 +593,31 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
   type NoUiStatFilter = Pick<StatFilter, 'not' | keyof BareStatFilter>
   const realStats: NoUiStatFilter[] = stats.filter((stat): stat is StatFilter =>
     !stat.group &&
+    !stat.disabled &&
     !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]))
   if (filters.veiled) {
     for (const statRef of filters.veiled.statRefs) {
       const statOrGroup = STAT_BY_REF_V2(statRef)!
       const dbStats = ('stats' in statOrGroup) ? statOrGroup.stats : [statOrGroup]
-      realStats.push({
-        disabled: filters.veiled.disabled,
-        tradeId: dbStats
-          .filter(dbStat => ModifierType.Veiled in dbStat.trade.ids)
-          .map(dbStat => dbStat.trade.ids[ModifierType.Veiled][0])
-      })
+      if (!filters.veiled.disabled) {
+        realStats.push({
+          disabled: false,
+          tradeId: dbStats
+            .filter(dbStat => ModifierType.Veiled in dbStat.trade.ids)
+            .map(dbStat => dbStat.trade.ids[ModifierType.Veiled][0])
+        })
+      }
     }
   }
 
   if (filters.influences) {
     for (const influence of filters.influences) {
-      realStats.push({
-        disabled: influence.disabled,
-        tradeId: pseudoStatByRef(INFLUENCE_PSEUDO_TEXT[influence.value])!.trade.ids[ModifierType.Pseudo]
-      })
+      if (!influence.disabled) {
+        realStats.push({
+          disabled: false,
+          tradeId: pseudoStatByRef(INFLUENCE_PSEUDO_TEXT[influence.value])!.trade.ids[ModifierType.Pseudo]
+        })
+      }
     }
   }
 
@@ -624,29 +629,39 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
 
   for (const group of stats) {
     if (group.group === 'not') {
-      query.stats.push({
-        type: 'not',
-        disabled: group.meta.disabled,
-        filters: group.stats.flatMap(stat => everyTradeIdToQuery(stat))
-      })
+      if (!group.meta.disabled) {
+        const enabledStats = group.stats.filter(stat => !stat.disabled)
+        if (enabledStats.length) {
+          query.stats.push({
+            type: 'not',
+            disabled: false,
+            filters: enabledStats.flatMap(stat => everyTradeIdToQuery(stat))
+          })
+        }
+      }
     } else if (group.group === 'mercenary') {
       const { meta: skill, stats } = group
+      const skillEnabled = skill.tag === FilterTag.MercenaryPrimary || !skill.disabled
+      if (!skillEnabled) continue
 
-      if (skill.tag === FilterTag.MercenaryPrimary) {
-        appendAndFilter({ ...skill, disabled: false }, qAnd, query.stats)
-      } else if (!skill.disabled) {
-        appendAndFilter(skill, qAnd, query.stats)
-      }
+      const effectiveSkill = (skill.tag === FilterTag.MercenaryPrimary)
+        ? { ...skill, disabled: false }
+        : skill
 
-      const socketedSupports = stats.filter(stat => !stat.not && !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]))
-      const enabledOptionalGems = socketedSupports.filter(stat => !stat.disabled && stat.option!.value === MercSearchMode.Optional)
-      const enabledRequiredGems = socketedSupports.filter(stat => !stat.disabled && stat.option!.value === MercSearchMode.Required)
+      appendAndFilter(effectiveSkill, qAnd, query.stats)
+
+      const socketedSupports = stats.filter(stat =>
+        !stat.not &&
+        !stat.disabled &&
+        !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]))
+      const enabledOptionalGems = socketedSupports.filter(stat => stat.option!.value === MercSearchMode.Optional)
+      const enabledRequiredGems = socketedSupports.filter(stat => stat.option!.value === MercSearchMode.Required)
 
       const localNotMode = stats.some(stat => stat.tradeId[0] === 'item.mercenary_6link')
       const localNotStats = (localNotMode) ? stats.filter(stat => stat.not && !stat.disabled) : []
 
       for (const stat of stats) {
-        if (skill.disabled || enabledRequiredGems.length === 5) break
+        if (!skillEnabled || enabledRequiredGems.length === 5) break
 
         if (stat.not) {
           if (localNotMode) continue
@@ -677,7 +692,7 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
               type: 'mercenary',
               disabled: false,
               ...weightedGroupToQuery({
-                allOf: [skill.tradeId],
+                allOf: [effectiveSkill.tradeId],
                 someOf: {
                   min: 5,
                   ids: possibleSupports.map(family => {
@@ -698,7 +713,7 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
               type: 'mercenary',
               disabled: false,
               ...weightedGroupToQuery({
-                allOf: [skill.tradeId],
+                allOf: [effectiveSkill.tradeId],
                 someOf: {
                   min: tier3Count,
                   ids: possibleSupports.map(family => {
@@ -720,7 +735,7 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
           disabled: false,
           ...weightedGroupToQuery({
             allOf: [
-              skill.tradeId,
+              effectiveSkill.tradeId,
               ...enabledRequiredGems.map(stat => stat.tradeId)
             ],
             someOf: {
@@ -729,21 +744,17 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
             }
           })
         })
-      } else {
+      } else if (enabledRequiredGems.length) {
         // AND group. Not using `weightedGroupToQuery` for better trade site experience
         query.stats.push({
           type: 'mercenary',
-          value: (!skill.disabled && enabledRequiredGems.length)
-            ? { min: 1 + enabledRequiredGems.length }
-            : undefined,
-          // for a Skill without any checked Support Gems we use a simple AND filter
-          disabled: skill.disabled || !enabledRequiredGems.length,
+          value: { min: 1 + enabledRequiredGems.length },
+          disabled: false,
           filters: [
-            ...everyTradeIdToQuery(skill),
-            ...socketedSupports.flatMap(stat => everyTradeIdToQuery({
+            ...everyTradeIdToQuery(effectiveSkill),
+            ...enabledRequiredGems.flatMap(stat => everyTradeIdToQuery({
               ...stat,
-              option: undefined,
-              disabled: (stat.option!.value === MercSearchMode.Optional) ? true : stat.disabled
+              option: undefined
             }))
           ]
         })
@@ -752,11 +763,8 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
   }
 
   for (const stat of realStats) {
-    if (stat.not) {
-      qNot.filters.push(...everyTradeIdToQuery(stat))
-    } else {
-      appendAndFilter(stat, qAnd, query.stats)
-    }
+    if (stat.not) qNot.filters.push(...everyTradeIdToQuery(stat))
+    else appendAndFilter(stat, qAnd, query.stats)
   }
 
   if (qNot.filters.length) {
