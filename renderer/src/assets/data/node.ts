@@ -36,7 +36,6 @@ export async function initForNode (lang: string, options?: { dataDir?: string, r
     // Match the globals populated by the browser-side data bootstrap.
     clientStringsRef: await importTranslationDict(path.join(dataDir, 'en', 'client_strings.js')),
     itemDrop: JSON.parse(await readFile(path.join(dataDir, 'item-drop.json'), 'utf8')),
-    mercenaryBuilds: JSON.parse(await readFile(path.join(dataDir, 'mercenary-builds.json'), 'utf8')),
     appPatrons: JSON.parse(await readFile(path.join(dataDir, 'patrons.json'), 'utf8'))
   })
 

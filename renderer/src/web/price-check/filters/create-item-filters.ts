@@ -97,11 +97,14 @@ export function createFilters (
   if (item.info.refName === 'Scrying Orb') {
     filters.searchExact = {
       baseType: item.info.name,
-      baseTypeTrade: item.mapArea!.tradeDisc!,
-      discriminatorTrade: item.info.tradeDisc!
+      baseTypeTrade: t(opts, item.info),
+      sub: {
+        baseType: item.mapArea!.name,
+        baseTypeTrade: item.mapArea!.tradeDisc!,
+        discriminatorTrade: item.info.tradeDisc!,
+        disabled: false
+      }
     }
-    filters.scryingMapArea = item.mapArea!.name
-
     return filters
   }
   if (
@@ -200,33 +203,6 @@ export function createFilters (
         disabled: false
       }
     }
-  } else if (item.category === ItemCategory.HeistBlueprint) {
-    filters.searchRelaxed = {
-      category: item.category,
-      disabled: true // TODO: blocked by https://www.pathofexile.com/forum/view-thread/3109852
-    }
-    filters.searchExact = {
-      baseType: item.info.name,
-      baseTypeTrade: t(opts, item.info)
-    }
-
-    filters.areaLevel = {
-      value: item.areaLevel!,
-      disabled: false
-    }
-
-    if (item.heistBlueprint?.wingsRevealed) {
-      filters.heistWingsRevealed = {
-        value: item.heistBlueprint.wingsRevealed,
-        disabled: false
-      }
-    }
-    if (item.heistBlueprint?.totalWings) {
-      filters.heistTotalWings = {
-        value: item.heistBlueprint.totalWings,
-        disabled: false
-      }
-    }
   } else if (item.rarity === ItemRarity.Unique && item.info.unique) {
     filters.searchExact = {
       name: item.info.name,
@@ -243,7 +219,8 @@ export function createFilters (
       if (
         item.category === ItemCategory.ClusterJewel ||
         item.category === ItemCategory.Idol ||
-        item.category === ItemCategory.Graft
+        item.category === ItemCategory.Graft ||
+        item.category === ItemCategory.HeistBlueprint
       ) {
         disabled = true
       } else if (
@@ -476,6 +453,7 @@ export function createFilters (
 
   if (
     item.category === ItemCategory.HeistContract ||
+    item.category === ItemCategory.HeistBlueprint ||
     item.category === ItemCategory.Chart
   ) {
     if (item.rarity !== ItemRarity.Unique) {
@@ -505,6 +483,15 @@ function createGemFilters (
       baseType: item.info.name,
       baseTypeTrade: t(opts, normalGem),
       discriminatorTrade: item.info.tradeDisc!
+    }
+  }
+
+  if (item.vaalGem) {
+    filters.searchExact.sub = {
+      baseType: item.vaalGem.name,
+      baseTypeTrade: t(opts, item.vaalGem),
+      discriminatorTrade: item.info.tradeDisc,
+      disabled: false
     }
   }
 

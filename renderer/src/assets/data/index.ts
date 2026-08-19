@@ -1,12 +1,11 @@
 import fnv1a from '@sindresorhus/fnv1a'
-import type { BaseType, DropEntry, MercenaryBuild, Stat, StatOrGroup, StatMatcher, TranslationDict } from './interfaces'
+import type { BaseType, DropEntry, Stat, StatOrGroup, StatMatcher, TranslationDict } from './interfaces'
 
 export * from './interfaces'
 
 export interface StaticDataPayload {
   clientStringsRef: TranslationDict
   itemDrop: DropEntry[]
-  mercenaryBuilds: MercenaryBuild[]
   appPatrons: Array<{ from: string, months: number, style: number }>
 }
 
@@ -21,7 +20,6 @@ export interface LanguageDataPayload {
 }
 
 export let ITEM_DROP: DropEntry[]
-export let MERCENARY_BUILDS: MercenaryBuild[]
 export let CLIENT_STRINGS: TranslationDict
 export let CLIENT_STRINGS_REF: TranslationDict
 export let APP_PATRONS: Array<{ from: string, months: number, style: number }>
@@ -210,7 +208,6 @@ async function importClientStrings (url: string) {
 export function hydrateStaticData (data: StaticDataPayload) {
   CLIENT_STRINGS_REF = data.clientStringsRef
   ITEM_DROP = data.itemDrop
-  MERCENARY_BUILDS = data.mercenaryBuilds
   APP_PATRONS = data.appPatrons
 }
 
@@ -265,7 +262,6 @@ export async function init (lang: string) {
   hydrateStaticData({
     clientStringsRef: await importClientStrings(`${import.meta.env.BASE_URL}data/en/client_strings.js`),
     itemDrop: await (await fetch(`${import.meta.env.BASE_URL}data/item-drop.json`)).json(),
-    mercenaryBuilds: await (await fetch(`${import.meta.env.BASE_URL}data/mercenary-builds.json`)).json(),
     appPatrons: await (await fetch(`${import.meta.env.BASE_URL}data/patrons.json`)).json()
   })
 
