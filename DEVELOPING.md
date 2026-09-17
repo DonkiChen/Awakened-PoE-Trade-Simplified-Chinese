@@ -18,7 +18,6 @@ Here's what that looks like as of 2026-08-01.
 ```shell
 cd renderer
 npm ci
-npm run make-index-files
 npm run dev
 
 # In a second shell
@@ -37,7 +36,6 @@ npm run dev
 ```shell
 cd renderer
 npm ci
-npm run make-index-files
 npm run build
 
 cd ../main

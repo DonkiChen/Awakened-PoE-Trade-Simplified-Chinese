@@ -1,21 +1,25 @@
 import { ParsedItem, ItemRarity, ItemCategory } from '@/parser'
 import { ModifierType, StatCalculated, statSourcesTotal, translateStatWithRoll } from '@/parser/modifiers'
+import { JEWELLERY } from '@/parser/meta'
+import { getPropQuality, QUALITY_CHANGING_ENCHANT } from '@/parser/calc-q20'
 import { percentRoll, percentRollDelta, roundRoll } from './util'
-import { FilterTag, ItemHasEmptyModifier, StatFilter } from './interfaces'
+import { FilterTag, ItemHasEmptyModifier, StatFilter, FilterGroup, FilterOrGroup } from './interfaces'
 import { filterPseudo } from './pseudo'
 import { applyRules as applyAtzoatlRules } from './pseudo/atzoatl-rules'
 import { applyRules as applyMirroredTabletRules } from './pseudo/reflection-rules'
-import { filterItemProp, filterBasePercentile, filterMemoryStrands } from './pseudo/item-property'
+import { filterEquipmentProps, filterBasePercentile, filterMemoryStrands, BASE_PCTL_AFFECTED_IDS } from './pseudo/item-property'
 import { mapProps, valdoBadMods, chartProps } from './pseudo/maps'
 import { applyFlaskHybridMod } from './pseudo/flasks'
 import { applyHeistRules } from './pseudo/heist'
+import { filterTimelessJewelKeystones } from './pseudo/timeless-jewel'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
-import { StatBetter, CLIENT_STRINGS, CLIENT_STRINGS_REF } from '@/assets/data'
+import { StatBetter } from '@/assets/data'
 
 export interface FiltersCreationContext {
   readonly item: ParsedItem
   readonly searchInRange: number
   filters: StatFilter[]
+  groups: FilterGroup[]
   statsByType: StatCalculated[]
 }
 
@@ -25,13 +29,9 @@ export function createExactStatFilters (
   opts: { searchStatRange: number, mode?: 'props' | 'bulk' }
 ): StatFilter[] {
   if (
+    item.info.area?.blighted ||
     item.mapBlighted ||
     item.category === ItemCategory.Invitation
-  ) return []
-  if (
-    item.isUnidentified &&
-    item.rarity === ItemRarity.Unique &&
-    !item.isSynthesised
   ) return []
 
   const keepByType = [ModifierType.Pseudo, ModifierType.Fractured, ModifierType.Enchant, ModifierType.Necropolis, ModifierType.Imbued]
@@ -69,6 +69,7 @@ export function createExactStatFilters (
       ? Math.min(2, opts.searchStatRange)
       : opts.searchStatRange,
     filters: [],
+    groups: [],
     statsByType: statsByType.filter(calc => keepByType.includes(calc.type))
   }
 
@@ -90,16 +91,10 @@ export function createExactStatFilters (
     applyMirroredTabletRules(ctx.filters)
     return ctx.filters
   }
-  if (item.category === ItemCategory.Map || item.category === ItemCategory.Chart) {
-    for (const filter of ctx.filters) {
-      if (filter.tag !== FilterTag.Property && filter.tag !== FilterTag.Pseudo) {
-        filter.disabled = false
-      }
-    }
-    return ctx.filters
-  }
 
   for (const filter of ctx.filters) {
+    if (filter.not) continue
+
     filter.hidden = undefined
 
     if (filter.tag === FilterTag.Explicit) {
@@ -107,7 +102,7 @@ export function createExactStatFilters (
         source.modifier.info.tier != null &&
         source.modifier.info.tier <= 2
       )
-    } else if (filter.tag !== FilterTag.Property) {
+    } else if (filter.tag !== FilterTag.Property && filter.tag !== FilterTag.Pseudo) {
       filter.disabled = false
     }
 
@@ -119,7 +114,7 @@ export function createExactStatFilters (
   }
 
   if (item.category === ItemCategory.ClusterJewel) {
-    applyClusterJewelRules(ctx.filters)
+    applyClusterJewelRules(ctx.filters, true)
   } if (
     item.category === ItemCategory.HeistContract ||
     item.category === ItemCategory.HeistBlueprint
@@ -146,10 +141,11 @@ export function initUiModFilters (
   opts: {
     searchStatRange: number
   }
-): StatFilter[] {
+): FilterOrGroup[] {
   const ctx: FiltersCreationContext = {
     item,
     filters: [],
+    groups: [],
     searchInRange: (item.rarity === ItemRarity.Normal) ? 100 : opts.searchStatRange,
     statsByType: item.statsByType.map(calc => {
       if (calc.type === ModifierType.Fractured && calc.stat.trade.ids[ModifierType.Explicit]) {
@@ -160,13 +156,16 @@ export function initUiModFilters (
     })
   }
 
+  filterEquipmentProps(ctx)
+  if (item.rarity === ItemRarity.Unique) {
+    filterBasePercentile(ctx)
+  }
+  filterMemoryStrands(ctx, 'hide_memory_strands')
   if (item.info.refName !== 'Split Personality') {
-    filterItemProp(ctx)
     filterPseudo(ctx)
-    if (item.info.refName === "Emperor's Vigilance") {
-      filterBasePercentile(ctx)
-    }
-    filterMemoryStrands(ctx, 'hide_memory_strands')
+  }
+  if (item.uniqueBase?.refName === 'Timeless Jewel') {
+    filterTimelessJewelKeystones(ctx)
   }
 
   if (!item.isCorrupted && !item.isMirrored) {
@@ -188,7 +187,7 @@ export function initUiModFilters (
 
   finalFilterTweaks(ctx)
 
-  return ctx.filters
+  return [...ctx.filters, ...ctx.groups]
 }
 
 export function calculatedStatToFilter (
@@ -207,7 +206,6 @@ export function calculatedStatToFilter (
       tag: (type === ModifierType.Enchant)
         ? FilterTag.Enchant
         : FilterTag.Variant,
-      oils: decodeOils(calc),
       sources: sources,
       option: {
         value: sources[0].contributes!.value
@@ -226,7 +224,7 @@ export function calculatedStatToFilter (
     tradeId: stat.trade.ids[type],
     statRef: stat.ref,
     text: translation.string,
-    tag: (type as unknown) as FilterTag,
+    tag: type,
     oils: decodeOils(calc),
     sources: sources,
     roll: undefined,
@@ -242,56 +240,28 @@ export function calculatedStatToFilter (
     }
   }
 
-  if (type === ModifierType.Implicit) {
-    if (sources.some(s => s.modifier.info.generation === 'corrupted')) {
-      filter.tag = FilterTag.Corrupted
-    } else if (sources.some(s => s.modifier.info.generation === 'eldritch')) {
-      filter.tag = FilterTag.Eldritch
-    } else if (sources.some(s => s.modifier.info.generation === 'vestigial')) {
-      filter.tag = FilterTag.Vestigial
-    } else if (item.isSynthesised) {
-      filter.tag = FilterTag.Synthesised
-    }
-  } else if (type === ModifierType.Explicit) {
-    if (item.info.unique?.fixedStats) {
-      const fixedStats = item.info.unique.fixedStats
-      if (!fixedStats.includes(filter.statRef)) {
+  if (
+    type === ModifierType.Implicit ||
+    type === ModifierType.Explicit
+  ) {
+    if (type === ModifierType.Explicit && item.info.unique) {
+      if (item.info.unique.fixedStats) {
+        const fixedStats = item.info.unique.fixedStats
+        if (!fixedStats.includes(filter.statRef)) {
+          filter.tag = FilterTag.Variant
+        }
+      } else if (sources.some(s =>
+        s.modifier.info.generation === 'prefix' ||
+        s.modifier.info.generation === 'suffix'
+      )) {
+        // recognized unveiled mods are overridden below, this is kept as fallback
         filter.tag = FilterTag.Variant
       }
-    } else if (sources.some(s => s.modifier.info.generation === 'foulborn')) {
-      filter.tag = FilterTag.Foulborn
-    } else if (sources.some(s => CLIENT_STRINGS.SHAPER_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.SHAPER_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Shaper
-    } else if (sources.some(s => CLIENT_STRINGS.ELDER_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.ELDER_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Elder
-    } else if (sources.some(s => CLIENT_STRINGS.HUNTER_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.HUNTER_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Hunter
-    } else if (sources.some(s => CLIENT_STRINGS.WARLORD_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.WARLORD_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Warlord
-    } else if (sources.some(s => CLIENT_STRINGS.REDEEMER_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.REDEEMER_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Redeemer
-    } else if (sources.some(s => CLIENT_STRINGS.CRUSADER_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.CRUSADER_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Crusader
-    } else if (sources.some(s => CLIENT_STRINGS.DELVE_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.DELVE_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Delve
-    } else if (sources.some(s => CLIENT_STRINGS.VEILED_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.VEILED_MODS.includes(s.modifier.info.name!))) {
-      // can't drop from ground, so don't show
-      // filter.tag = FilterTag.Unveiled
-    } else if (sources.some(s => CLIENT_STRINGS.INCURSION_MODS.includes(s.modifier.info.name!)) ||
-        sources.some(s => CLIENT_STRINGS_REF.INCURSION_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Incursion
-    } else if (sources.some(s => CLIENT_STRINGS.ESSENCE_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Essence
-    } else if (sources.some(s => CLIENT_STRINGS.INFAMOUS_MODS.includes(s.modifier.info.name!))) {
-      filter.tag = FilterTag.Infamous
+    }
+
+    const mechanic = sources.find(s => s.modifier.info.mechanic != null)?.modifier.info.mechanic
+    if (mechanic) {
+      filter.tag = mechanic
     }
   }
 
@@ -328,7 +298,7 @@ export function calculatedStatToFilter (
 
     const dp =
     calc.stat.dp ||
-    calc.sources.some(s => s.stat.stat.ref === calc.stat.ref && s.stat.roll!.dp)
+    calc.sources.some(s => s.stat.stat.ref === calc.stat.ref && s.stat.roll?.dp)
 
     const filterBounds = {
       min: percentRoll(roll.min, -0, Math.floor, dp),
@@ -354,7 +324,7 @@ export function calculatedStatToFilter (
       min: undefined,
       max: undefined,
       default: filterDefault,
-      bounds: (item.rarity === ItemRarity.Unique && roll.min !== roll.max && calc.stat.better !== StatBetter.NotComparable)
+      bounds: (roll.min !== roll.max && calc.stat.better !== StatBetter.NotComparable)
         ? filterBounds
         : undefined,
       dp: dp,
@@ -370,32 +340,54 @@ export function calculatedStatToFilter (
     }
   }
 
-  hideNotVariableStat(filter, item)
-
   return filter
 }
 
 function hideNotVariableStat (filter: StatFilter, item: ParsedItem) {
-  if (item.rarity !== ItemRarity.Unique) return
-  if (filter.tag === FilterTag.Implicit &&
-    item.category === ItemCategory.Jewel) return
-  if (
-    filter.tag !== FilterTag.Implicit &&
+  if (item.rarity !== ItemRarity.Unique || (
     filter.tag !== FilterTag.Explicit &&
-    filter.tag !== FilterTag.Pseudo
+    filter.tag !== FilterTag.Property
+  )) return
+
+  // always show stat increased by Catalyst
+  if (item.quality && JEWELLERY.has(item.category!) &&
+    filter.sources.some(source =>
+      source.modifier.info.rollIncr &&
+      source.stat.roll && !source.stat.roll.unscalable)
   ) return
+
+  // always show scalable stat on corrupted item
+  const hasRollAndScalable = filter.sources.some(source => source.stat.roll && !source.stat.roll.unscalable)
+  if (item.isCorrupted && hasRollAndScalable) {
+    const isVvoCorrupted = item.newMods.some(mod => mod.stats.some(stat => stat.roll?.generation === 'volatile'))
+    if (!isVvoCorrupted) {
+      // some stat not being reduced compared to other VVO corrupted items can be important
+      filter.disabled = false
+    }
+    return
+  }
 
   if (!filter.roll) {
     filter.hidden = 'filters.hide_const_roll'
+    filter.disabled = true
   } else if (!filter.roll.bounds) {
     filter.roll.min = undefined
     filter.roll.max = undefined
     filter.hidden = 'filters.hide_const_roll'
+    filter.disabled = true
+  } else if (
+    BASE_PCTL_AFFECTED_IDS.includes(filter.tradeId[0]) &&
+    filter.sources.every(source => source.stat.roll?.min === source.stat.roll?.max) &&
+    getPropQuality(item) < 21
+  ) {
+    filter.roll.min = undefined
+    filter.roll.max = undefined
+    filter.hidden = 'hide_variable_by_base_percentile_only'
+    filter.disabled = true
   }
 
   if (item.isFoulborn && filter.tag === FilterTag.Explicit) {
     // some mod not being replaced with foulborn one can be important
-    filter.hidden = undefined
     filter.disabled = false
   }
 }
@@ -423,7 +415,7 @@ function filterAdjustmentForNegate (
 ) {
   roll.tradeInvert = !roll.tradeInvert
   roll.isNegated = true
-  const swap = JSON.parse(JSON.stringify(roll)) as typeof roll
+  const swap = structuredClone(roll)
 
   if (swap.bounds && roll.bounds) {
     roll.bounds.min = -1 * swap.bounds.max
@@ -446,7 +438,7 @@ function finalFilterTweaks (ctx: FiltersCreationContext) {
   const { item } = ctx
 
   if (item.category === ItemCategory.ClusterJewel && item.rarity !== ItemRarity.Unique) {
-    applyClusterJewelRules(ctx.filters)
+    applyClusterJewelRules(ctx.filters, false)
   } else if (item.category === ItemCategory.Flask) {
     applyFlaskRules(ctx.filters)
     applyFlaskHybridMod(ctx)
@@ -473,11 +465,25 @@ function finalFilterTweaks (ctx: FiltersCreationContext) {
   }
 
   for (const filter of ctx.filters) {
-    if (filter.tag === FilterTag.Fractured) {
+    hideNotVariableStat(filter, item)
+
+    if (filter.tag === FilterTag.Enchant) {
+      if (QUALITY_CHANGING_ENCHANT.includes(filter.statRef)) {
+        filter.hidden = 'hide_enchant_meta_stat'
+      }
+    } else if (filter.tag === FilterTag.Fractured) {
       const mod = ctx.item.statsByType.find(mod => mod.stat.ref === filter.statRef)!
       if (mod.stat.trade.ids[ModifierType.Explicit]) {
         // hide only if fractured mod has corresponding explicit variant
         filter.hidden = 'filters.hide_for_crafting'
+      }
+    } else if (filter.sources[0]?.stat.stat.jewelleryQuality) {
+      filter.hidden = 'hide_jewellery_quality'
+    } else if (filter.tag === FilterTag.Implicit) {
+      if (item.rarity === ItemRarity.Unique && !item.isCorrupted && item.category !== ItemCategory.Jewel) {
+        // hide not Corrupted, Vestigial implicits etc., that were not consumed by pseudo stats
+        filter.hidden = 'hide_unique_base_implicit'
+        filter.disabled = true
       }
     } else if (
       filter.tag === FilterTag.Foulborn ||
@@ -485,6 +491,17 @@ function finalFilterTweaks (ctx: FiltersCreationContext) {
       filter.tag === FilterTag.Variant
     ) {
       filter.disabled = false
+    }
+  }
+
+  const basePercentile = ctx.filters.find(fitler => fitler.tradeId[0] === 'item.base_percentile')
+  if (basePercentile && item.rarity === ItemRarity.Unique) {
+    const hasVisibleArmourProp = ctx.filters.some(filter =>
+      BASE_PCTL_AFFECTED_IDS.includes(filter.tradeId[0]) &&
+      !filter.hidden)
+    if (hasVisibleArmourProp) {
+      basePercentile.hidden = 'hide_redundant'
+      basePercentile.disabled = true
     }
   }
 
@@ -496,7 +513,7 @@ function finalFilterTweaks (ctx: FiltersCreationContext) {
   }
 }
 
-function applyClusterJewelRules (filters: StatFilter[]) {
+function applyClusterJewelRules (filters: StatFilter[], exact: boolean) {
   for (const filter of filters) {
     if (filter.statRef === '# Added Passive Skills are Jewel Sockets') {
       filter.hidden = 'filters.hide_const_roll'
@@ -510,8 +527,8 @@ function applyClusterJewelRules (filters: StatFilter[]) {
       // 4 is [_, 5]
       if (filter.roll!.value === 4) {
         filter.roll!.max = 5
-      // 5 is [5, 5]
-      } else if (filter.roll!.value === 5) {
+      // 5 is [5, 5] (and [_, 5] for Rare jewel)
+      } else if (filter.roll!.value === 5 && exact) {
         filter.roll!.min = filter.roll!.default.min
       // 3, 6, 10, 11, 12 are [n, _]
       } else if (
@@ -524,7 +541,7 @@ function applyClusterJewelRules (filters: StatFilter[]) {
         filter.roll!.min = filter.roll!.default.min
         filter.roll!.max = undefined
       }
-      // else 2, 8, 9 are [_ , n]
+      // else 2, 5(Rare), 8, 9 are [_ , n]
     }
   }
 }

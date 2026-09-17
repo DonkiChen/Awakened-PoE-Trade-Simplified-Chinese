@@ -27,8 +27,6 @@
   "map.mods.outdated": "outdated",
   "Support development on": "Support development\u00A0on",
 
-  "Blighted": "Blighted",
-  "Blight-ravaged": "Blight-ravaged",
   "Magic": "Magic",
   "Shaper": "Shaper",
   "Elder": "Elder",
@@ -43,7 +41,9 @@
 
   "item": {
     "not_group": "None of",
-    "prop_quality": "Q {0}%",
+    "count_one_group": "One of",
+    "disenchanting": "Disenchanting",
+    "prop_quality": "(Quality: {0}%)",
     "base_percentile": "Base Percentile: {0}%",
     "armour": "Armour: {0}",
     "evasion_rating": "Evasion Rating: {0}",
@@ -60,9 +60,6 @@
     "map_pack_size": "Monster Pack Size: {0}%",
     "chart_sulphur": "Dead Man's Sulphur: {0}%",
     "has_empty_modifier": "1 Empty or Crafted Modifier",
-    "has_empty_affix": "Any",
-    "has_empty_prefix": "Prefix",
-    "has_empty_suffix": "Suffix",
     "mercenary_6link": "6-Link with {0} Support Gems of Tier 3",
     "item_level": "Item Level: {0}",
     "stock": "Stock: {0}",
@@ -185,6 +182,9 @@
     "hide_empty_mod": "Select only if item has 6 modifiers (1 of which is crafted) or if it has 5 modifiers",
     "option_merc_required": "Req",
     "option_merc_optional": "N-1",
+    "option_empty_affix": "Any",
+    "option_empty_prefix": "Prefix",
+    "option_empty_suffix": "Suffix",
 
     "tag_implicit": "implicit",
     "tag_fractured": "fractured",
@@ -291,6 +291,7 @@
     "name": "Map check",
     "has_outdated": "Wording of some stats has been changed. Check and update dangerous map mods in the settings. (This message will be hidden as soon as you remove all outdated stats)",
     "no_mods": "Item has no modifiers.",
+    "maven_reminder": "Contains the Boss required for\nMaven's Invitation",
     "profile": "Profile",
     "search_selected": "Only selected",
     "search_stat_col": "Stat (found: {0})",
@@ -368,6 +369,7 @@
     "auto_search": "Perform an auto search, when pressing",
     "select_stock": "Always select \"Stock\" filter",
     "show_prediction": "Show price prediction",
-    "remember_currency": "Remember the Buyout Currency filter"
+    "remember_currency": "Remember the Buyout Currency filter",
+    "default_settings": "Search by default with the following settings:"
   }
 }

@@ -14,7 +14,7 @@
       <filter-btn-numeric v-if="filters.sentinelCharge"
         :filter="filters.sentinelCharge" :name="t('item.sentinel_charge')" />
       <filter-btn-logical v-if="filters.mapBlighted" readonly
-        :filter="{ disabled: false }" :text="filters.mapBlighted.value" />
+        :filter="{ disabled: false }" :text="String(filters.mapBlighted.value)" />
       <filter-btn-numeric v-if="filters.storedExperience"
         :filter="filters.storedExperience" :name="t('item.stored_experience')" />
       <filter-btn-numeric v-if="filters.itemLevel"

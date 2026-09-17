@@ -1,6 +1,6 @@
-import { CLIENT_STRINGS as _$ } from '@/assets/data'
+import { CLIENT_STRINGS as _$, CLIENT_STRINGS_REF } from '@/assets/data'
 import type { ParsedStat } from './stat-translations'
-import { ModifierType } from './modifiers'
+import { ModifierType, ModifierMechanic } from './modifiers'
 import { matchesClientString } from './client-string-variants'
 
 export const SCOURGE_LINE = ' (scourge)'
@@ -14,7 +14,8 @@ export interface ParsedModifier {
 
 export interface ModifierInfo {
   type: ModifierType
-  generation?: 'suffix' | 'prefix' | 'corrupted' | 'eldritch' | 'foulborn' | 'vestigial'
+  generation?: 'suffix' | 'prefix'
+  mechanic?: ModifierMechanic
   name?: string
   tier?: number
   rank?: number
@@ -30,6 +31,7 @@ export function parseModInfoLine (line: string): ModifierInfo {
 
   let type = ModifierType.Explicit
   let generation: ModifierInfo['generation']
+  let mechanic: ModifierInfo['mechanic']
   let name: ModifierInfo['name']
   let tier: ModifierInfo['tier']
   let rank: ModifierInfo['rank']
@@ -38,7 +40,7 @@ export function parseModInfoLine (line: string): ModifierInfo {
     const match = modText.match(_$.EATER_IMPLICIT) ?? modText.match(_$.EXARCH_IMPLICIT)!
 
     type = ModifierType.Implicit
-    generation = 'eldritch'
+    mechanic = ModifierMechanic.Eldritch
 
     switch (match.groups!.rank) {
       case _$.ELDRITCH_MOD_R1: rank = 1; break
@@ -69,16 +71,20 @@ export function parseModInfoLine (line: string): ModifierInfo {
     } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText)) {
       generation = 'suffix'
     } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText)) {
-      generation = 'corrupted'
+      mechanic = ModifierMechanic.Corruption
     } else if (matchesClientString('FOULBORN_MODIFIER', typeText)) {
-      generation = 'foulborn'
+      mechanic = ModifierMechanic.Foulborn
     } else if (matchesClientString('VESTIGIAL_IMPLICIT', typeText)) {
-      generation = 'vestigial'
+      mechanic = ModifierMechanic.Vestigial
     }
 
     name = match.groups!.name ?? undefined
     tier = Number(match.groups!.tier) || undefined
     rank = Number(match.groups!.rank) || undefined
+  }
+
+  if (!mechanic && name) {
+    mechanic = mechanicFromModName(name)
   }
 
   let tags: ModifierInfo['tags']
@@ -98,7 +104,7 @@ export function parseModInfoLine (line: string): ModifierInfo {
     rollIncr = incrText ? Number(_$.MODIFIER_INCREASED.exec(incrText)![1]) : undefined
   }
 
-  return { type, generation, name, tier, rank, tags, rollIncr }
+  return { type, generation, mechanic, name, tier, rank, tags, rollIncr }
 }
 
 export function isModInfoLine (line: string): boolean {
@@ -189,4 +195,31 @@ export function incrRoll (
   const res = value + (value * p / 100)
   const rounding = Math.pow(10, dp)
   return Math.trunc((res + Number.EPSILON) * rounding) / rounding
+}
+
+function mechanicFromModName (name: string): ModifierMechanic | undefined {
+  if (_$.SHAPER_MODS.includes(name) || CLIENT_STRINGS_REF.SHAPER_MODS.includes(name)) {
+    return ModifierMechanic.Shaper
+  } else if (_$.ELDER_MODS.includes(name) || CLIENT_STRINGS_REF.ELDER_MODS.includes(name)) {
+    return ModifierMechanic.Elder
+  } else if (_$.HUNTER_MODS.includes(name) || CLIENT_STRINGS_REF.HUNTER_MODS.includes(name)) {
+    return ModifierMechanic.Hunter
+  } else if (_$.WARLORD_MODS.includes(name) || CLIENT_STRINGS_REF.WARLORD_MODS.includes(name)) {
+    return ModifierMechanic.Warlord
+  } else if (_$.REDEEMER_MODS.includes(name) || CLIENT_STRINGS_REF.REDEEMER_MODS.includes(name)) {
+    return ModifierMechanic.Redeemer
+  } else if (_$.CRUSADER_MODS.includes(name) || CLIENT_STRINGS_REF.CRUSADER_MODS.includes(name)) {
+    return ModifierMechanic.Crusader
+  } else if (_$.DELVE_MODS.includes(name) || CLIENT_STRINGS_REF.DELVE_MODS.includes(name)) {
+    return ModifierMechanic.Delve
+  } else if (_$.VEILED_MODS.includes(name) || CLIENT_STRINGS_REF.VEILED_MODS.includes(name)) {
+    return ModifierMechanic.Unveiled
+  } else if (_$.INCURSION_MODS.includes(name) || CLIENT_STRINGS_REF.INCURSION_MODS.includes(name)) {
+    return ModifierMechanic.Incursion
+  } else if (_$.ESSENCE_MODS.includes(name)) {
+    return ModifierMechanic.Essence
+  } else if (_$.INFAMOUS_MODS.includes(name)) {
+    return ModifierMechanic.Infamous
+  }
+  return undefined
 }

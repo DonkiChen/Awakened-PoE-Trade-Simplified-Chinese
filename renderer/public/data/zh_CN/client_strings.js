@@ -115,6 +115,8 @@ export default {
   ELDRITCH_MOD_R4: '卓越',
   ELDRITCH_MOD_R5: '精美的',
   ELDRITCH_MOD_R6: '完美的',
+  ITEM_EATER: '灭界者物品',
+  ITEM_EXARCH: '焚界者物品',
   EATER_ITEM: '灭界者物品',
   EXARCH_ITEM: '焚界者物品',
   SENTINEL_CHARGE: '充能: ',
