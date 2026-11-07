@@ -73,14 +73,16 @@ export function createMercenaryFilters (item: ParsedItem): FilterOrGroup[] {
     })
 
     if (supports.length === 5 && possibleSupports.length) {
-      const tier3Count = supports.filter(support => support.stat.mercenary!.tier! >= 3).length
+      const tier3Count = supports.filter(support =>
+        support.stat.mercenary!.tier! >= 3 ||
+        support.stat.modFamily?.at(-1) === support.stat.ref).length
       filterGroup.stats.push(propToFilter({
         ref: '6-Link',
         tradeId: 'item.mercenary_6link',
         roll: { min: 0, max: 5, value: tier3Count },
         sources: possibleSupports.map(family => encodeFamilyToSource(family)),
         disabled: true
-      }, { filters: [], item, searchInRange: 0, statsByType: [] }))
+      }, { filters: [], groups: [], item, searchInRange: 0, statsByType: [] }))
     }
 
     for (const support of supports) {
@@ -109,7 +111,10 @@ export function createMercenaryFilters (item: ParsedItem): FilterOrGroup[] {
         statRef: canonStat.ref,
         text: canonStat.matchers[0].string,
         tag: FilterTag.MercenarySupport,
-        mercenary: { tier: tier },
+        mercenary: {
+          tier: tier,
+          maxTier: (tier >= 3 || support.stat.modFamily?.at(-1) === support.stat.ref)
+        },
         sources: [],
         option: { value: SearchMode.Required },
         disabled: true

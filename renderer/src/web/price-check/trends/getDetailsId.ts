@@ -1,6 +1,6 @@
 import { ParsedItem, ItemRarity, ItemCategory } from '@/parser'
 import { SPECIAL_SUPPORT_GEM, floorToBracket } from '../filters/create-item-filters'
-import { ACCESSORY, ARMOUR, WEAPON } from '@/parser/meta'
+import { JEWELLERY, ARMOUR, WEAPON } from '@/parser/meta'
 
 export function isValuableBasetype (item: ParsedItem): boolean {
   if (
@@ -9,7 +9,7 @@ export function isValuableBasetype (item: ParsedItem): boolean {
   ) return false
 
   return (
-    ACCESSORY.has(item.category) ||
+    JEWELLERY.has(item.category) ||
     ARMOUR.has(item.category) ||
     WEAPON.has(item.category) ||
     item.category === ItemCategory.Quiver
@@ -23,9 +23,7 @@ export function getDetailsId (item: ParsedItem) {
   if (item.category === ItemCategory.Map) {
     return {
       ns: item.info.namespace,
-      name: (item.mapBlighted)
-        ? `${item.mapBlighted} ${item.info.refName}`
-        : item.info.refName,
+      name: item.info.refName,
       variant: variant([
         `T${(item.rarity === ItemRarity.Unique ? undefined : item.mapTier) ?? 0}`,
         (item.rarity !== ItemRarity.Unique)
@@ -105,7 +103,7 @@ function forBasetype (item: ParsedItem) {
 }
 
 function forUniqueItem (item: ParsedItem) {
-  if (!item.info.unique) return
+  if (!item.uniqueBase) return
 
   return {
     ns: item.info.namespace,
@@ -114,7 +112,7 @@ function forUniqueItem (item: ParsedItem) {
       getUniqueVariant(item),
       (item.category === ItemCategory.Flask) ? null
         : (item.category === ItemCategory.SanctumRelic) ? 'Relic'
-            : item.info.unique.base,
+            : item.uniqueBase.refName,
       (item.sockets?.linked) ? `${item.sockets.linked}L` : null
     ])
   }

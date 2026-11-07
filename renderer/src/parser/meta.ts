@@ -97,7 +97,7 @@ export const ARMOUR = new Set([
   ItemCategory.Shield
 ])
 
-export const ACCESSORY = new Set([
+export const JEWELLERY = new Set([
   ItemCategory.Amulet,
   ItemCategory.Belt,
   ItemCategory.Ring

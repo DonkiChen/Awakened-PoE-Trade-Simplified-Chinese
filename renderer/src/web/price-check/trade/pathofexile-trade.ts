@@ -179,7 +179,6 @@ interface TradeRequest {
       heist_filters?: {
         filters: {
           heist_wings?: FilterRange
-          heist_max_wings?: FilterRange
           heist_objective_value?: { option?: 'priceless' }
           heist_agility?: FilterRange
           heist_brute_force?: FilterRange
@@ -408,6 +407,9 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
       propSet(query.filters, 'map_filters.filters.map_blighted.option', String(true))
     } else if (filters.mapBlighted.value === 'Blight-ravaged') {
       propSet(query.filters, 'map_filters.filters.map_uberblighted.option', String(true))
+    } else if (filters.mapBlighted.value === false) {
+      propSet(query.filters, 'map_filters.filters.map_blighted.option', String(false))
+      propSet(query.filters, 'map_filters.filters.map_uberblighted.option', String(false))
     }
   }
 
@@ -449,20 +451,20 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
       query.stats.push({
         type: 'count',
         value: { min: 1, max: 1 },
-        disabled: false,
+        disabled: stat.disabled,
         filters: [
-          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: false },
-          { id: TARGET_ID.CRAFTED_MODIFIERS, value: { min: 1, max: undefined }, disabled: false }
+          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: stat.disabled },
+          { id: TARGET_ID.CRAFTED_MODIFIERS, value: { min: 1, max: undefined }, disabled: stat.disabled }
         ]
       })
 
       query.stats.push({
         type: 'count',
         value: { min: 1, max: 1 },
-        disabled: false,
+        disabled: stat.disabled,
         filters: [
-          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: false },
-          { id: TARGET_ID.TOTAL_MODIFIERS, value: { min: 6, max: undefined }, disabled: false }
+          { id: TARGET_ID.EMPTY_MODIFIERS, value: { min: 1, max: 1 }, disabled: stat.disabled },
+          { id: TARGET_ID.TOTAL_MODIFIERS, value: { min: 6, max: undefined }, disabled: stat.disabled }
         ]
       })
     }
@@ -639,6 +641,13 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
           })
         }
       }
+    } else if (group.group === 'one') {
+      query.stats.push({
+        type: 'count',
+        value: { min: 1 },
+        disabled: group.meta.disabled || group.stats.every(stat => stat.disabled),
+        filters: group.stats.flatMap(stat => everyTradeIdToQuery(stat))
+      })
     } else if (group.group === 'mercenary') {
       const { meta: skill, stats } = group
       const skillEnabled = skill.tag === FilterTag.MercenaryPrimary || !skill.disabled
@@ -654,8 +663,8 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
         !stat.not &&
         !stat.disabled &&
         !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]))
-      const enabledOptionalGems = socketedSupports.filter(stat => stat.option!.value === MercSearchMode.Optional)
-      const enabledRequiredGems = socketedSupports.filter(stat => stat.option!.value === MercSearchMode.Required)
+      const enabledOptionalGems = socketedSupports.filter(stat => !stat.disabled && stat.option!.value === MercSearchMode.Optional)
+      const enabledRequiredGems = socketedSupports.filter(stat => !stat.disabled && stat.option!.value === MercSearchMode.Required)
 
       const localNotMode = stats.some(stat => stat.tradeId[0] === 'item.mercenary_6link')
       const localNotStats = (localNotMode) ? stats.filter(stat => stat.not && !stat.disabled) : []
@@ -682,7 +691,12 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
               notStat.statRef === family[0].ref
             ))
           let tier3Count = (typeof stat.roll?.min === 'number') ? Math.min(Math.max(stat.roll.min, 0), 5) : 0
-          if (forceEnabled) {
+
+          const maxTierEnabledCount =
+            enabledRequiredGems.filter(stat => stat.mercenary!.maxTier).length +
+            ((enabledOptionalGems.length >= 2)
+              ? enabledOptionalGems.filter(stat => stat.mercenary!.maxTier).length - 1 : 0)
+          if (forceEnabled || maxTierEnabledCount >= tier3Count) {
             tier3Count = 0
           }
 
@@ -696,7 +710,7 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
                 someOf: {
                   min: 5,
                   ids: possibleSupports.map(family => {
-                    if (family.length > 2) {
+                    if (family.length >= 3) {
                       const minTier = (family[0].mercenary!.syntheticFamily) ? 3 : 2
                       family = family.filter(stat => stat.mercenary!.tier! >= minTier)
                     }
@@ -763,8 +777,11 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
   }
 
   for (const stat of realStats) {
-    if (stat.not) qNot.filters.push(...everyTradeIdToQuery(stat))
-    else appendAndFilter(stat, qAnd, query.stats)
+    if (stat.not) {
+      qNot.filters.push(...everyTradeIdToQuery(stat))
+    } else {
+      appendAndFilter(stat, qAnd, query.stats)
+    }
   }
 
   if (qNot.filters.length) {

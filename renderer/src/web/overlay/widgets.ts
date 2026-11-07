@@ -48,10 +48,11 @@ export interface PriceCheckWidget extends Widget {
   lockedInitialSearch: boolean
   activateStockFilter: boolean
   offline: boolean
+  merchantOnly: boolean
+  defaultCurrency: string | null
   showCursor: boolean
   requestPricePrediction: boolean
   builtinBrowser: boolean
-  rememberCurrency: boolean
 }
 
 export interface StopwatchWidget extends Widget {

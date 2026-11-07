@@ -1,6 +1,7 @@
 import type { ItemFilters } from './interfaces'
 import { ParsedItem, ItemCategory, ItemRarity } from '@/parser'
-import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM } from '@/parser/meta'
+import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM, JEWELLERY } from '@/parser/meta'
+import { getPropQuality } from '@/parser/calc-q20'
 import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF } from '@/assets/data'
@@ -9,10 +10,11 @@ import { PERMANENT_SC } from '../../background/Leagues'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
 
-interface CreateOptions {
+export interface CreateOptions {
   offline: boolean
   league: string
-  currency: string | undefined
+  merchantOnly: boolean
+  currency: string | null
   collapseListings: 'app' | 'api'
   activateStockFilter: boolean
   exact: boolean
@@ -28,11 +30,11 @@ export function createFilters (
     trade: {
       offline: opts.offline,
       onlineInLeague: false,
-      merchantOnly:
+      merchantOnly: opts.merchantOnly &&
         // these are Divination Cards, and some items at start of league
         // that are on Currency Exchange but was not added to Bulk section of site yet
         !(item.info.exchangeable && !item.info.tradeTag),
-      listed: undefined,
+      listed: null,
       currency: opts.currency,
       league: opts.league,
       collapseListings: opts.collapseListings,
@@ -145,11 +147,23 @@ export function createFilters (
   }
 
   if (item.category === ItemCategory.Map) {
-    if (item.rarity === ItemRarity.Unique && item.info.unique) {
+    if (item.info.area?.blighted) {
+      filters.searchExact = {
+        baseType: item.info.name,
+        baseTypeTrade: t(opts, ITEM_BY_REF('ITEM', 'Map')![0]),
+        discriminatorTrade: 'map',
+        sub: {
+          baseType: item.mapArea!.name,
+          baseTypeTrade: item.mapArea!.tradeDisc!,
+          discriminatorTrade: item.info.tradeDisc!,
+          disabled: false
+        }
+      }
+    } else if (item.rarity === ItemRarity.Unique && item.uniqueBase) {
       filters.searchExact = {
         name: item.info.name,
         nameTrade: t(opts, item.info),
-        baseTypeTrade: t(opts, ITEM_BY_REF('ITEM', item.info.unique.base)![0])
+        baseTypeTrade: t(opts, item.uniqueBase)
       }
     } else {
       filters.searchExact = {
@@ -158,12 +172,16 @@ export function createFilters (
       }
     }
 
-    if (item.info.refName === 'Map' || item.info.unique?.base === 'Map') {
+    if (item.info.refName === 'Map' || item.uniqueBase?.refName === 'Map') {
       filters.searchExact.discriminatorTrade = 'map'
     }
 
-    if (item.mapBlighted) {
-      filters.mapBlighted = { value: item.mapBlighted }
+    if (item.info.refName === 'Blighted Map') {
+      filters.mapBlighted = { value: 'Blighted' }
+    } else if (item.info.refName === 'Blight-ravaged Map') {
+      filters.mapBlighted = { value: 'Blight-ravaged' }
+    } else if (item.info.refName === 'Map') {
+      filters.mapBlighted = { value: false }
     }
 
     if (item.mapCompletionReward) {
@@ -203,11 +221,11 @@ export function createFilters (
         disabled: false
       }
     }
-  } else if (item.rarity === ItemRarity.Unique && item.info.unique) {
+  } else if (item.rarity === ItemRarity.Unique && item.uniqueBase) {
     filters.searchExact = {
       name: item.info.name,
       nameTrade: t(opts, item.info),
-      baseTypeTrade: t(opts, ITEM_BY_REF('ITEM', item.info.unique.base)![0])
+      baseTypeTrade: t(opts, item.uniqueBase)
     }
   } else {
     filters.searchExact = {
@@ -244,10 +262,10 @@ export function createFilters (
     }
   }
 
-  if (item.quality && item.quality >= 20) {
+  if (item.quality && item.quality >= 20 && !JEWELLERY.has(item.category!)) {
     if (
       item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture ||
-      opts.exact // for Weapons & Armour
+      (getPropQuality(item) === 0) || opts.exact // for Weapons & Armour
     ) {
       filters.quality = {
         value: item.quality,
