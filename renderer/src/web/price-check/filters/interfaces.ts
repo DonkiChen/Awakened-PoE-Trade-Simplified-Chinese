@@ -1,4 +1,4 @@
-import type { ItemInfluence, ItemCategory } from '@/parser'
+import type { ItemInfluence, ItemCategory, CorruptionState } from '@/parser'
 import { ModifierType, ModifierMechanic, type StatCalculated } from '@/parser/modifiers'
 
 export interface FilterPreset {
@@ -33,8 +33,7 @@ export interface ItemFilters {
   greenSockets?: FilterNumeric
   blueSockets?: FilterNumeric
   corrupted?: {
-    value: boolean
-    exact?: boolean
+    value: CorruptionState
   }
   fractured?: {
     value: false

@@ -96,6 +96,7 @@
     "open_on_craftofexile": "Open base item on Craft of Exile",
     "info": "Item info",
     "corrupted": "Corrupted",
+    "twice_corrupted": "Twice Corrupted",
     "not_corrupted": "Not Corrupted",
     "mod_tier": "Tier: {0}",
     "mod_rank": "Rank: {0}",
@@ -158,6 +159,11 @@
     "azmeri_charm": "Charm",
     "idol": "Idol",
     "graft": "Graft",
+    "viscera": "Viscera",
+    "viscera_head": "Viscera (Head)",
+    "viscera_arm": "Viscera (Arm)",
+    "viscera_body": "Viscera (Body)",
+    "viscera_leg": "Viscera (Leg)",
     "chart": "Chart"
   },
   "filters": {

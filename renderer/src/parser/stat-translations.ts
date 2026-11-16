@@ -1,7 +1,7 @@
 import { CLIENT_STRINGS as _$, STAT_BY_MATCH_STR_V2 } from '@/assets/data'
 import type { StatMatcher, Stat, StatGroup } from '@/assets/data'
 import type { ModifierType } from './modifiers'
-import { type ItemCategory, ARMOUR, WEAPON, HEIST_EQUIPMENT } from './meta'
+import { type ItemCategory, ARMOUR, WEAPON, HEIST_EQUIPMENT, VISCERA } from './meta'
 import { stripTrailingClientString } from './client-string-variants'
 
 // This file is a little messy and scary,
@@ -54,6 +54,9 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
       const unscalableText = stripTrailingClientString('UNSCALABLE_VALUE', str)
       const unscalable = unscalableText.matched
       str = unscalableText.value
+
+      // 去除技能提示占位符和零宽空格，保留数值范围括号。
+      str = str.replace(/\(\.\.\.\)|\u200B/g, '')
 
       const isParsed: boolean = yield { string: str, unscalable }
       if (isParsed) {
@@ -341,6 +344,8 @@ function testItemCategory (actual: ItemCategory | null, expected: string): boole
       return ARMOUR.has(actual)
     case 'HEIST_EQUIPMENT':
       return HEIST_EQUIPMENT.has(actual)
+    case 'Viscera':
+      return VISCERA.has(actual)
     default:
       return expected === actual
   }

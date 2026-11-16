@@ -12,7 +12,7 @@ import {
 import { ModifierType, ModifierMechanic, sumStatsByModType } from './modifiers'
 import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg, ParsedStat } from './stat-translations'
 import { ItemCategory, JEWELLERY } from './meta'
-import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedItem'
+import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity, CorruptionState } from './ParsedItem'
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
@@ -34,6 +34,7 @@ interface ParserState extends ParsedItem {
 
 const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, 便于调试 */ name: string }> = [
   parseUnidentified,
+  { virtual: parseViscera, name: 'parseViscera' },
   { virtual: parseSuperior, name: 'parseSuperior' },
   { virtual: parseFoulborn, name: 'parseFoulborn' },
   { virtual: parseVestigial, name: 'parseVestigial' },
@@ -244,6 +245,9 @@ function findInDatabase (item: ParserState) {
 export function makeIdentifiedUnique (uniqueInfo: BaseType, unidentified: ParsedItem): ParsedItem {
   const newItem: ParsedItem = {
     ...unidentified,
+    get isCorrupted () {
+      return this.corruptionState !== CorruptionState.None
+    },
     info: uniqueInfo,
     uniqueBase: unidentified.info
   }
@@ -392,6 +396,7 @@ function parseNamePlate (section: string[]) {
   if (!line?.startsWith(_$.ITEM_CLASS)) {
     return err('item.parse_error')
   }
+  const itemClass = line.slice(_$.ITEM_CLASS.length).trim()
 
   line = section.shift()
   let rarityText: string | undefined
@@ -416,7 +421,10 @@ function parseNamePlate (section: string[]) {
     name,
     baseType,
     isUnidentified: false,
-    isCorrupted: false,
+    corruptionState: CorruptionState.None,
+    get isCorrupted () {
+      return this.corruptionState !== CorruptionState.None
+    },
     newMods: [],
     statsByType: [],
     unknownModifiers: [],
@@ -444,7 +452,40 @@ function parseNamePlate (section: string[]) {
       item.rarity = ItemRarity.Unique; break
   }
 
+  if (_$.ITEM_CLASS_VISCERA && itemClass === _$.ITEM_CLASS_VISCERA) {
+    item.rarity = ItemRarity.Normal
+    item.category = ItemCategory.Viscera
+  }
+
   return ok(item)
+}
+
+function parseViscera (item: ParserState) {
+  if (item.category !== ItemCategory.Viscera) return
+
+  item.category = parseVisceraCategory(item.baseType)
+  item.name = normalizeVisceraName(item.name)
+  // 第二行是部位标签，而非真实底材名称。
+  item.baseType = undefined
+}
+
+function parseVisceraCategory (baseType: string | undefined): ItemCategory {
+  if (!baseType) return ItemCategory.Viscera
+
+  if (baseType === _$.VISCERA_ITEM_HEAD) return ItemCategory.VisceraHead
+  if (baseType === _$.VISCERA_ITEM_ARM) return ItemCategory.VisceraArm
+  if (baseType === _$.VISCERA_ITEM_TORSO) return ItemCategory.VisceraBody
+  if (baseType === _$.VISCERA_ITEM_LEG) return ItemCategory.VisceraLeg
+  return ItemCategory.Viscera
+}
+
+function normalizeVisceraName (name: string): string {
+  for (const prefix of [_$.VISCERA_LESSER, _$.VISCERA_GREATER]) {
+    if (prefix && name.startsWith(prefix)) {
+      return name.slice(prefix.length)
+    }
+  }
+  return name
 }
 
 function parseInfluence (section: string[], item: ParsedItem) {
@@ -482,11 +523,14 @@ function parseInfluence (section: string[], item: ParsedItem) {
 }
 
 function parseCorrupted (section: string[], item: ParsedItem) {
-  if (section[0] === _$.CORRUPTED) {
-    item.isCorrupted = true
+  if (_$.TWICE_CORRUPTED && section[0] === _$.TWICE_CORRUPTED) {
+    item.corruptionState = CorruptionState.TwiceCorrupted
+    return 'SECTION_PARSED'
+  } else if (section[0] === _$.CORRUPTED) {
+    item.corruptionState = CorruptionState.Corrupted
     return 'SECTION_PARSED'
   } else if (section[0] === _$.UNMODIFIABLE) {
-    item.isCorrupted = true
+    item.corruptionState = CorruptionState.Corrupted
     item.isUnmodifiable = true
     return 'SECTION_PARSED'
   }
