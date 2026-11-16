@@ -95,6 +95,7 @@
     "open_on_craftofexile": "在Craft of Exile中打开物品",
     "info": "项目信息",
     "corrupted": "已腐化",
+    "twice_corrupted": "双重腐化",
     "not_corrupted": "未腐化",
     "mod_tier": "等阶: {0}",
     "mod_rank": "级别: {0}",

@@ -1,4 +1,4 @@
-import { ItemInfluence, ItemCategory } from '@/parser'
+import { ItemInfluence, ItemCategory, CorruptionState } from '@/parser'
 import { ItemFilters, StatFilter, FilterOrGroup, INTERNAL_TRADE_IDS, InternalTradeId, FilterTag } from '../filters/interfaces'
 import { setProperty as propSet } from 'dot-prop'
 import { DateTime } from 'luxon'
@@ -137,6 +137,7 @@ interface TradeRequest {
           quality?: FilterRange
           gem_level?: FilterRange
           corrupted?: FilterBoolean
+          twice_corrupted?: FilterBoolean
           fractured_item?: FilterBoolean
           gem_imbued?: FilterBoolean
           mirrored?: FilterBoolean
@@ -341,8 +342,10 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
     }
   }
 
-  if (filters.corrupted?.value === false || filters.corrupted?.exact) {
-    propSet(query.filters, 'misc_filters.filters.corrupted.option', String(filters.corrupted.value))
+  if (filters.corrupted) {
+    const state = filters.corrupted.value
+    const key = state === CorruptionState.TwiceCorrupted ? 'twice_corrupted' : 'corrupted'
+    propSet(query.filters, `misc_filters.filters.${key}.option`, String(state !== CorruptionState.None))
   }
   if (filters.fractured?.value === false) {
     propSet(query.filters, 'misc_filters.filters.fractured_item.option', String(false))

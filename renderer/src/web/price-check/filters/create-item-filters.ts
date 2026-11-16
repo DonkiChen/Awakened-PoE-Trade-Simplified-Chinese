@@ -316,8 +316,7 @@ export function createFilters (
 
   if (!item.isUnmodifiable && (item.info.craftable || item.rarity === ItemRarity.Unique)) {
     filters.corrupted = {
-      value: item.isCorrupted,
-      exact: forAdornedJewel
+      value: item.corruptionState
     }
   }
 
@@ -514,7 +513,7 @@ function createGemFilters (
   }
 
   filters.corrupted = {
-    value: item.isCorrupted
+    value: item.corruptionState
   }
 
   if (!item.imbuedGem && item.isCorrupted && item.gemLevel! >= 20) {

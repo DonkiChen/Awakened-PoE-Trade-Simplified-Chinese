@@ -3,8 +3,8 @@
     <button class="px-2 rounded border overflow-hidden text-ellipsis"
       :class="{ 'border-gray-500': showAsActive, 'border-gray-900': !showAsActive }"
       @click="toggleAccuracy">{{ label }}</button>
-    <button v-if="filters.corrupted" class="px-2" @click="corrupted = !corrupted">
-      <span v-if="corrupted" class="text-red-500">{{ t('item.corrupted') }}</span>
+    <button v-if="filters.corrupted" class="px-2" :aria-pressed="corrupted" @click="corrupted = !corrupted">
+      <span v-if="corrupted" class="text-red-500">{{ t(item.corruptionState === CorruptionState.TwiceCorrupted ? 'item.twice_corrupted' : 'item.corrupted') }}</span>
       <span v-else class="text-gray-600">{{ t('item.not_corrupted') }}</span>
     </button>
   </div>
@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { ParsedItem } from '@/parser'
+import { CorruptionState, type ParsedItem } from '@/parser'
 import type { ItemFilters } from './interfaces'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
 
@@ -72,12 +72,17 @@ export default defineComponent({
     }
 
     const corrupted = computed<boolean>({
-      get () { return props.filters.corrupted!.value },
-      set (value) { props.filters.corrupted!.value = value }
+      get () { return props.filters.corrupted!.value !== CorruptionState.None },
+      set (value) {
+        props.filters.corrupted!.value = value
+          ? (props.item.corruptionState === CorruptionState.TwiceCorrupted ? CorruptionState.TwiceCorrupted : CorruptionState.Corrupted)
+          : CorruptionState.None
+      }
     })
 
     return {
       t,
+      CorruptionState,
       label,
       showAsActive,
       toggleAccuracy,

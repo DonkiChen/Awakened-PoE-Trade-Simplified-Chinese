@@ -1,5 +1,5 @@
 export type { ParsedItem } from './ParsedItem'
-export { ItemRarity, ItemInfluence } from './ParsedItem'
+export { ItemRarity, ItemInfluence, CorruptionState } from './ParsedItem'
 export { parseClipboard, makeIdentifiedUnique } from './Parser'
 export { ItemCategory } from './meta'
 export { configureParserRuntime } from './runtime'

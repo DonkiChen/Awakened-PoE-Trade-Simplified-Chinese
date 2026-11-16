@@ -12,7 +12,7 @@ import {
 import { ModifierType, ModifierMechanic, sumStatsByModType } from './modifiers'
 import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg, ParsedStat } from './stat-translations'
 import { ItemCategory, JEWELLERY } from './meta'
-import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedItem'
+import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity, CorruptionState } from './ParsedItem'
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
@@ -245,6 +245,9 @@ function findInDatabase (item: ParserState) {
 export function makeIdentifiedUnique (uniqueInfo: BaseType, unidentified: ParsedItem): ParsedItem {
   const newItem: ParsedItem = {
     ...unidentified,
+    get isCorrupted () {
+      return this.corruptionState !== CorruptionState.None
+    },
     info: uniqueInfo,
     uniqueBase: unidentified.info
   }
@@ -418,7 +421,10 @@ function parseNamePlate (section: string[]) {
     name,
     baseType,
     isUnidentified: false,
-    isCorrupted: false,
+    corruptionState: CorruptionState.None,
+    get isCorrupted () {
+      return this.corruptionState !== CorruptionState.None
+    },
     newMods: [],
     statsByType: [],
     unknownModifiers: [],
@@ -517,11 +523,14 @@ function parseInfluence (section: string[], item: ParsedItem) {
 }
 
 function parseCorrupted (section: string[], item: ParsedItem) {
-  if (section[0] === _$.CORRUPTED) {
-    item.isCorrupted = true
+  if (_$.TWICE_CORRUPTED && section[0] === _$.TWICE_CORRUPTED) {
+    item.corruptionState = CorruptionState.TwiceCorrupted
+    return 'SECTION_PARSED'
+  } else if (section[0] === _$.CORRUPTED) {
+    item.corruptionState = CorruptionState.Corrupted
     return 'SECTION_PARSED'
   } else if (section[0] === _$.UNMODIFIABLE) {
-    item.isCorrupted = true
+    item.corruptionState = CorruptionState.Corrupted
     item.isUnmodifiable = true
     return 'SECTION_PARSED'
   }
