@@ -136,6 +136,13 @@ export default {
   CHART_SULPHUR: "Dead Man's Sulphur: ",
   MERCENARY_LEVEL: 'Mercenary Level: ',
   MERCENARY_BUILD: 'Build: ',
+  ITEM_CLASS_VISCERA: 'Viscera',
+  VISCERA_LESSER: 'Lesser ',
+  VISCERA_GREATER: 'Greater ',
+  VISCERA_ITEM_ARM: 'Upper Limb',
+  VISCERA_ITEM_LEG: 'Lower Limb',
+  VISCERA_ITEM_HEAD: 'Head',
+  VISCERA_ITEM_TORSO: 'Torso',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

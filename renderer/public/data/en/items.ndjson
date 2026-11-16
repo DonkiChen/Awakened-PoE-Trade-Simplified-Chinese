@@ -4977,3 +4977,167 @@
 {"name":"Zerphi's Heart","refName":"Zerphi's Heart","namespace":"UNIQUE","unique":{"base":"Paua Amulet","disenchantValue":26.52},"icon":"https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQW11bGV0cy9aZXJwaGlzSGVhcnQiLCJ3IjoxLCJoIjoxLCJzY2FsZSI6MX1d/3e35140dfe/ZerphisHeart.png"}
 {"name":"Zerphi's Last Breath","refName":"Zerphi's Last Breath","namespace":"UNIQUE","unique":{"base":"Grand Mana Flask","disenchantValue":106.41},"icon":"https://web.poecdn.com/gen/image/WzksMTQseyJmIjoiMkRJdGVtcy9GbGFza3MvWmVycGhpc0xhc3RCcmVhdGgiLCJ3IjoxLCJoIjoyLCJzY2FsZSI6MSwibGV2ZWwiOjF9XQ/bf8cb7b943/ZerphisLastBreath.png"}
 {"name":"Facetor's Lens","refName":"Facetor's Lens","namespace":"ITEM","icon":"https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lHZW1FeHBlcmllbmNlIiwidyI6MSwiaCI6MSwic2NhbGUiOjF9XQ/4e718312e1/CurrencyGemExperience.png"}
+{"name":"Adherent's Crown","refName":"Adherent's Crown","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Al-Hezmin's Head","refName":"Al-Hezmin's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Ancestor's Club","refName":"Ancestor's Club","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Arachnid Egg Sac","refName":"Arachnid Egg Sac","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Arachnid Fangs","refName":"Arachnid Fangs","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Arachnid Leg","refName":"Arachnid Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Aristocrat's Torso","refName":"Aristocrat's Torso","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Armoured Leg","refName":"Armoured Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Artificial Appendage","refName":"Artificial Appendage","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bandit Rogue's Head","refName":"Bandit Rogue's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bandit Warrior's Head","refName":"Bandit Warrior's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bandit Witch's Head","refName":"Bandit Witch's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Baran's Head","refName":"Baran's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bat's Wings","refName":"Bat's Wings","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bear Head","refName":"Bear Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Blackened Lungs","refName":"Blackened Lungs","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Blackguard's Leg","refName":"Blackguard's Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Blazing Skull","refName":"Blazing Skull","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bloodied Arm","refName":"Bloodied Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Boar Head","refName":"Boar Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Bonestalker's Ribcage","refName":"Bonestalker's Ribcage","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Broken Bust","refName":"Broken Bust","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Brute's Arm","refName":"Brute's Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Calcified Leg","refName":"Calcified Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Captain's Leg","refName":"Captain's Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Carved Haunches","refName":"Carved Haunches","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Champion's Banner","refName":"Champion's Banner","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Chaos Golem's Core","refName":"Chaos Golem's Core","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Charred Leg","refName":"Charred Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Chimera's Head","refName":"Chimera's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Chimeral Eye","refName":"Chimeral Eye","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Chitinous Leg","refName":"Chitinous Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Coagulated Essence","refName":"Coagulated Essence","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Cobra Tail","refName":"Cobra Tail","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Conjoined Hound Head","refName":"Conjoined Hound Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Constrictor's Head","refName":"Constrictor's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Construct's Head","refName":"Construct's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Corrupted Carapace","refName":"Corrupted Carapace","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Coven Queen's Crown","refName":"Coven Queen's Crown","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Crescent Blade","refName":"Crescent Blade","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Crustacean's Claw","refName":"Crustacean's Claw","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Cutthroat's Head","refName":"Cutthroat's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Defaced Bust","refName":"Defaced Bust","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Desert Queen's Crown","refName":"Desert Queen's Crown","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Desert Sword","refName":"Desert Sword","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Despot's Fist","refName":"Despot's Fist","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Dessicated Head","refName":"Dessicated Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Devourer's Antenna","refName":"Devourer's Antenna","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Diseased Wing","refName":"Diseased Wing","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Distended Stomach","refName":"Distended Stomach","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Drox's Head","refName":"Drox's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Eater of Worlds' Head","refName":"Eater of Worlds' Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Elder's Head","refName":"Elder's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Elemental Essence","refName":"Elemental Essence","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Engorged Eye","refName":"Engorged Eye","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Enslaver's Head","refName":"Enslaver's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Eradicator's Head","refName":"Eradicator's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Flaming Furnace","refName":"Flaming Furnace","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Flaming Goat Hoof","refName":"Flaming Goat Hoof","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Flaming Ribbon","refName":"Flaming Ribbon","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Flayed Arm","refName":"Flayed Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Flayed Visage","refName":"Flayed Visage","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Flesh-fused Lantern","refName":"Flesh-fused Lantern","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Galvanic Tentacle","refName":"Galvanic Tentacle","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Gargantuan Claws","refName":"Gargantuan Claws","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Gelid Fangs","refName":"Gelid Fangs","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Gemling Torso","refName":"Gemling Torso","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"General's Head","refName":"General's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Ghostly Claw","refName":"Ghostly Claw","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Gladiator's Heart","refName":"Gladiator's Heart","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Goatman's Horn","refName":"Goatman's Horn","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Golden Ankh","refName":"Golden Ankh","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Golemic Stone","refName":"Golemic Stone","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Hag's Head","refName":"Hag's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Hag's Stomach","refName":"Hag's Stomach","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Hallowed Descry","refName":"Hallowed Descry","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Heretical Tome","refName":"Heretical Tome","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Hollowed Skull","refName":"Hollowed Skull","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Hydra's Head","refName":"Hydra's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Incarnation of Dread's Head","refName":"Incarnation of Dread's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Incarnation of Fear's Head","refName":"Incarnation of Fear's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Incarnation of Neglect's Cube","refName":"Incarnation of Neglect's Cube","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Infected Leg","refName":"Infected Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Infested Torso","refName":"Infested Torso","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Inquisitor's Claw","refName":"Inquisitor's Claw","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Inquisitor's Head","refName":"Inquisitor's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Justicar's Helm","refName":"Justicar's Helm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"King Crab's Claw","refName":"King Crab's Claw","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Lion's Claws","refName":"Lion's Claws","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Lithic Haunches","refName":"Lithic Haunches","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Lunar Bow","refName":"Lunar Bow","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Mariner's Tricorne","refName":"Mariner's Tricorne","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Maven's Orrery","refName":"Maven's Orrery","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Minotaur's Head","refName":"Minotaur's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Molten Core","refName":"Molten Core","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Necromancer's Mask","refName":"Necromancer's Mask","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Nightmarish Book of Depravity","refName":"Nightmarish Book of Depravity","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Nightmarish Core of the Unbreakable","refName":"Nightmarish Core of the Unbreakable","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Nightmarish Head of Uhtred","refName":"Nightmarish Head of Uhtred","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Nightmarish Wings of Catarina","refName":"Nightmarish Wings of Catarina","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Nightmarish Wings of Lycia","refName":"Nightmarish Wings of Lycia","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Noble's Head","refName":"Noble's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Ornate Torso","refName":"Ornate Torso","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Osseous Scythe","refName":"Osseous Scythe","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Osseous Talon","refName":"Osseous Talon","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Overseer's Whip","refName":"Overseer's Whip","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Phoenix's Head","refName":"Phoenix's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Pit Fighter's Helm","refName":"Pit Fighter's Helm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Poacher's Leg","refName":"Poacher's Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Pocked Arm","refName":"Pocked Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Pocked Leg","refName":"Pocked Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Primate Foot","refName":"Primate Foot","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Prosthetic Leg","refName":"Prosthetic Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Purifier's Head","refName":"Purifier's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Ravenous Skull","refName":"Ravenous Skull","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Resplendent Sceptre","refName":"Resplendent Sceptre","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Scarecrow's Pitchfork","refName":"Scarecrow's Pitchfork","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Scholar's Arm","refName":"Scholar's Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Scholar's Leg","refName":"Scholar's Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Scorched Arm","refName":"Scorched Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Scorpion Stinger","refName":"Scorpion Stinger","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Scout's Bow","refName":"Scout's Bow","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Sea Witch's Tentacle","refName":"Sea Witch's Tentacle","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Searing Exarch's Descry","refName":"Searing Exarch's Descry","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Severed Rhoa Head","refName":"Severed Rhoa Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Severed Scythe-hand","refName":"Severed Scythe-hand","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Severed Stinger","refName":"Severed Stinger","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Shaper's Head","refName":"Shaper's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Siren's Tentacle","refName":"Siren's Tentacle","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Sirus' Head","refName":"Sirus' Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Skeletal Archer's Arm","refName":"Skeletal Archer's Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Skeletal Beast Leg","refName":"Skeletal Beast Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Skeletal Tail","refName":"Skeletal Tail","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Skeletal Warrior's Leg","refName":"Skeletal Warrior's Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Skeleton Wheel","refName":"Skeleton Wheel","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Smouldering Leg","refName":"Smouldering Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Smuggler's Hand","refName":"Smuggler's Hand","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Solar Shield","refName":"Solar Shield","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Soldier's Head","refName":"Soldier's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Spectral Hood","refName":"Spectral Hood","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Spider Queen's Head","refName":"Spider Queen's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Spiked Carapace","refName":"Spiked Carapace","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Spined Claws","refName":"Spined Claws","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Stag Head","refName":"Stag Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Statue Leg","refName":"Statue Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Sun-bleached Breastplate","refName":"Sun-bleached Breastplate","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Swordmaster's Blade","refName":"Swordmaster's Blade","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Templar Banner","refName":"Templar Banner","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Templar Skull","refName":"Templar Skull","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Terrifying Maw","refName":"Terrifying Maw","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Thaumaturge's Head","refName":"Thaumaturge's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Totemic Visage","refName":"Totemic Visage","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Ursine Flesh","refName":"Ursine Flesh","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Vaal Appendage","refName":"Vaal Appendage","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Venarius' Scripture","refName":"Venarius' Scripture","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Vendigo Claws","refName":"Vendigo Claws","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Veritania's Head","refName":"Veritania's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Voidbearer's Leg","refName":"Voidbearer's Leg","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Voltaic Apparatus","refName":"Voltaic Apparatus","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Voltaic Skull","refName":"Voltaic Skull","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Vulture's Gut","refName":"Vulture's Gut","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Warden's Arm","refName":"Warden's Arm","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Witch's Head","refName":"Witch's Head","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
+{"name":"Wraith Claws","refName":"Wraith Claws","namespace":"ITEM","craftable":{"category":"Viscera"},"icon":""}
