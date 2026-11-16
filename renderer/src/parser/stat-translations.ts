@@ -55,6 +55,9 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
       const unscalable = unscalableText.matched
       str = unscalableText.value
 
+      // 去除技能提示占位符和零宽空格，保留数值范围括号。
+      str = str.replace(/\(\.\.\.\)|\u200B/g, '')
+
       const isParsed: boolean = yield { string: str, unscalable }
       if (isParsed) {
         start += (end - start)

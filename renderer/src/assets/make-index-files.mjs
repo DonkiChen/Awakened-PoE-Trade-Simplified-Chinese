@@ -20,6 +20,8 @@ export function makeIndexFiles () {
 
     {
       const ndjson = fs.readFileSync(path.join(__dirname, `../../public/data/${lang}/stats.ndjson`), { encoding: 'utf-8' })
+      /** @type {Map<string, Set<number>>} */
+      const plainMatchers = new Map()
       let start = 0
       while (start !== ndjson.length) {
         const end = ndjson.indexOf('\n', start)
@@ -31,12 +33,26 @@ export function makeIndexFiles () {
           for (const matcher of stat.matchers) {
             if (matcher.advanced) {
               lineStarts.matchers.push({ start, hash: Number(fnv1a(matcher.advanced, { size: 32 })) })
+              const starts = plainMatchers.get(matcher.string) ?? new Set()
+              starts.add(start)
+              plainMatchers.set(matcher.string, starts)
             } else {
               lineStarts.matchers.push({ start, hash: Number(fnv1a(matcher.string, { size: 32 })) })
             }
           }
         }
         start = (end + 1)
+      }
+      // Preserve advanced matches; only add plain-text aliases that resolve to
+      // one record and do not collide with an existing index entry.
+      const indexedHashes = new Set(lineStarts.matchers.map(matcher => matcher.hash))
+      for (const [text, starts] of plainMatchers) {
+        const hash = Number(fnv1a(text, { size: 32 }))
+        const start = starts.values().next().value
+        if (starts.size === 1 && start !== undefined && !indexedHashes.has(hash)) {
+          lineStarts.matchers.push({ start, hash })
+          indexedHashes.add(hash)
+        }
       }
     }
 
