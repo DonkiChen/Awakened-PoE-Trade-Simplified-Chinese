@@ -236,6 +236,7 @@ function splitJsonBlob (jsonBlob: string) {
       { ns: 'ITEM', url: 'ducats', type: 'Ducat' },
       { ns: 'ITEM', url: 'enshrouding-crystals', type: 'EnshroudingCrystal' },
       { ns: 'ITEM', url: 'corpses', type: 'Corpse' },
+      { ns: 'ITEM', url: 'threads', type: 'Thread' },
       { ns: 'DIVINATION_CARD', url: 'divination-cards', type: 'DivinationCard' },
       { ns: 'CAPTURED_BEAST', url: 'beasts', type: 'Beast' },
       { ns: 'UNIQUE', url: 'unique-jewels', type: 'UniqueJewel' },
