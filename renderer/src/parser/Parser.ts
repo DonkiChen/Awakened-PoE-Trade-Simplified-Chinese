@@ -175,10 +175,15 @@ function normalizeName (item: ParserState) {
     const targetText = item.baseType ?? item.name
     const blightedMatch = execClientStringRegex(['MAP_BLIGHTED', 'MAP_BLIGHT_RAVAGED'], targetText)
     if (blightedMatch) {
+      const mapName = blightedMatch.match[1]
+      const isGenericMap = ITEM_BY_REF_OR_TRANSLATED('ITEM', mapName)?.[0].refName === 'Map'
+      const baseName = isGenericMap
+        ? (blightedMatch.key === 'MAP_BLIGHT_RAVAGED' ? 'Blight-ravaged Map' : 'Blighted Map')
+        : mapName
       if (item.baseType) {
-        item.baseType = blightedMatch.match[1]
+        item.baseType = baseName
       } else {
-        item.name = blightedMatch.match[1]
+        item.name = baseName
       }
     }
   }
@@ -222,8 +227,13 @@ function findInDatabase (item: ParserState) {
   if (info[0].unique) {
     info = info.filter(unique => {
       const baseRef = unique.unique?.base
-      return baseRef != null && ITEM_BY_REF('ITEM', baseRef)?.some(base =>
-        base.name === item.baseType || base.refName === item.baseType
+      return baseRef != null && (
+        ITEM_BY_REF('ITEM', baseRef)?.some(base =>
+          base.name === item.baseType || base.refName === item.baseType
+        ) ||
+        (item.baseType != null && ITEM_BY_TRANSLATED('ITEM', item.baseType)?.some(base =>
+          base.refName === baseRef
+        ))
       )
     })
     if (!info.length) return err('item.unknown')
@@ -306,7 +316,7 @@ function parseMap (section: string[], item: ParsedItem) {
       item.mapMoreDivCards = parseInt(line.slice(_$.MAP_MORE_DIVINATION_CARDS.length), 10)
       isParsed = 'SECTION_PARSED'
     } else if (line.startsWith(_$.MAP_AREA)) {
-      const areaName = section[0].slice(_$.MAP_AREA.length)
+      const areaName = line.slice(_$.MAP_AREA.length)
       const areaInfo = ITEM_BY_TRANSLATED('AREA', areaName)
       if (!areaInfo) throw new Error('Unknown Area name.')
       item.mapArea = areaInfo[0]
@@ -325,6 +335,14 @@ function parseMap (section: string[], item: ParsedItem) {
 
 function parseBlightedMap (item: ParsedItem) {
   if (item.category !== ItemCategory.Map) return
+
+  if (item.info.refName === 'Blight-ravaged Map') {
+    item.mapBlighted = 'Blight-ravaged'
+    return
+  } else if (item.info.refName === 'Blighted Map') {
+    item.mapBlighted = 'Blighted'
+    return
+  }
 
   const calc = item.statsByType.find(calc =>
     calc.type === ModifierType.Implicit &&

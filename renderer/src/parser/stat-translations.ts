@@ -55,9 +55,6 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
       const unscalable = unscalableText.matched
       str = unscalableText.value
 
-      // 去除技能提示占位符和零宽空格，保留数值范围括号。
-      str = str.replace(/\(\.\.\.\)|\u200B/g, '')
-
       const isParsed: boolean = yield { string: str, unscalable }
       if (isParsed) {
         start += (end - start)
@@ -90,8 +87,11 @@ function * _statPlaceholderGenerator (stat: string) {
     bounds?: { min: number, max: number }
   }> = []
   const withPlaceholders = stat
-    .replace(/\(\)/gm, '') // when GGG didn't provide advanced desc, like in "Passives in Radius of Wicked Ward() can be Allocated"
-    .replace(/(?<value>(?<!\d|\))[+-]?\d+(?:\.\d+)?)(?:\((?<min>.[^)-]*)(?:-(?<max>[^)]+))?\))?/gm, (_, roll: string, min?: string, max?: string) => {
+    .replaceAll('()', '') // when GGG didn't provide advanced desc, like in "Passives in Radius of Wicked Ward() can be Allocated"
+    .replaceAll('(...)', '') // remove stat value ranges which are described textually
+    .replaceAll('\u200B', '') // remove zwsp
+    .replaceAll(' ', ' ') // replace nbsp to normal space
+    .replaceAll(/(?<value>(?<!\d|\))[+-]?\d+(?:\.\d+)?)(?:\((?<min>.[^)-]*)(?:-(?<max>[^)]+))?\))?/g, (_, roll: string, min?: string, max?: string) => {
       if (min != null && max == null) {
         // example: Sextant "# uses remaining", legacy rolls
         max = min
