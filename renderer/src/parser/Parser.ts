@@ -227,8 +227,13 @@ function findInDatabase (item: ParserState) {
   if (info[0].unique) {
     info = info.filter(unique => {
       const baseRef = unique.unique?.base
-      return baseRef != null && ITEM_BY_REF('ITEM', baseRef)?.some(base =>
-        base.name === item.baseType || base.refName === item.baseType
+      return baseRef != null && (
+        ITEM_BY_REF('ITEM', baseRef)?.some(base =>
+          base.name === item.baseType || base.refName === item.baseType
+        ) ||
+        (item.baseType != null && ITEM_BY_TRANSLATED('ITEM', item.baseType)?.some(base =>
+          base.refName === baseRef
+        ))
       )
     })
     if (!info.length) return err('item.unknown')
