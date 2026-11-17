@@ -5776,20 +5776,20 @@
 {"ref":"Map Bosses have #% chance to be accompanied by two Rogue Exile Bodyguards","better":1,"matchers":[{"string":"地图首领有 #% 的几率有两个盗贼流放者保镖陪伴"}],"trade":{"ids":{"explicit":["explicit.stat_472880157"]}}}
 {"ref":"Map Bosses have #% chance to be surrounded by Tormented Spirits","better":1,"matchers":[{"string":"地图首领有 #% 的几率被罪魂缠身"},{"string":"地图首领有 #% 的几率被罪魂环绕"}],"trade":{"ids":{"explicit":["explicit.stat_906368454"]}}}
 {"ref":"Map Bosses have #% increased chance to drop a Conqueror Map","better":1,"matchers":[{"string":"地图首领掉落征服者地图的几率提高 #%"}],"trade":{"ids":{"explicit":["explicit.stat_1554844434"]}}}
-{"ref":"Map contains Al-Hezmin's Citadel\nItem Quantity increases amount of Rewards Al-Hezmin drops by 20% of its value","better":0,"matchers":[{"string":"地图上有阿尔赫兹敏的要塞\n增加阿尔赫兹敏掉落的奖励数量，等于物品总量的 20%"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|3"]}}}
-{"ref":"Map contains Baran's Citadel\nItem Quantity increases amount of Rewards Baran drops by 20% of its value","better":0,"matchers":[{"string":"地图上有巴兰的要塞\n增加巴兰掉落的奖励数量，等于物品总量的 20%"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|1"]}}}
-{"ref":"Map contains Drox's Citadel\nItem Quantity increases amount of Rewards Drox drops by 20% of its value","better":0,"matchers":[{"string":"地图上有狄洛克斯的要塞\n增加狄洛克斯掉落的奖励数量，等于物品总量的 20%"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|4"]}}}
-{"ref":"Map contains Veritania's Citadel\nItem Quantity increases amount of Rewards Veritania drops by 20% of its value","better":0,"matchers":[{"string":"地图上有维利塔妮娅的要塞\n增加维利塔妮娅掉落的奖励数量，等于物品总量的 20%"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|2"]}}}
+{"ref":"Map contains Al-Hezmin's Citadel","better":0,"matchers":[{"string":"地图中包含 阿尔赫兹敏要塞"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|3"]}}}
+{"ref":"Map contains Baran's Citadel","better":0,"matchers":[{"string":"地图中包含 巴兰要塞"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|1"]}}}
+{"ref":"Map contains Drox's Citadel","better":0,"matchers":[{"string":"地图中包含 狄洛克斯要塞"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|4"]}}}
+{"ref":"Map contains Veritania's Citadel","better":0,"matchers":[{"string":"地图中包含 维利塔妮娅要塞"}],"trade":{"ids":{"implicit":["implicit.stat_2563183002|2"]}}}
 {"ref":"Map Crafting options for this Map have no cost","better":1,"fromAreaMods":"yes","matchers":[{"string":"该地图的地图工艺选项没有成本"}],"trade":{"ids":{"implicit":["implicit.stat_4149961555"]}}}
 {"ref":"Map Device has #% chance not to consume Scarabs","better":1,"matchers":[{"string":"地图装置有 #% 的几率不消耗圣甲虫"}],"trade":{"ids":{"explicit":["explicit.stat_4140427516"]}}}
 {"ref":"Map has # additional random Modifier","better":1,"matchers":[{"string":"该地图有 # 个额外的随机词缀"},{"string":"该地图有 # 组额外的随机词缀"}],"trade":{"ids":{"explicit":["explicit.stat_4003278965"]}}}
 {"ref":"Map has # additional Synthesis Global Modifier","better":1,"matchers":[{"string":"该地图有# 个额外的虚空忆境全局词缀"},{"string":"该地图有# 组额外的虚空忆境全局词缀"}],"trade":{"ids":{"explicit":["explicit.stat_2132807290"]}}}
 {"ref":"Map has a Vaal Side Area","better":1,"fromAreaMods":"yes","matchers":[{"string":"地图中有腐化区域"}],"trade":{"ids":{"enchant":["enchant.stat_73209495"]}}}
 {"ref":"Map has an additional random Modifier from Kirac's Crafting Bench","better":1,"matchers":[{"string":"地图随机从奇拉克的工艺台上获得一个额外词缀"}],"trade":{"ids":{"enchant":["enchant.stat_1389457945"]}}}
-{"ref":"Map is occupied by The Constrictor","better":0,"matchers":[{"string":"该地图被裂界守卫：约束占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|3"]}}}
-{"ref":"Map is occupied by The Enslaver","better":0,"matchers":[{"string":"该地图被裂界守卫：奴役占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|1"]}}}
-{"ref":"Map is occupied by The Eradicator","better":0,"matchers":[{"string":"该地图被裂界守卫：寂灭占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|2"]}}}
-{"ref":"Map is occupied by The Purifier","better":0,"matchers":[{"string":"该地图被裂界守卫：净世占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|4"]}}}
+{"ref":"Map is occupied by The Constrictor","better":0,"matchers":[{"string":"地图被 裂界守卫：约束 占据"},{"string":"该地图被裂界守卫：约束占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|3"]}}}
+{"ref":"Map is occupied by The Enslaver","better":0,"matchers":[{"string":"地图被 裂界守卫：奴役 占据"},{"string":"该地图被裂界守卫：奴役占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|1"]}}}
+{"ref":"Map is occupied by The Eradicator","better":0,"matchers":[{"string":"地图被 裂界守卫：寂灭 占据"},{"string":"该地图被裂界守卫：寂灭占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|2"]}}}
+{"ref":"Map is occupied by The Purifier","better":0,"matchers":[{"string":"地图被 裂界守卫：净世 占据"},{"string":"该地图被裂界守卫：净世占据"}],"trade":{"ids":{"implicit":["implicit.stat_3624393862|4"]}}}
 {"ref":"Maps found cannot be your Favoured Maps","better":1,"matchers":[{"string":"掉落的地图不会是偏好地图"},{"string":"掉落的地图不会是酷爱地图"}],"trade":{"ids":{"explicit":["explicit.stat_441900529"]}}}
 {"ref":"Maps found have #% more chance to be Favoured Maps","better":1,"matchers":[{"string":"掉落的地图为偏好地图的几率总增 #%"},{"string":"掉落的地图为酷爱地图的几率总增 #%"}],"trade":{"ids":{"explicit":["explicit.stat_3527275979"]}}}
 {"ref":"Maps found in your Maps have #% chance to have layers of Delirium","better":1,"matchers":[{"string":"地图内发现的地图有 #% 的几率包含惊悸迷雾层数"},{"string":"地图内发现的地图包含惊悸迷雾层数","value":100}],"trade":{"ids":{"explicit":["explicit.stat_1482478377"]}}}
