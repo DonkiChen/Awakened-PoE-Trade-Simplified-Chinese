@@ -36,10 +36,7 @@ jobs:
 
   package:
     needs: renderer
-    strategy:
-      matrix:
-        os: [windows-2022, ubuntu-22.04, macos-15]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
@@ -56,11 +53,4 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.APT_GITHUB_TOKEN }}
     - name: Hash
-      if: ${{ startsWith(matrix.os, 'windows') }}
       run: type .\main\dist\latest.yml
-    - name: Hash
-      if: ${{ startsWith(matrix.os, 'ubuntu') }}
-      run: cat ./main/dist/latest-linux.yml
-    - name: Hash
-      if: ${{ startsWith(matrix.os, 'macos') }}
-      run: cat ./main/dist/latest-mac.yml
