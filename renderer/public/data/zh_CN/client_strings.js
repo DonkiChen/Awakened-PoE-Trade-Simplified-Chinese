@@ -53,7 +53,7 @@ export default {
   TAG_WARD: '结界: ',
   BLOCK_CHANCE: '格挡几率: ',
   CORRUPTED: '已腐化',
-  TWICE_CORRUPTED: 'Twice Corrupted',
+  TWICE_CORRUPTED: '二次腐化',
   UNIDENTIFIED: '未鉴定',
   ITEM_SUPERIOR: /^精良的 (.*)$/,
   MAP_BLIGHTED: /^菌潮 (.*)$/,
