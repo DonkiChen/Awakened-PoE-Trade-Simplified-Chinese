@@ -56,7 +56,8 @@ export function parseModInfoLine (line: string): ModifierInfo {
       throw new Error('Invalid regex for mod info line')
     }
 
-    const typeText = match.groups!.type
+    // MODIFIER_LINE 正则在匹配 `仅限罕见 (等阶：1)` 时 type 会有空格(`仅限罕见 `), 为了避免改动正则影响扩大, 这里直接 trim
+    const typeText = match.groups!.type.trim()
 
     if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT', 'VESTIGIAL_IMPLICIT'], typeText)) {
       type = ModifierType.Implicit

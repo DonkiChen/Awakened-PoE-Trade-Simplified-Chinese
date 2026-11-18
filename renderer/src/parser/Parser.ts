@@ -269,16 +269,15 @@ export function makeIdentifiedUnique (uniqueInfo: BaseType, unidentified: Parsed
 }
 
 function parseMapTier (item: ParserState) {
-  // TODO blocked by https://www.pathofexile.com/forum/view-thread/3915458
-  const tierMatch = execClientStringRegex('MAP_TIER', item.baseType || item.name)
-  if (!tierMatch) return
+  const execResult = _$.MAP_TIER.exec(item.baseType || item.name)
+  if (!execResult) return
 
-  item.mapTier = Number(tierMatch.match[1])
+  item.mapTier = Number(execResult[1])
 
   if (item.baseType) {
-    item.baseType = item.baseType.replace(tierMatch.match[0], '')
+    item.baseType = item.baseType.replace(execResult[0], '')
   } else {
-    item.name = item.name.replace(tierMatch.match[0], '')
+    item.name = item.name.replace(execResult[0], '')
   }
 }
 
@@ -440,8 +439,8 @@ function parseNamePlate (section: string[]) {
   const item: ParserState = {
     rarity: undefined,
     category: undefined,
-    name,
-    baseType,
+    name: name,
+    baseType: baseType,
     isUnidentified: false,
     corruptionState: CorruptionState.None,
     get isCorrupted () {
