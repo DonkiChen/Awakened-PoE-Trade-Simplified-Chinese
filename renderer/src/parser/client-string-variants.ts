@@ -95,6 +95,7 @@ export function execClientStringRegex (
   for (const key of keys) {
     for (const dictionary of dictionaries) {
       const regex = dictionary[key]
+      if (!regex) continue
       regex.lastIndex = 0
       const match = regex.exec(value)
       if (match) {

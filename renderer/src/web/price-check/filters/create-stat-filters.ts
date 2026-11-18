@@ -14,6 +14,7 @@ import { applyHeistRules } from './pseudo/heist'
 import { filterTimelessJewelKeystones } from './pseudo/timeless-jewel'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
 import { StatBetter } from '@/assets/data'
+import { filterRitualMonsters } from './pseudo/ritual'
 
 export interface FiltersCreationContext {
   readonly item: ParsedItem
@@ -71,6 +72,11 @@ export function createExactStatFilters (
     filters: [],
     groups: [],
     statsByType: statsByType.filter(calc => keepByType.includes(calc.type))
+  }
+
+  if (item.info.refName === 'Blood-filled Vessel') {
+    filterRitualMonsters(ctx)
+    return ctx.filters
   }
 
   filterBasePercentile(ctx)

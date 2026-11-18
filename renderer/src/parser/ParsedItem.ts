@@ -70,6 +70,7 @@ export interface ParsedItem {
   imbuedGem?: boolean
   mercenaryBuild?: BaseType
   mercenarySkills?: ParsedStat[][]
+  ritualMonsters?: { unique: number, other?: number }
   talismanTier?: number
   memoryStrands?: number
   storedExperience?: number

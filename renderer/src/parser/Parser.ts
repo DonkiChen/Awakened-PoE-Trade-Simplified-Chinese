@@ -16,7 +16,7 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity, CorruptionState }
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
-import { execClientStringRegex, matchesClientString, stripLeadingClientString } from './client-string-variants'
+import { execClientStringRegex, matchesClientString, stripLeadingClientString, testClientStringRegex } from './client-string-variants'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -67,6 +67,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseAtzoatlRooms,
   parseMirroredTablet,
   parseFilledCoffin,
+  parseBloodFilledVessel,
   parseMirrored,
   parseSplit,
   parseSentinelCharge,
@@ -1314,6 +1315,34 @@ function parseMirroredTablet (section: string[], item: ParsedItem) {
     }
   }
 
+  return 'SECTION_PARSED'
+}
+
+function parseBloodFilledVessel (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Blood-filled Vessel') return 'PARSER_SKIPPED'
+  const header = execClientStringRegex('RITUAL_MONSTERS', section[0].trim())?.match
+  if (!header) return 'SECTION_SKIPPED'
+  if (header[1] != null) {
+    item.ritualMonsters = { unique: 0, other: Number(header[1]) }
+    return 'SECTION_PARSED'
+  }
+
+  let unique = 0
+  let other: number | undefined
+  for (const rawLine of section.slice(1)) {
+    const line = rawLine.trim()
+    if (!line) continue
+    if (testClientStringRegex('RITUAL_MONSTER_LIST_END', line)) break
+
+    const count = execClientStringRegex('RITUAL_OTHER_MONSTERS', line)?.match
+    if (count) {
+      other = Number(count[1])
+      break
+    }
+    unique++
+  }
+
+  item.ritualMonsters = { unique, other }
   return 'SECTION_PARSED'
 }
 

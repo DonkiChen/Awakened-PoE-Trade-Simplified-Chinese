@@ -259,6 +259,9 @@ export interface TranslationDict {
   SCRYING_MAP_AREA?: string
   CHART_SULPHUR: string
   MERCENARY_LEVEL: string
+  RITUAL_MONSTERS?: RegExp
+  RITUAL_OTHER_MONSTERS?: RegExp
+  RITUAL_MONSTER_LIST_END?: RegExp
   MERCENARY_BUILD: string
   ITEM_CLASS_VISCERA?: string
   VISCERA_LESSER?: string
