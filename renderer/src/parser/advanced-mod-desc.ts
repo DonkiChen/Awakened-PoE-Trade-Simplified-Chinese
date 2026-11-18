@@ -70,6 +70,8 @@ export function parseModInfoLine (line: string): ModifierInfo {
       generation = 'prefix'
     } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText)) {
       generation = 'suffix'
+    } else if (matchesClientString('RARE_ONLY_AFFIX', typeText)) {
+      mechanic = ModifierMechanic.RareOnly
     } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText)) {
       mechanic = ModifierMechanic.Corruption
     } else if (matchesClientString('FOULBORN_MODIFIER', typeText)) {
