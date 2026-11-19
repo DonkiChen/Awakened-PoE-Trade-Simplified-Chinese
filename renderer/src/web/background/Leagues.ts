@@ -22,7 +22,7 @@ interface League {
 type LeaguesConfigSource = Pick<Config, 'leagueId' | 'realm' | 'language' | 'useIntlSite'>
 
 export function leaguesDependencyKey (config: Pick<Config, 'realm' | 'language' | 'useIntlSite'>) {
-  return `${config.realm}|${config.language}|${config.useIntlSite ? 1 : 0}`
+  return `${config.realm}|${config.language}|${poeWebApi(config)}`
 }
 
 function createLeaguesState (configSource?: LeaguesConfigSource) {

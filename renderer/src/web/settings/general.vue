@@ -77,7 +77,7 @@ import { useI18nNs } from '@/web/i18n'
 import UiRadio from '@/web/ui/UiRadio.vue'
 import UiCheckbox from '@/web/ui/UiCheckbox.vue'
 import { configModelValue, configProp } from './utils'
-import { AppConfig } from '@/web/Config'
+import { AppConfig, forcesIntlSite, usesIntlSite } from '@/web/Config'
 
 export default defineComponent({
   name: 'settings.general',
@@ -101,19 +101,22 @@ export default defineComponent({
           if (value !== 'cmn-Hant' && value !== 'zh_CN') {
             props.config.realm = 'pc-ggg'
           }
-          props.config.useIntlSite = (props.config.realm === 'pc-ggg' && (value === 'cmn-Hant' || value === 'zh_CN'))
+          props.config.useIntlSite = forcesIntlSite(props.config)
         }
       }),
       realm: computed<typeof props.config.realm>({
         get () { return props.config.realm },
         set (value) {
           props.config.realm = value
-          props.config.useIntlSite = (value === 'pc-ggg' && (props.config.language === 'cmn-Hant' || props.config.language === 'zh_CN'))
+          props.config.useIntlSite = forcesIntlSite(props.config)
         }
       }),
       cookies: configModelValue(() => props.config, 'cookies'),
-      useIntlSite: configModelValue(() => props.config, 'useIntlSite'),
-      forcedIntlSite: computed(() => props.config.realm === 'pc-ggg' && (props.config.language === 'cmn-Hant' || props.config.language === 'zh_CN')),
+      useIntlSite: computed({
+        get: () => usesIntlSite(props.config),
+        set: (value) => { props.config.useIntlSite = value }
+      }),
+      forcedIntlSite: computed(() => forcesIntlSite(props.config)),
       restoreClipboard: configModelValue(() => props.config, 'restoreClipboard'),
       showAttachNotification: configModelValue(() => props.config, 'showAttachNotification'),
       windowTitle: configModelValue(() => props.config, 'windowTitle')

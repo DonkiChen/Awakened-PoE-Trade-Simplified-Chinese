@@ -71,7 +71,7 @@ import StackValue from './expected-value/StackValue.vue'
 import DustValue from './expected-value/DustValue.vue'
 import FilterName from './filters/FilterName.vue'
 import { CATEGORY_TO_TRADE_ID, createTradeRequest } from './trade/pathofexile-trade'
-import { AppConfig } from '@/web/Config'
+import { AppConfig, usesIntlSite } from '@/web/Config'
 import { FilterPreset } from './filters/interfaces'
 import { PriceCheckWidget } from '../overlay/interfaces'
 import { useLeagues } from '@/web/background/Leagues'
@@ -126,7 +126,7 @@ export default defineComponent({
         activateStockFilter: widget.value.activateStockFilter,
         searchStatRange: widget.value.searchStatRange,
         offline: widget.value.offline,
-        useEn: AppConfig().useIntlSite,
+        useEn: usesIntlSite(AppConfig()),
         currency: (prevItem &&
           item.info.namespace === prevItem.info.namespace &&
           item.info.refName === prevItem.info.refName
