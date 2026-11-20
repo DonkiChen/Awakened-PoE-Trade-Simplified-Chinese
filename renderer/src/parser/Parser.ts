@@ -1007,22 +1007,13 @@ function parseScryingOrb (section: string[], item: ParsedItem) {
   if (item.info.refName !== 'Scrying Orb') return 'PARSER_SKIPPED'
 
   if (section.length === 1) {
-    const line = section[0]
-    let areaName: string | undefined
-    if (_$.SCRYING_MAP_AREA && line.startsWith(_$.SCRYING_MAP_AREA)) {
-      areaName = line.slice(_$.SCRYING_MAP_AREA.length).trim()
-    } else if (_$.MAP_AREA && line.startsWith(_$.MAP_AREA)) {
-      areaName = line.slice(_$.MAP_AREA.length).trim()
-    } else {
-      const separator = Math.max(line.indexOf(':'), line.indexOf('：'))
-      if (separator >= 0) areaName = line.slice(separator + 1).trim()
+    if (section[0].startsWith(_$.MAP_AREA)) {
+      const areaName = section[0].slice(_$.MAP_AREA.length)
+      const areaInfo = ITEM_BY_TRANSLATED('AREA', areaName)
+      if (!areaInfo) throw new Error('Unknown Area name.')
+      item.mapArea = areaInfo[0]
+      return 'SECTION_PARSED'
     }
-    if (!areaName) return 'SECTION_SKIPPED'
-
-    const areaInfo = ITEM_BY_REF_OR_TRANSLATED('AREA', areaName)
-    if (!areaInfo) throw new Error('Unknown Area name.')
-    item.mapArea = areaInfo[0]
-    return 'SECTION_PARSED'
   }
   return 'SECTION_SKIPPED'
 }
