@@ -6,7 +6,7 @@ import { noSourcePseudoToFilter, propToFilter } from './item-property'
 import { findAndResolveByRef, statToNotFilter } from './utils'
 
 const PSEUDO = {
-  MORE_SCARABS: stat('More Scarabs: #%'),
+  MORE_THREADS: stat('More Scarabs: #%'),
   MORE_MAPS: stat('More Maps: #%'),
   MORE_DIVINATION_CARDS: stat('More Divination Cards: #%'),
   MORE_CURRENCY: stat('More Currency: #%'),
@@ -30,6 +30,15 @@ function areaProps (
       roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.areaItemQuantity },
       sources: [],
       disabled: disabled.itemQuantity
+    }, ctx))
+  }
+  if (item.areaAtlasDrops) {
+    ctx.filters.push(propToFilter({
+      ref: 'Atlas Drops: +#%',
+      tradeId: 'item.map_atlas_drops',
+      roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.areaAtlasDrops },
+      sources: [],
+      disabled: disabled.itemQuantity // reuse quant
     }, ctx))
   }
   if (item.areaItemRarity) {
@@ -57,7 +66,7 @@ export function mapProps (bulk: boolean, ctx: FiltersCreationContext): void {
   if (item.category !== ItemCategory.Map || item.mapCompletionReward || item.rarity === ItemRarity.Unique) return
 
   if (!bulk) {
-    const hasValuableDrops = Boolean(item.mapMoreScarabs || item.mapMoreCurrency || item.mapMoreDivCards)
+    const hasValuableDrops = Boolean(item.mapMoreThreads || item.mapMoreCurrency || item.mapMoreDivCards)
 
     areaProps({
       disabled: {
@@ -74,10 +83,10 @@ export function mapProps (bulk: boolean, ctx: FiltersCreationContext): void {
         disabled: true
       }, ctx))
     }
-    if (item.mapMoreScarabs) {
+    if (item.mapMoreThreads) {
       ctx.filters.push(noSourcePseudoToFilter({
-        pseudo: pseudoStatByRef(PSEUDO.MORE_SCARABS)!,
-        roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.mapMoreScarabs },
+        pseudo: pseudoStatByRef(PSEUDO.MORE_THREADS)!,
+        roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.mapMoreThreads },
         disabled: false
       }, ctx))
     }
@@ -97,11 +106,13 @@ export function mapProps (bulk: boolean, ctx: FiltersCreationContext): void {
     }
   }
 
-  const explicitMods = item.newMods.filter(mod => mod.info.generation === 'prefix' || mod.info.generation === 'suffix')
-  if (explicitMods.length === 8) {
+  const explicitMods = item.newMods.filter(mod =>
+    mod.info.type === ModifierType.Explicit ||
+    mod.info.type === ModifierType.Fractured)
+  if (explicitMods.length >= 8) {
     ctx.filters.push(noSourcePseudoToFilter({
       pseudo: pseudoStatByRef(PSEUDO.EXPLICIT_MODIFIERS)!,
-      roll: { min: 0, max: 8, value: explicitMods.length },
+      roll: { min: 0, max: 9, value: explicitMods.length },
       disabled: false
     }, { ...ctx, searchInRange: 0 }))
   }

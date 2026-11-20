@@ -1,4 +1,4 @@
-import type { ItemInfluence, ItemCategory, CorruptionState } from '@/parser'
+import type { ItemInfluence, ItemCategory } from '@/parser'
 import { ModifierType, ModifierMechanic, type StatCalculated } from '@/parser/modifiers'
 
 export interface FilterPreset {
@@ -33,7 +33,9 @@ export interface ItemFilters {
   greenSockets?: FilterNumeric
   blueSockets?: FilterNumeric
   corrupted?: {
-    value: CorruptionState
+    value: boolean
+    twice: boolean
+    exact?: boolean
   }
   fractured?: {
     value: false
@@ -48,6 +50,9 @@ export interface ItemFilters {
   split?: {
     disabled: boolean
     hidden: boolean
+  }
+  notCatalysed?: {
+    disabled: boolean
   }
   foil?: {
     disabled: boolean
@@ -122,6 +127,7 @@ export interface StatFilter {
   tag: FilterTag
   oils?: string[]
   mercenary?: { icon?: string, tier?: number, maxTier?: boolean }
+  reminderText?: string
   sources: StatCalculated['sources']
   not?: true
   roll?: {
@@ -160,6 +166,7 @@ const _INTERNAL_TRADE_IDS = [
   'item.has_empty_modifier',
   'item.mercenary_6link',
   'item.map_item_quantity',
+  'item.map_atlas_drops',
   'item.map_item_rarity',
   'item.map_pack_size',
   'item.heist_job_lockpicking',

@@ -14,6 +14,8 @@ export type ClientStringVariantKey =
   | 'IMPLICIT_MODIFIER'
   | 'FRACTURED_PREFIX'
   | 'FRACTURED_SUFFIX'
+  | 'RARE_ONLY_PREFIX'
+  | 'RARE_ONLY_SUFFIX'
   | 'CORRUPTED_IMPLICIT'
   | 'FOULBORN_MODIFIER'
   | 'VESTIGIAL_IMPLICIT'
@@ -38,6 +40,8 @@ const PARSER_CLIENT_STRING_ALIASES: ClientStringAliasMap = {
   FRACTURED_SUFFIX: ['分裂 ▽ 后缀词缀', '破碎的 ▽ 后缀词缀', '分裂 后缀词缀'],
   CRAFTED_PREFIX: ['大师工艺 ▲ 前缀词缀', '大师级 ▲ 前缀词缀', '大师 前缀词缀'],
   CRAFTED_SUFFIX: ['大师工艺 ▽ 后缀词缀', '大师级 ▽ 后缀词缀', '大师 后缀词缀'],
+  RARE_ONLY_PREFIX: ['仅限稀有 ▲ 前缀词缀'],
+  RARE_ONLY_SUFFIX: ['仅限稀有 ▽ 后缀词缀'],
   CORRUPTED_IMPLICIT: ['腐化基底词缀'],
   UNSCALABLE_VALUE: [' — 数值不可估量', ' — 数值不可调整'],
   MEMORY_STRANDS: ['记忆丝缕: ']
@@ -57,7 +61,9 @@ const PARSER_CLIENT_STRING_ALIASES: ClientStringAliasMap = {
 export function getClientStringVariants (
   key: ClientStringVariantKey
 ): readonly string[] {
-  return [clientStrings[key], ...(PARSER_CLIENT_STRING_ALIASES[key] ?? [])]
+  const canonical = clientStrings[key]
+  const aliases = PARSER_CLIENT_STRING_ALIASES[key] ?? []
+  return canonical === undefined ? aliases : [canonical, ...aliases]
 }
 
 function getSortedClientStringVariants (key: ClientStringVariantKey): string[] {
@@ -95,6 +101,7 @@ export function execClientStringRegex (
   for (const key of keys) {
     for (const dictionary of dictionaries) {
       const regex = dictionary[key]
+      if (!regex) continue
       regex.lastIndex = 0
       const match = regex.exec(value)
       if (match) {

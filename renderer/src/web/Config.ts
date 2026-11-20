@@ -84,12 +84,19 @@ export async function initConfig () {
   pushHostConfig()
 }
 
-export function poeWebApi (config: Pick<Config, 'language' | 'useIntlSite'> = AppConfig()) {
-  const { language, useIntlSite } = config
-  if (useIntlSite) {
+export function forcesIntlSite ({ language, realm }: Pick<Config, 'language' | 'realm'>) {
+  return realm === 'pc-ggg' && (language === 'cmn-Hant' || language === 'zh_CN')
+}
+
+export function usesIntlSite (config: Pick<Config, 'language' | 'realm' | 'useIntlSite'>) {
+  return forcesIntlSite(config) || config.useIntlSite
+}
+
+export function poeWebApi (config: Pick<Config, 'language' | 'realm' | 'useIntlSite'> = AppConfig()) {
+  if (usesIntlSite(config)) {
     return 'www.pathofexile.com'
   }
-  switch (language) {
+  switch (config.language) {
     case 'en': return 'www.pathofexile.com'
     case 'ru': return 'ru.pathofexile.com'
     case 'cmn-Hant': return 'pathofexile.tw'
@@ -173,7 +180,7 @@ export const defaultConfig = (): Config => ({
   language: 'zh_CN',
   cookies: '',
   realm: 'pc-ggg',
-  useIntlSite: false,
+  useIntlSite: true,
   fontSize: 16,
   widgets: widgetRegistry.widgets.reduce<widget.Widget[]>((widgets, { widget }) => {
     const res: widget.Widget[] = []
@@ -454,7 +461,7 @@ function upgradeConfig (_config: Config): Config {
   }
 
   if (config.configVersion < 19) {
-    config.useIntlSite = ((config.language === 'cmn-Hant' || config.language === 'zh_CN') && config.realm === 'pc-ggg')
+    config.useIntlSite = forcesIntlSite(config)
 
     config.configVersion = 19
   }

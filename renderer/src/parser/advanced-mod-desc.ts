@@ -57,6 +57,8 @@ export function parseModInfoLine (line: string): ModifierInfo {
     }
 
     const typeText = match.groups!.type
+    const rareOnlyPrefix = matchesClientString('RARE_ONLY_PREFIX', typeText)
+    const rareOnlySuffix = matchesClientString('RARE_ONLY_SUFFIX', typeText)
 
     if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT', 'VESTIGIAL_IMPLICIT'], typeText)) {
       type = ModifierType.Implicit
@@ -66,10 +68,16 @@ export function parseModInfoLine (line: string): ModifierInfo {
       type = ModifierType.Crafted
     }
 
-    if (matchesClientString(['PREFIX_MODIFIER', 'FRACTURED_PREFIX', 'CRAFTED_PREFIX'], typeText)) {
+    if (matchesClientString(['PREFIX_MODIFIER', 'FRACTURED_PREFIX', 'CRAFTED_PREFIX'], typeText) ||
+      (rareOnlyPrefix && !rareOnlySuffix)) {
       generation = 'prefix'
-    } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText)) {
+    } else if (matchesClientString(['SUFFIX_MODIFIER', 'FRACTURED_SUFFIX', 'CRAFTED_SUFFIX'], typeText) ||
+      (rareOnlySuffix && !rareOnlyPrefix)) {
       generation = 'suffix'
+    }
+
+    if (rareOnlyPrefix || rareOnlySuffix) {
+      mechanic = ModifierMechanic.RareOnly
     } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText)) {
       mechanic = ModifierMechanic.Corruption
     } else if (matchesClientString('FOULBORN_MODIFIER', typeText)) {

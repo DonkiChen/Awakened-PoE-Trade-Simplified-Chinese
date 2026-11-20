@@ -74,6 +74,7 @@
     "crit": "Шанс критического удара: {0}%",
     "aps": "Атак в секунду: {0}",
     "map_item_quantity": "Количество предметов: {0}%",
+    "map_atlas_drops": "Награды в Атласе: {0}%",
     "map_item_rarity": "Редкость предметов: {0}%",
     "map_pack_size": "Размер групп монстров: {0}%",
     "has_empty_modifier": "1 свободное или ремесленное свойство",
@@ -111,6 +112,7 @@
     "open_on_poedb": "Открыть предмет в PoEDB",
     "info": "Проверка предмета",
     "corrupted": "Осквернен",
+    "twice_corrupted": "Дважды осквернен",
     "not_corrupted": "Не осквернен",
     "mod_tier": "Уровень: {0}",
     "mod_rank": "Ранг: {0}",
@@ -127,6 +129,7 @@
     "not_mirrored": "Не отражено",
     "split": "Разделено",
     "not_split": "Не разделено",
+    "not_catalysed": "Не катализировано",
     "map_foil_reward": "Особая {0}",
     "chart_sulphur": "Мертвецкая сера: {0}%"
   },
@@ -173,7 +176,11 @@
     "azmeri_charm": "Оберег",
     "idol": "Идол",
     "graft": "Нарост",
-    "chart": "Морская карта"
+    "chart": "Морская карта",
+    "viscera_arm": "Верхняя конечность",
+    "viscera_leg": "Нижняя конечность",
+    "viscera_head": "Голова",
+    "viscera_body": "Туловище"
   },
   "filters": {
     "selected_some": "Св-ва: {0} из {1}",
@@ -224,6 +231,7 @@
     "tag_explicit_incursion": "Вмешательство",
     "tag_explicit_infamous": "Наёмник",
     "tag_explicit_essence": "Сущность",
+    "tag_explicit_rareonly": "только редкое",
     "tag_brick": "кирпич",
     "tag_mercenary_primary": "основной",
     "tag_mercenary_secondary": "дополнительный",

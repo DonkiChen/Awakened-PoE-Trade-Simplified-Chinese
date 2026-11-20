@@ -51,6 +51,7 @@
     "crit": "치명타 확률: {0}%",
     "aps": "초당 공격 횟수: {0}",
     "map_item_quantity": "아이템 수량: {0}%",
+    "map_atlas_drops": "아틀라스 획득물: {0}%",
     "map_item_rarity": "아이템 희귀도: {0}%",
     "map_pack_size": "몬스터 무리 규모: {0}%",
     "has_empty_modifier": "비었거나 작업대 모드 1",
@@ -85,6 +86,7 @@
     "open_on_poedb": "PoEDB에서 아이템 보기",
     "info": "아이템 정보",
     "corrupted": "타락",
+    "twice_corrupted": "두 번 타락",
     "not_corrupted": "타락되지 않은",
     "mod_tier": "티어: {0}",
     "mod_rank": "등급: {0}",
@@ -142,7 +144,11 @@
     "accessory_trinket": "도둑 장신구",
     "sanctum_relic": "성역 유물",
     "tincture": "팅크",
-    "azmeri_charm": "부적"
+    "azmeri_charm": "부적",
+    "viscera_arm": "상지",
+    "viscera_leg": "하지",
+    "viscera_head": "머리",
+    "viscera_body": "몸통"
   },
   "filters": {
     "selected_some": "{1} 중 {0}개 선택",
@@ -191,7 +197,8 @@
     "tag_explicit_veiled": "장막",
     "tag_explicit_incursion": "기습",
     "tag_explicit_infamous": "악명 높은",
-    "tag_explicit_essence": "에센스"
+    "tag_explicit_essence": "에센스",
+    "tag_explicit_rareonly": "희귀만"
   },
   "online_filter": {
     "offline_toggle": "오프라인 & 온라인",

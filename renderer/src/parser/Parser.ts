@@ -12,11 +12,11 @@ import {
 import { ModifierType, ModifierMechanic, sumStatsByModType } from './modifiers'
 import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg, ParsedStat } from './stat-translations'
 import { ItemCategory, JEWELLERY } from './meta'
-import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity, CorruptionState } from './ParsedItem'
+import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedItem'
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
-import { execClientStringRegex, matchesClientString, stripLeadingClientString } from './client-string-variants'
+import { execClientStringRegex, matchesClientString, stripLeadingClientString, testClientStringRegex } from './client-string-variants'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -34,7 +34,6 @@ interface ParserState extends ParsedItem {
 
 const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, 便于调试 */ name: string }> = [
   parseUnidentified,
-  { virtual: parseViscera, name: 'parseViscera' },
   { virtual: parseSuperior, name: 'parseSuperior' },
   { virtual: parseFoulborn, name: 'parseFoulborn' },
   { virtual: parseVestigial, name: 'parseVestigial' },
@@ -67,11 +66,13 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseAtzoatlRooms,
   parseMirroredTablet,
   parseFilledCoffin,
+  parseBloodFilledVessel,
   parseMirrored,
   parseSplit,
   parseSentinelCharge,
   parseScryingOrb,
   parseMercenary,
+  parseViscera,
   parseLogbookArea,
   parseLogbookArea,
   parseLogbookArea,
@@ -255,9 +256,6 @@ function findInDatabase (item: ParserState) {
 export function makeIdentifiedUnique (uniqueInfo: BaseType, unidentified: ParsedItem): ParsedItem {
   const newItem: ParsedItem = {
     ...unidentified,
-    get isCorrupted () {
-      return this.corruptionState !== CorruptionState.None
-    },
     info: uniqueInfo,
     uniqueBase: unidentified.info
   }
@@ -268,22 +266,24 @@ export function makeIdentifiedUnique (uniqueInfo: BaseType, unidentified: Parsed
 }
 
 function parseMapTier (item: ParserState) {
-  // TODO blocked by https://www.pathofexile.com/forum/view-thread/3915458
-  const tierMatch = execClientStringRegex('MAP_TIER', item.baseType || item.name)
-  if (!tierMatch) return
+  const execResult = _$.MAP_TIER.exec(item.baseType || item.name)
+  if (!execResult) return
 
-  item.mapTier = Number(tierMatch.match[1])
+  item.mapTier = Number(execResult[1])
 
   if (item.baseType) {
-    item.baseType = item.baseType.replace(tierMatch.match[0], '')
+    item.baseType = item.baseType.replace(execResult[0], '')
   } else {
-    item.name = item.name.replace(tierMatch.match[0], '')
+    item.name = item.name.replace(execResult[0], '')
   }
 }
 
 function parseAreaPropNested (line: string, item: ParsedItem): boolean {
   if (line.startsWith(_$.MAP_ITEM_QUANTITY)) {
     item.areaItemQuantity = parseInt(line.slice(_$.MAP_ITEM_QUANTITY.length), 10)
+    return true
+  } else if (line.startsWith(_$.MAP_ATLAS_DROPS)) {
+    item.areaAtlasDrops = parseInt(line.slice(_$.MAP_ATLAS_DROPS.length), 10)
     return true
   } else if (line.startsWith(_$.MAP_ITEM_RARITY)) {
     item.areaItemRarity = parseInt(line.slice(_$.MAP_ITEM_RARITY.length), 10)
@@ -306,8 +306,8 @@ function parseMap (section: string[], item: ParsedItem) {
     } else if (line.startsWith(_$.MAP_MORE_MAPS)) {
       item.mapMoreMaps = parseInt(line.slice(_$.MAP_MORE_MAPS.length), 10)
       isParsed = 'SECTION_PARSED'
-    } else if (line.startsWith(_$.MAP_MORE_SCARABS)) {
-      item.mapMoreScarabs = parseInt(line.slice(_$.MAP_MORE_SCARABS.length), 10)
+    } else if (line.startsWith(_$.MAP_MORE_THREADS)) {
+      item.mapMoreThreads = parseInt(line.slice(_$.MAP_MORE_THREADS.length), 10)
       isParsed = 'SECTION_PARSED'
     } else if (line.startsWith(_$.MAP_MORE_CURRENCY)) {
       item.mapMoreCurrency = parseInt(line.slice(_$.MAP_MORE_CURRENCY.length), 10)
@@ -414,7 +414,6 @@ function parseNamePlate (section: string[]) {
   if (!line?.startsWith(_$.ITEM_CLASS)) {
     return err('item.parse_error')
   }
-  const itemClass = line.slice(_$.ITEM_CLASS.length).trim()
 
   line = section.shift()
   let rarityText: string | undefined
@@ -436,13 +435,9 @@ function parseNamePlate (section: string[]) {
   const item: ParserState = {
     rarity: undefined,
     category: undefined,
-    name,
-    baseType,
+    name: name,
+    baseType: baseType,
     isUnidentified: false,
-    corruptionState: CorruptionState.None,
-    get isCorrupted () {
-      return this.corruptionState !== CorruptionState.None
-    },
     newMods: [],
     statsByType: [],
     unknownModifiers: [],
@@ -470,40 +465,7 @@ function parseNamePlate (section: string[]) {
       item.rarity = ItemRarity.Unique; break
   }
 
-  if (_$.ITEM_CLASS_VISCERA && itemClass === _$.ITEM_CLASS_VISCERA) {
-    item.rarity = ItemRarity.Normal
-    item.category = ItemCategory.Viscera
-  }
-
   return ok(item)
-}
-
-function parseViscera (item: ParserState) {
-  if (item.category !== ItemCategory.Viscera) return
-
-  item.category = parseVisceraCategory(item.baseType)
-  item.name = normalizeVisceraName(item.name)
-  // 第二行是部位标签，而非真实底材名称。
-  item.baseType = undefined
-}
-
-function parseVisceraCategory (baseType: string | undefined): ItemCategory {
-  if (!baseType) return ItemCategory.Viscera
-
-  if (baseType === _$.VISCERA_ITEM_HEAD) return ItemCategory.VisceraHead
-  if (baseType === _$.VISCERA_ITEM_ARM) return ItemCategory.VisceraArm
-  if (baseType === _$.VISCERA_ITEM_TORSO) return ItemCategory.VisceraBody
-  if (baseType === _$.VISCERA_ITEM_LEG) return ItemCategory.VisceraLeg
-  return ItemCategory.Viscera
-}
-
-function normalizeVisceraName (name: string): string {
-  for (const prefix of [_$.VISCERA_LESSER, _$.VISCERA_GREATER]) {
-    if (prefix && name.startsWith(prefix)) {
-      return name.slice(prefix.length)
-    }
-  }
-  return name
 }
 
 function parseInfluence (section: string[], item: ParsedItem) {
@@ -541,14 +503,14 @@ function parseInfluence (section: string[], item: ParsedItem) {
 }
 
 function parseCorrupted (section: string[], item: ParsedItem) {
-  if (_$.TWICE_CORRUPTED && section[0] === _$.TWICE_CORRUPTED) {
-    item.corruptionState = CorruptionState.TwiceCorrupted
+  if (section[0] === _$.CORRUPTED) {
+    item.isCorrupted = {}
     return 'SECTION_PARSED'
-  } else if (section[0] === _$.CORRUPTED) {
-    item.corruptionState = CorruptionState.Corrupted
+  } else if (section[0] === _$.TWICE_CORRUPTED) {
+    item.isCorrupted = { twice: true }
     return 'SECTION_PARSED'
   } else if (section[0] === _$.UNMODIFIABLE) {
-    item.corruptionState = CorruptionState.Corrupted
+    item.isCorrupted = {}
     item.isUnmodifiable = true
     return 'SECTION_PARSED'
   }
@@ -809,6 +771,24 @@ function parseAccessory (section: string[], item: ParsedItem) {
   return isParsed
 }
 
+function parseViscera (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Viscera') return 'PARSER_SKIPPED'
+  if (section.length === 1) {
+    switch (section[0]) {
+      case _$.VISCERA_HEAD:
+        item.category = ItemCategory.HeadViscera; break
+      case _$.VISCERA_LOWER_LIMB:
+        item.category = ItemCategory.LowerLimbViscera; break
+      case _$.VISCERA_UPPER_LIMB:
+        item.category = ItemCategory.UpperLimbViscera; break
+      case _$.VISCERA_TORSO:
+        item.category = ItemCategory.TorsoViscera; break
+    }
+    if (item.category) return 'SECTION_PARSED'
+  }
+  return 'SECTION_SKIPPED'
+}
+
 function parseLogbookArea (section: string[], item: ParsedItem) {
   if (item.info.refName !== 'Expedition Logbook') return 'PARSER_SKIPPED'
   if (section.length < 3) return 'SECTION_SKIPPED'
@@ -925,7 +905,8 @@ function parseModifiers (section: string[], item: ParsedItem) {
     item.rarity !== ItemRarity.Normal &&
     item.rarity !== ItemRarity.Magic &&
     item.rarity !== ItemRarity.Rare &&
-    item.rarity !== ItemRarity.Unique
+    item.rarity !== ItemRarity.Unique &&
+    item.info.refName !== 'Viscera'
   ) {
     return 'PARSER_SKIPPED'
   }
@@ -1026,22 +1007,13 @@ function parseScryingOrb (section: string[], item: ParsedItem) {
   if (item.info.refName !== 'Scrying Orb') return 'PARSER_SKIPPED'
 
   if (section.length === 1) {
-    const line = section[0]
-    let areaName: string | undefined
-    if (_$.SCRYING_MAP_AREA && line.startsWith(_$.SCRYING_MAP_AREA)) {
-      areaName = line.slice(_$.SCRYING_MAP_AREA.length).trim()
-    } else if (_$.MAP_AREA && line.startsWith(_$.MAP_AREA)) {
-      areaName = line.slice(_$.MAP_AREA.length).trim()
-    } else {
-      const separator = Math.max(line.indexOf(':'), line.indexOf('：'))
-      if (separator >= 0) areaName = line.slice(separator + 1).trim()
+    if (section[0].startsWith(_$.MAP_AREA)) {
+      const areaName = section[0].slice(_$.MAP_AREA.length)
+      const areaInfo = ITEM_BY_TRANSLATED('AREA', areaName)
+      if (!areaInfo) throw new Error('Unknown Area name.')
+      item.mapArea = areaInfo[0]
+      return 'SECTION_PARSED'
     }
-    if (!areaName) return 'SECTION_SKIPPED'
-
-    const areaInfo = ITEM_BY_REF_OR_TRANSLATED('AREA', areaName)
-    if (!areaInfo) throw new Error('Unknown Area name.')
-    item.mapArea = areaInfo[0]
-    return 'SECTION_PARSED'
   }
   return 'SECTION_SKIPPED'
 }
@@ -1111,7 +1083,7 @@ function parseVestigial (item: ParserState) {
   }
 }
 
-function parseCategoryByHelpText (section: string[], item: ParsedItem) {
+function parseCategoryByHelpText (section: string[], item: ParserState) {
   if (section[0] === _$.BEAST_HELP) {
     item.category = ItemCategory.CapturedBeast
     return 'SECTION_PARSED'
@@ -1120,6 +1092,9 @@ function parseCategoryByHelpText (section: string[], item: ParsedItem) {
     return 'SECTION_PARSED'
   } else if (section[0] === _$.VOIDSTONE_HELP) {
     item.category = ItemCategory.Voidstone
+    return 'SECTION_PARSED'
+  } else if (section[0] === _$.VISCERA_HELP) {
+    item.name = 'Viscera'
     return 'SECTION_PARSED'
   }
 
@@ -1314,6 +1289,34 @@ function parseMirroredTablet (section: string[], item: ParsedItem) {
     }
   }
 
+  return 'SECTION_PARSED'
+}
+
+function parseBloodFilledVessel (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Blood-filled Vessel') return 'PARSER_SKIPPED'
+  const header = execClientStringRegex('RITUAL_MONSTERS', section[0].trim())?.match
+  if (!header) return 'SECTION_SKIPPED'
+  if (header[1] != null) {
+    item.ritualMonsters = { unique: 0, other: Number(header[1]) }
+    return 'SECTION_PARSED'
+  }
+
+  let unique = 0
+  let other: number | undefined
+  for (const rawLine of section.slice(1)) {
+    const line = rawLine.trim()
+    if (!line) continue
+    if (testClientStringRegex('RITUAL_MONSTER_LIST_END', line)) break
+
+    const count = execClientStringRegex('RITUAL_OTHER_MONSTERS', line)?.match
+    if (count) {
+      other = Number(count[1])
+      break
+    }
+    unique++
+  }
+
+  item.ritualMonsters = { unique, other }
   return 'SECTION_PARSED'
 }
 

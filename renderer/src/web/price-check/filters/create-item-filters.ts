@@ -49,7 +49,10 @@ export function createFilters (
     if (!opts.currency) {
       filters.trade.currency = 'chaos_divine'
     }
-    if (item.info.refName !== 'Mercenary Warrant') {
+    if (
+      item.info.refName !== 'Mercenary Warrant' &&
+      item.info.refName !== 'Viscera'
+    ) {
       filters.trade.collapseMerchant = true
     }
   }
@@ -142,6 +145,12 @@ export function createFilters (
         value: item.itemLevel,
         disabled: false
       }
+    }
+    return filters
+  }
+  if (item.info.refName === 'Viscera') {
+    filters.searchExact = {
+      category: item.category
     }
     return filters
   }
@@ -262,6 +271,10 @@ export function createFilters (
     }
   }
 
+  if (JEWELLERY.has(item.category!) && !item.quality) {
+    filters.notCatalysed = { disabled: false }
+  }
+
   if (item.quality && item.quality >= 20 && !JEWELLERY.has(item.category!)) {
     if (
       item.category === ItemCategory.Flask || item.category === ItemCategory.Tincture ||
@@ -316,7 +329,9 @@ export function createFilters (
 
   if (!item.isUnmodifiable && (item.info.craftable || item.rarity === ItemRarity.Unique)) {
     filters.corrupted = {
-      value: item.corruptionState
+      value: Boolean(item.isCorrupted),
+      twice: Boolean(item.isCorrupted?.twice),
+      exact: forAdornedJewel
     }
   }
 
@@ -513,7 +528,8 @@ function createGemFilters (
   }
 
   filters.corrupted = {
-    value: item.corruptionState
+    value: Boolean(item.isCorrupted),
+    twice: Boolean(item.isCorrupted?.twice)
   }
 
   if (!item.imbuedGem && item.isCorrupted && item.gemLevel! >= 20) {

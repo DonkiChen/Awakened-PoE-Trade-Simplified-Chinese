@@ -1,5 +1,5 @@
 import { ParsedItem, ItemRarity, ItemCategory } from '@/parser'
-import { ModifierType, StatCalculated, statSourcesTotal, translateStatWithRoll } from '@/parser/modifiers'
+import { ModifierType, ModifierMechanic, StatCalculated, statSourcesTotal, translateStatWithRoll } from '@/parser/modifiers'
 import { JEWELLERY } from '@/parser/meta'
 import { getPropQuality, QUALITY_CHANGING_ENCHANT } from '@/parser/calc-q20'
 import { percentRoll, percentRollDelta, roundRoll } from './util'
@@ -14,6 +14,7 @@ import { applyHeistRules } from './pseudo/heist'
 import { filterTimelessJewelKeystones } from './pseudo/timeless-jewel'
 import { decodeOils, applyAnointmentRules } from './pseudo/anointments'
 import { StatBetter } from '@/assets/data'
+import { filterRitualMonsters } from './pseudo/ritual'
 
 export interface FiltersCreationContext {
   readonly item: ParsedItem
@@ -70,7 +71,14 @@ export function createExactStatFilters (
       : opts.searchStatRange,
     filters: [],
     groups: [],
-    statsByType: statsByType.filter(calc => keepByType.includes(calc.type))
+    statsByType: statsByType.filter(calc =>
+      keepByType.includes(calc.type) ||
+      calc.sources.some(({ modifier }) => modifier.info.mechanic === ModifierMechanic.RareOnly))
+  }
+
+  if (item.info.refName === 'Blood-filled Vessel') {
+    filterRitualMonsters(ctx)
+    return ctx.filters
   }
 
   filterBasePercentile(ctx)
@@ -206,6 +214,7 @@ export function calculatedStatToFilter (
       tag: (type === ModifierType.Enchant)
         ? FilterTag.Enchant
         : FilterTag.Variant,
+      reminderText: sources[0].stat.stat.reminderText,
       sources: sources,
       option: {
         value: sources[0].contributes!.value
@@ -226,6 +235,7 @@ export function calculatedStatToFilter (
     text: translation.string,
     tag: type,
     oils: decodeOils(calc),
+    reminderText: sources.find(({ stat }) => stat.stat.reminderText != null)?.stat.stat.reminderText,
     sources: sources,
     roll: undefined,
     disabled: true
@@ -266,9 +276,10 @@ export function calculatedStatToFilter (
   }
 
   if (roll && !filter.option) {
-    if (item.rarity === ItemRarity.Magic && (
-      item.isUnmodifiable || item.isCorrupted || item.isMirrored
-    )) {
+    if (
+      (item.rarity === ItemRarity.Magic && (item.isUnmodifiable || item.isCorrupted || item.isMirrored)) ||
+      item.info.refName === 'Viscera'
+    ) {
       percent = 0
     } else if (
       item.rarity === ItemRarity.Unique ||

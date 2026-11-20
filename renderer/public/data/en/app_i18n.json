@@ -56,6 +56,7 @@
     "crit": "Critical Strike Chance: {0}%",
     "aps": "Attacks per Second: {0}",
     "map_item_quantity": "Item Quantity: {0}%",
+    "map_atlas_drops": "Atlas Drops: {0}%",
     "map_item_rarity": "Item Rarity: {0}%",
     "map_pack_size": "Monster Pack Size: {0}%",
     "chart_sulphur": "Dead Man's Sulphur: {0}%",
@@ -113,6 +114,7 @@
     "not_mirrored": "Not Mirrored",
     "split": "Split",
     "not_split": "Not Split",
+    "not_catalysed": "Not Catalysed",
     "map_foil_reward": "Foil {0}",
     "chart_sulphur": "Dead Man's Sulphur: {0}%"
   },
@@ -159,12 +161,11 @@
     "azmeri_charm": "Charm",
     "idol": "Idol",
     "graft": "Graft",
-    "viscera": "Viscera",
-    "viscera_head": "Viscera (Head)",
-    "viscera_arm": "Viscera (Arm)",
-    "viscera_body": "Viscera (Body)",
-    "viscera_leg": "Viscera (Leg)",
-    "chart": "Chart"
+    "chart": "Chart",
+    "viscera_arm": "Upper Limb Viscera",
+    "viscera_leg": "Lower Limb Viscera",
+    "viscera_head": "Head Viscera",
+    "viscera_body": "Torso Viscera"
   },
   "filters": {
     "selected_some": "{0} of {1}, stats",
@@ -217,6 +218,7 @@
     "tag_explicit_incursion": "Incursion",
     "tag_explicit_infamous": "Mercenary",
     "tag_explicit_essence": "Essence",
+    "tag_explicit_rareonly": "rare-only",
     "tag_brick": "brick",
     "tag_mercenary_primary": "primary",
     "tag_mercenary_secondary": "secondary",

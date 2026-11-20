@@ -1,4 +1,4 @@
-import { ItemInfluence, ItemCategory, CorruptionState } from '@/parser'
+import { ItemInfluence, ItemCategory } from '@/parser'
 import { ItemFilters, StatFilter, FilterOrGroup, INTERNAL_TRADE_IDS, InternalTradeId, FilterTag } from '../filters/interfaces'
 import { setProperty as propSet } from 'dot-prop'
 import { DateTime } from 'luxon'
@@ -52,12 +52,11 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Charm, 'azmeri.charm'],
   [ItemCategory.Idol, 'idol'],
   [ItemCategory.Graft, 'graft'],
-  [ItemCategory.Viscera, 'viscera'],
-  [ItemCategory.VisceraHead, 'viscera.head'],
-  [ItemCategory.VisceraArm, 'viscera.arm'],
-  [ItemCategory.VisceraBody, 'viscera.body'],
-  [ItemCategory.VisceraLeg, 'viscera.leg'],
-  [ItemCategory.Chart, 'chart']
+  [ItemCategory.Chart, 'chart'],
+  [ItemCategory.HeadViscera, 'viscera.head'],
+  [ItemCategory.TorsoViscera, 'viscera.body'],
+  [ItemCategory.LowerLimbViscera, 'viscera.leg'],
+  [ItemCategory.UpperLimbViscera, 'viscera.arm']
 ])
 
 const TOTAL_MODS_TEXT = {
@@ -173,6 +172,7 @@ interface TradeRequest {
         filters: {
           map_tier?: FilterRange
           map_iiq?: FilterRange
+          map_bonus?: FilterRange
           map_iir?: FilterRange
           map_packsize?: FilterRange
           map_blighted?: FilterBoolean
@@ -342,10 +342,11 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
     }
   }
 
-  if (filters.corrupted) {
-    const state = filters.corrupted.value
-    const key = state === CorruptionState.TwiceCorrupted ? 'twice_corrupted' : 'corrupted'
-    propSet(query.filters, `misc_filters.filters.${key}.option`, String(state !== CorruptionState.None))
+  if (filters.corrupted?.value === false || filters.corrupted?.exact) {
+    propSet(query.filters, 'misc_filters.filters.corrupted.option', String(filters.corrupted.value))
+  }
+  if (filters.corrupted?.value === true && filters.corrupted.twice === false) {
+    propSet(query.filters, 'misc_filters.filters.twice_corrupted.option', String(filters.corrupted.twice))
   }
   if (filters.fractured?.value === false) {
     propSet(query.filters, 'misc_filters.filters.fractured_item.option', String(false))
@@ -364,6 +365,9 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
   }
   if (filters.mirrored?.disabled) {
     propSet(query.filters, 'misc_filters.filters.mirrored.option', String(false))
+  }
+  if (filters.notCatalysed && !filters.notCatalysed.disabled) {
+    propSet(query.filters, 'misc_filters.filters.quality.max', 0)
   }
 
   if (filters.gemLevel && !filters.gemLevel.disabled) {
@@ -530,6 +534,10 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
       case 'item.map_item_quantity':
         propSet(query.filters, 'map_filters.filters.map_iiq.min', typeof input.min === 'number' ? input.min : undefined)
         propSet(query.filters, 'map_filters.filters.map_iiq.max', typeof input.max === 'number' ? input.max : undefined)
+        break
+      case 'item.map_atlas_drops':
+        propSet(query.filters, 'map_filters.filters.map_bonus.min', typeof input.min === 'number' ? input.min : undefined)
+        propSet(query.filters, 'map_filters.filters.map_bonus.max', typeof input.max === 'number' ? input.max : undefined)
         break
       case 'item.map_item_rarity':
         propSet(query.filters, 'map_filters.filters.map_iir.min', typeof input.min === 'number' ? input.min : undefined)

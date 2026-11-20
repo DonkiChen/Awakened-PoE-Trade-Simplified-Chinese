@@ -3,9 +3,10 @@
     <button class="px-2 rounded border overflow-hidden text-ellipsis"
       :class="{ 'border-gray-500': showAsActive, 'border-gray-900': !showAsActive }"
       @click="toggleAccuracy">{{ label }}</button>
-    <button v-if="filters.corrupted" class="px-2" :aria-pressed="corrupted" @click="corrupted = !corrupted">
-      <span v-if="corrupted" class="text-red-500">{{ t(item.corruptionState === CorruptionState.TwiceCorrupted ? 'item.twice_corrupted' : 'item.corrupted') }}</span>
-      <span v-else class="text-gray-600">{{ t('item.not_corrupted') }}</span>
+    <button v-if="filters.corrupted" class="px-2" :aria-pressed="filters.corrupted.value" @click="toggleCorrupted">
+      <span v-if="!filters.corrupted.value" class="text-gray-600">{{ t('item.not_corrupted') }}</span>
+      <span v-else-if="filters.corrupted.twice" class="text-red-500">{{ t('item.twice_corrupted') }}</span>
+      <span v-else class="text-red-500">{{ t('item.corrupted') }}</span>
     </button>
   </div>
 </template>
@@ -13,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CorruptionState, type ParsedItem } from '@/parser'
+import type { ParsedItem } from '@/parser'
 import type { ItemFilters } from './interfaces'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
 
@@ -71,22 +72,19 @@ export default defineComponent({
       }
     }
 
-    const corrupted = computed<boolean>({
-      get () { return props.filters.corrupted!.value !== CorruptionState.None },
-      set (value) {
-        props.filters.corrupted!.value = value
-          ? (props.item.corruptionState === CorruptionState.TwiceCorrupted ? CorruptionState.TwiceCorrupted : CorruptionState.Corrupted)
-          : CorruptionState.None
+    function toggleCorrupted () {
+      const { filters } = props
+      if (filters.corrupted) {
+        filters.corrupted.value = !filters.corrupted.value
       }
-    })
+    }
 
     return {
       t,
-      CorruptionState,
       label,
       showAsActive,
       toggleAccuracy,
-      corrupted
+      toggleCorrupted
     }
   }
 })

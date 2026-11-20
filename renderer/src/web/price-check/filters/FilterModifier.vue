@@ -54,7 +54,7 @@
         </slot>
       </div>
       <div class="flex pt-px" v-if="!miniFilter">
-        <div class="w-5 flex items-start">
+        <div class="w-5 flex flex-shrink-0 items-start">
           <ui-popover v-if="isHidden" tag-name="div" class="flex" placement="right-start" boundary="#price-window">
             <template #target>
               <span class="text-xs leading-none text-gray-600 cursor-pointer">
@@ -66,26 +66,33 @@
             </template>
           </ui-popover>
         </div>
-        <div class="flex-1 min-w-0 flex items-start gap-x-2">
-          <span v-if="filter.not"
-            :class="[$style['tag'], $style['tag-not']]">{{ t('filters.tag_not') }}</span>
-          <span v-if="showTag"
-            :class="[$style['tag'], $style[`tag-${tag}`]]">{{ t(`filters.tag_${tag.replace('-', '_')}`) }}{{ (filter.sources.length > 1) ? ` x ${filter.sources.length}` : null }}</span>
-          <filter-modifier-tiers v-if="!showBounds()"
-            :filter="filter" :item="item" />
-          <filter-modifier-options v-if="rollOptions"
-            show-checked="always"
-            :options="rollOptions"
-            :filter="filter" />
+        <div class="flex-1 flex flex-col min-w-0">
+          <div class="flex min-w-0">
+            <div class="flex-1 min-w-0 flex items-start gap-x-2">
+              <span v-if="filter.not"
+                :class="[$style['tag'], $style['tag-not']]">{{ t('filters.tag_not') }}</span>
+              <span v-if="showTag"
+                :class="[$style['tag'], $style[`tag-${tag}`]]">{{ t(`filters.tag_${tag.replace('-', '_')}`) }}{{ (filter.sources.length > 1) ? ` x ${filter.sources.length}` : null }}</span>
+              <filter-modifier-tiers v-if="!showBounds()"
+                :filter="filter" :item="item" />
+              <filter-modifier-options v-if="rollOptions"
+                show-checked="always"
+                :options="rollOptions"
+                :filter="filter" />
+            </div>
+            <stat-roll-slider v-if="roll && roll.bounds && showBounds()"
+              class="ml-2 mr-4" style="width: 12.5rem;"
+              v-model="sliderValue"
+              :roll="roll.value"
+              :dp="roll.dp"
+              :bounds="roll.bounds"
+            />
+            <div style="min-width: calc(2*3rem + 1px)" />
+          </div>
+          <div v-if="filter.reminderText" :class="$style.reminderText">
+            <div>{{ filter.reminderText?.replaceAll("\n", "") }}</div>
+          </div>
         </div>
-        <stat-roll-slider v-if="roll && roll.bounds && showBounds()"
-          class="ml-2 mr-4" style="width: 12.5rem;"
-          v-model="sliderValue"
-          :roll="roll.value"
-          :dp="roll.dp"
-          :bounds="roll.bounds"
-        />
-        <div style="width: calc(2*3rem + 1px)" />
       </div>
     </div>
     <modifier-anointment class="self-center" :filter="filter" />
@@ -154,6 +161,7 @@ export default defineComponent({
       props.item.info.refName !== 'Chronicle of Atzoatl' &&
       props.item.info.refName !== 'Mirrored Tablet' &&
       props.item.info.refName !== 'Filled Coffin' &&
+      props.item.info.refName !== 'Viscera' &&
       props.item.category !== ItemCategory.Gem &&
       !(props.item.rarity === ItemRarity.Unique && props.filter.tag === FilterTag.Explicit && (props.filter.roll?.bounds || props.filter.hidden) && !props.grouped)
     )
@@ -260,7 +268,6 @@ export default defineComponent({
       miniFilter: computed(() => !props.filter.hidden && (
         props.filter.tag === FilterTag.MercenarySupport ||
         (props.filter.tag === FilterTag.Property && props.item.info.refName === 'Mercenary Warrant') ||
-        props.item.info.refName === 'Chronicle of Atzoatl' ||
         props.item.info.refName === 'Mirrored Tablet' ||
         props.item.info.refName === 'Filled Coffin' ||
         props.item.category === ItemCategory.Gem
@@ -471,7 +478,8 @@ export default defineComponent({
 .tag-explicit-veiled,
 .tag-explicit-incursion,
 .tag-explicit-infamous,
-.tag-explicit-essence {
+.tag-explicit-essence,
+.tag-explicit-rareonly {
   display: flex;
   align-items: center;
   @apply -mx-1 pl-0.5 gap-x-0.5 text-gray-600;
@@ -508,6 +516,8 @@ export default defineComponent({
   background-image: url('/images/mercenary.png'); }
 .tag-explicit-essence::before {
   background-image: url('/images/essence.png'); }
+.tag-explicit-rareonly::before {
+  background-image: url('/images/rareonly.png'); }
 
 .tag-corrupted,
 .tag-brick {
@@ -542,6 +552,36 @@ export default defineComponent({
   position: relative;
   top: 0.3125rem;
   margin-top: -99px; /* not allowed to extend baseline */
+}
+
+.reminderText {
+  font-style: italic;
+  white-space: pre;
+  cursor: default;
+  position: relative;
+
+  & > div {
+    color: theme('colors.gray.500');
+    background: theme('colors.gray.800');
+    min-width: min-content;
+    box-sizing: content-box;
+    padding-right: theme('spacing.2');
+  }
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    pointer-events: none;
+    background: linear-gradient(to left, theme('colors.gray.800'), transparent 6rem);
+  }
+
+  .filter:not(:hover) & {
+    overflow: hidden;
+  }
+  .filter:hover &::after {
+    opacity: 0;
+  }
 }
 </style>
 
