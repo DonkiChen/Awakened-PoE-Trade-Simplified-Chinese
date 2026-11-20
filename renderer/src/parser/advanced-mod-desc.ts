@@ -56,10 +56,9 @@ export function parseModInfoLine (line: string): ModifierInfo {
       throw new Error('Invalid regex for mod info line')
     }
 
-    // MODIFIER_LINE 正则在匹配 `仅限罕见 (等阶：1)` 时 type 会有空格(`仅限罕见 `), 为了避免改动正则影响扩大, 这里直接 trim
-    const typeText = match.groups!.type.trim()
-    const rareOnlyPrefix = typeText === _$.RARE_ONLY_PREFIX
-    const rareOnlySuffix = typeText === _$.RARE_ONLY_SUFFIX
+    const typeText = match.groups!.type
+    const rareOnlyPrefix = matchesClientString('RARE_ONLY_PREFIX', typeText)
+    const rareOnlySuffix = matchesClientString('RARE_ONLY_SUFFIX', typeText)
 
     if (matchesClientString(['IMPLICIT_MODIFIER', 'CORRUPTED_IMPLICIT', 'VESTIGIAL_IMPLICIT'], typeText)) {
       type = ModifierType.Implicit
@@ -77,7 +76,7 @@ export function parseModInfoLine (line: string): ModifierInfo {
       generation = 'suffix'
     }
 
-    if (rareOnlyPrefix || rareOnlySuffix || typeText === _$.RARE_ONLY_AFFIX || typeText === 'Rare-only') {
+    if (rareOnlyPrefix || rareOnlySuffix) {
       mechanic = ModifierMechanic.RareOnly
     } else if (matchesClientString('CORRUPTED_IMPLICIT', typeText)) {
       mechanic = ModifierMechanic.Corruption
