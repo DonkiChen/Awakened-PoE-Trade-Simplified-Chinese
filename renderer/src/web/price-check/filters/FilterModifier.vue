@@ -90,7 +90,7 @@
             <div style="min-width: calc(2*3rem + 1px)" />
           </div>
           <div v-if="filter.reminderText" :class="$style.reminderText">
-            <div>{{ filter.reminderText }}</div>
+            <div>{{ filter.reminderText?.replaceAll("\n", "") }}</div>
           </div>
         </div>
       </div>
