@@ -29,7 +29,7 @@ export default {
   RITUAL_MONSTERS: /^怪物[:：]\s*(\d+)?$/,
   RITUAL_OTHER_MONSTERS: /^(\d+)\s*其他怪物$/,
   RITUAL_MONSTER_LIST_END: /^(?:怪物等级|From|来自|来源)[:：]/,
-  ITEM_CLASS_VISCERA: '内脏',
+  VISCERA_HELP: '将此物带到城镇或藏身处的柳条人处进行附着。',
   VISCERA_UPPER_LIMB: '上肢',
   VISCERA_LOWER_LIMB: '下肢',
   VISCERA_HEAD: '头部',

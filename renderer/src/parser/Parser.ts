@@ -414,7 +414,6 @@ function parseNamePlate (section: string[]) {
   if (!line?.startsWith(_$.ITEM_CLASS)) {
     return err('item.parse_error')
   }
-  const itemClass = line.slice(_$.ITEM_CLASS.length).trim()
 
   line = section.shift()
   let rarityText: string | undefined
@@ -464,14 +463,6 @@ function parseNamePlate (section: string[]) {
       item.rarity = ItemRarity.Rare; break
     case _$.RARITY_UNIQUE:
       item.rarity = ItemRarity.Unique; break
-  }
-
-  if (_$.ITEM_CLASS_VISCERA && itemClass === _$.ITEM_CLASS_VISCERA) {
-    // 简中剪贴板的部位也可能出现在名称下方，而不是独立段落。
-    item.rarity = ItemRarity.Normal
-    item.category = visceraCategory(item.baseType)
-    item.name = 'Viscera'
-    item.baseType = undefined
   }
 
   return ok(item)
@@ -780,24 +771,20 @@ function parseAccessory (section: string[], item: ParsedItem) {
   return isParsed
 }
 
-function visceraCategory (part: string | undefined): ItemCategory | undefined {
-  if (!part) return
-  switch (part) {
-    case _$.VISCERA_HEAD: return ItemCategory.HeadViscera
-    case _$.VISCERA_LOWER_LIMB: return ItemCategory.LowerLimbViscera
-    case _$.VISCERA_UPPER_LIMB: return ItemCategory.UpperLimbViscera
-    case _$.VISCERA_TORSO: return ItemCategory.TorsoViscera
-  }
-}
-
 function parseViscera (section: string[], item: ParsedItem) {
   if (item.info.refName !== 'Viscera') return 'PARSER_SKIPPED'
   if (section.length === 1) {
-    const category = visceraCategory(section[0])
-    if (category) {
-      item.category = category
-      return 'SECTION_PARSED'
+    switch (section[0]) {
+      case _$.VISCERA_HEAD:
+        item.category = ItemCategory.HeadViscera; break
+      case _$.VISCERA_LOWER_LIMB:
+        item.category = ItemCategory.LowerLimbViscera; break
+      case _$.VISCERA_UPPER_LIMB:
+        item.category = ItemCategory.UpperLimbViscera; break
+      case _$.VISCERA_TORSO:
+        item.category = ItemCategory.TorsoViscera; break
     }
+    if (item.category) return 'SECTION_PARSED'
   }
   return 'SECTION_SKIPPED'
 }
@@ -1115,9 +1102,8 @@ function parseCategoryByHelpText (section: string[], item: ParserState) {
   } else if (section[0] === _$.VOIDSTONE_HELP) {
     item.category = ItemCategory.Voidstone
     return 'SECTION_PARSED'
-  } else if (_$.VISCERA_HELP && section[0] === _$.VISCERA_HELP) {
+  } else if (section[0] === _$.VISCERA_HELP) {
     item.name = 'Viscera'
-    item.baseType = undefined
     return 'SECTION_PARSED'
   }
 

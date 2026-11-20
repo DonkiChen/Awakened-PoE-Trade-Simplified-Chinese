@@ -270,7 +270,6 @@ export interface TranslationDict {
   RITUAL_OTHER_MONSTERS?: RegExp
   RITUAL_MONSTER_LIST_END?: RegExp
   MERCENARY_BUILD: string
-  ITEM_CLASS_VISCERA?: string
   // ---
   CHAT_SYSTEM: RegExp
   CHAT_TRADE: RegExp
