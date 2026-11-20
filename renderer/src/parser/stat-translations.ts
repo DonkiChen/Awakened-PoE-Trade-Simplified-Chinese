@@ -1,4 +1,4 @@
-import { CLIENT_STRINGS as _$, STAT_BY_MATCH_STR_V2 } from '@/assets/data'
+import { STAT_BY_MATCH_STR_V2 } from '@/assets/data'
 import type { StatMatcher, Stat, StatGroup } from '@/assets/data'
 import type { ModifierType } from './modifiers'
 import { type ItemCategory, ARMOUR, WEAPON, HEIST_EQUIPMENT } from './meta'
@@ -35,9 +35,7 @@ export function * linesToStatStrings (lines: string[]): Generator<StatString, st
 
   outer:
   for (let start = 0; start < lines.length; start += 1) {
-    if (lines[start].match(LOCALIZED_PAREN_LEFT) ||
-        lines[start] === _$.EXARCH_ITEM ||
-        lines[start] === _$.EATER_ITEM) {
+    if (lines[start].match(LOCALIZED_PAREN_LEFT)) {
       reminderString = true
     }
     if (reminderString && lines[start].match(LOCALIZED_PAREN_RIGHT)) {

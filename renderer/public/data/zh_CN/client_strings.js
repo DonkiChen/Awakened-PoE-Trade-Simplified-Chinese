@@ -129,8 +129,6 @@ export default {
   ELDRITCH_MOD_R6: '完美的',
   ITEM_EATER: '灭界者物品',
   ITEM_EXARCH: '焚界者物品',
-  EATER_ITEM: '灭界者物品',
-  EXARCH_ITEM: '焚界者物品',
   SENTINEL_CHARGE: '充能: ',
   SHAPER_MODS: ['塑界者的', '塑界之', '尊崇塑界者的', '尊崇塑界之'],
   ELDER_MODS: ['裂界者的', '裂界之', '尊崇裂界者的', '尊崇裂界者之'],

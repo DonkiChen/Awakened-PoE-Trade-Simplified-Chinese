@@ -120,8 +120,6 @@ export default {
   ELDRITCH_MOD_R4: '특출난',
   ELDRITCH_MOD_R5: '정교한',
   ELDRITCH_MOD_R6: '완벽한',
-  EATER_ITEM: '세계 포식자 아이템',
-  EXARCH_ITEM: '작열의 총주교 아이템',
   SENTINEL_CHARGE: '충전: ',
   SHAPER_MODS: ["- 형성","쉐이퍼의","고양된 쉐이퍼의","- 고양된 형성"],
   ELDER_MODS: ["- 엘더","엘더의","고양된 엘더의","- 고양된 엘더"],
