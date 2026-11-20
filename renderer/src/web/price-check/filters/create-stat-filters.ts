@@ -214,6 +214,7 @@ export function calculatedStatToFilter (
       tag: (type === ModifierType.Enchant)
         ? FilterTag.Enchant
         : FilterTag.Variant,
+      reminderText: sources[0].stat.stat.reminderText,
       sources: sources,
       option: {
         value: sources[0].contributes!.value
@@ -234,6 +235,7 @@ export function calculatedStatToFilter (
     text: translation.string,
     tag: type,
     oils: decodeOils(calc),
+    reminderText: sources.find(({ stat }) => stat.stat.reminderText != null)?.stat.stat.reminderText,
     sources: sources,
     roll: undefined,
     disabled: true
@@ -274,9 +276,10 @@ export function calculatedStatToFilter (
   }
 
   if (roll && !filter.option) {
-    if (item.rarity === ItemRarity.Magic && (
-      item.isUnmodifiable || item.isCorrupted || item.isMirrored
-    )) {
+    if (
+      (item.rarity === ItemRarity.Magic && (item.isUnmodifiable || item.isCorrupted || item.isMirrored)) ||
+      item.info.refName === 'Viscera'
+    ) {
       percent = 0
     } else if (
       item.rarity === ItemRarity.Unique ||

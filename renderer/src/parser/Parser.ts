@@ -73,6 +73,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseSentinelCharge,
   parseScryingOrb,
   parseMercenary,
+  parseVisceraPart,
   parseLogbookArea,
   parseLogbookArea,
   parseLogbookArea,
@@ -493,10 +494,10 @@ function parseViscera (item: ParserState) {
 function parseVisceraCategory (baseType: string | undefined): ItemCategory {
   if (!baseType) return ItemCategory.Viscera
 
-  if (baseType === _$.VISCERA_ITEM_HEAD) return ItemCategory.VisceraHead
-  if (baseType === _$.VISCERA_ITEM_ARM) return ItemCategory.VisceraArm
-  if (baseType === _$.VISCERA_ITEM_TORSO) return ItemCategory.VisceraBody
-  if (baseType === _$.VISCERA_ITEM_LEG) return ItemCategory.VisceraLeg
+  if (baseType === _$.VISCERA_ITEM_HEAD || baseType === _$.VISCERA_HEAD) return ItemCategory.HeadViscera
+  if (baseType === _$.VISCERA_ITEM_ARM || baseType === _$.VISCERA_UPPER_LIMB) return ItemCategory.UpperLimbViscera
+  if (baseType === _$.VISCERA_ITEM_TORSO || baseType === _$.VISCERA_TORSO) return ItemCategory.TorsoViscera
+  if (baseType === _$.VISCERA_ITEM_LEG || baseType === _$.VISCERA_LOWER_LIMB) return ItemCategory.LowerLimbViscera
   return ItemCategory.Viscera
 }
 
@@ -812,6 +813,18 @@ function parseAccessory (section: string[], item: ParsedItem) {
   return isParsed
 }
 
+function parseVisceraPart (section: string[], item: ParsedItem) {
+  if (item.info.refName !== 'Viscera') return 'PARSER_SKIPPED'
+  if (section.length === 1) {
+    const category = parseVisceraCategory(section[0])
+    if (category !== ItemCategory.Viscera) {
+      item.category = category
+      return 'SECTION_PARSED'
+    }
+  }
+  return 'SECTION_SKIPPED'
+}
+
 function parseLogbookArea (section: string[], item: ParsedItem) {
   if (item.info.refName !== 'Expedition Logbook') return 'PARSER_SKIPPED'
   if (section.length < 3) return 'SECTION_SKIPPED'
@@ -928,7 +941,8 @@ function parseModifiers (section: string[], item: ParsedItem) {
     item.rarity !== ItemRarity.Normal &&
     item.rarity !== ItemRarity.Magic &&
     item.rarity !== ItemRarity.Rare &&
-    item.rarity !== ItemRarity.Unique
+    item.rarity !== ItemRarity.Unique &&
+    item.info.refName !== 'Viscera'
   ) {
     return 'PARSER_SKIPPED'
   }
@@ -1114,7 +1128,7 @@ function parseVestigial (item: ParserState) {
   }
 }
 
-function parseCategoryByHelpText (section: string[], item: ParsedItem) {
+function parseCategoryByHelpText (section: string[], item: ParserState) {
   if (section[0] === _$.BEAST_HELP) {
     item.category = ItemCategory.CapturedBeast
     return 'SECTION_PARSED'
@@ -1123,6 +1137,10 @@ function parseCategoryByHelpText (section: string[], item: ParsedItem) {
     return 'SECTION_PARSED'
   } else if (section[0] === _$.VOIDSTONE_HELP) {
     item.category = ItemCategory.Voidstone
+    return 'SECTION_PARSED'
+  } else if (_$.VISCERA_HELP && section[0] === _$.VISCERA_HELP) {
+    item.name = 'Viscera'
+    item.baseType = undefined
     return 'SECTION_PARSED'
   }
 

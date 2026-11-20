@@ -49,6 +49,9 @@ export interface ItemFilters {
     disabled: boolean
     hidden: boolean
   }
+  notCatalysed?: {
+    disabled: boolean
+  }
   foil?: {
     disabled: boolean
   }
@@ -122,6 +125,7 @@ export interface StatFilter {
   tag: FilterTag
   oils?: string[]
   mercenary?: { icon?: string, tier?: number, maxTier?: boolean }
+  reminderText?: string
   sources: StatCalculated['sources']
   not?: true
   roll?: {

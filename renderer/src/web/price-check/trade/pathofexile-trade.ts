@@ -53,10 +53,10 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Idol, 'idol'],
   [ItemCategory.Graft, 'graft'],
   [ItemCategory.Viscera, 'viscera'],
-  [ItemCategory.VisceraHead, 'viscera.head'],
-  [ItemCategory.VisceraArm, 'viscera.arm'],
-  [ItemCategory.VisceraBody, 'viscera.body'],
-  [ItemCategory.VisceraLeg, 'viscera.leg'],
+  [ItemCategory.HeadViscera, 'viscera.head'],
+  [ItemCategory.UpperLimbViscera, 'viscera.arm'],
+  [ItemCategory.TorsoViscera, 'viscera.body'],
+  [ItemCategory.LowerLimbViscera, 'viscera.leg'],
   [ItemCategory.Chart, 'chart']
 ])
 
@@ -347,6 +347,9 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
     const state = filters.corrupted.value
     const key = state === CorruptionState.TwiceCorrupted ? 'twice_corrupted' : 'corrupted'
     propSet(query.filters, `misc_filters.filters.${key}.option`, String(state !== CorruptionState.None))
+    if (state === CorruptionState.Corrupted) {
+      propSet(query.filters, 'misc_filters.filters.twice_corrupted.option', 'false')
+    }
   }
   if (filters.fractured?.value === false) {
     propSet(query.filters, 'misc_filters.filters.fractured_item.option', String(false))
@@ -365,6 +368,9 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
   }
   if (filters.mirrored?.disabled) {
     propSet(query.filters, 'misc_filters.filters.mirrored.option', String(false))
+  }
+  if (filters.notCatalysed && !filters.notCatalysed.disabled) {
+    propSet(query.filters, 'misc_filters.filters.quality.max', 0)
   }
 
   if (filters.gemLevel && !filters.gemLevel.disabled) {

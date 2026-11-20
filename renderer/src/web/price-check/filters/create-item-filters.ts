@@ -49,7 +49,10 @@ export function createFilters (
     if (!opts.currency) {
       filters.trade.currency = 'chaos_divine'
     }
-    if (item.info.refName !== 'Mercenary Warrant') {
+    if (
+      item.info.refName !== 'Mercenary Warrant' &&
+      item.info.refName !== 'Viscera'
+    ) {
       filters.trade.collapseMerchant = true
     }
   }
@@ -142,6 +145,12 @@ export function createFilters (
         value: item.itemLevel,
         disabled: false
       }
+    }
+    return filters
+  }
+  if (item.info.refName === 'Viscera') {
+    filters.searchExact = {
+      category: item.category
     }
     return filters
   }
@@ -260,6 +269,10 @@ export function createFilters (
       value: item.sentinelCharge,
       disabled: false
     }
+  }
+
+  if (JEWELLERY.has(item.category!) && !item.quality) {
+    filters.notCatalysed = { disabled: false }
   }
 
   if (item.quality && item.quality >= 20 && !JEWELLERY.has(item.category!)) {

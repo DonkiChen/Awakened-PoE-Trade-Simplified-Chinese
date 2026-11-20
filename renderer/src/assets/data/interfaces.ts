@@ -19,6 +19,7 @@ export interface Stat {
   matchers: StatMatcher[]
   better: StatBetter
   modFamily?: string[]
+  reminderText?: string
   fromAreaMods?: 'yes' | 'ubermap_exclusive' | 'heist_exclusive'
   anointments?: Array<{ roll: number, oils: string }>
   mercenary?: { icon?: string, supports?: string[], tier?: number, canonical?: string, syntheticFamily?: true }
@@ -184,6 +185,11 @@ export interface TranslationDict {
   METAMORPH_HELP: string
   BEAST_HELP: string
   VOIDSTONE_HELP: string
+  VISCERA_HELP?: string
+  VISCERA_UPPER_LIMB?: string
+  VISCERA_LOWER_LIMB?: string
+  VISCERA_HEAD?: string
+  VISCERA_TORSO?: string
   METAMORPH_BRAIN: RegExp
   METAMORPH_EYE: RegExp
   METAMORPH_LUNG: RegExp
@@ -222,7 +228,9 @@ export interface TranslationDict {
   IMPLICIT_MODIFIER: string
   FRACTURED_PREFIX: string
   FRACTURED_SUFFIX: string
-  RARE_ONLY_AFFIX: string
+  RARE_ONLY_AFFIX?: string
+  RARE_ONLY_PREFIX?: string
+  RARE_ONLY_SUFFIX?: string
   UNSCALABLE_VALUE: string
   CORRUPTED_IMPLICIT: string
   MODIFIER_INCREASED: RegExp

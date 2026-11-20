@@ -51,20 +51,20 @@ export enum ItemCategory {
   Idol = 'Idol',
   Graft = 'Graft',
   Viscera = 'Viscera',
-  VisceraHead = 'Viscera Head',
-  VisceraArm = 'Viscera Arm',
-  VisceraBody = 'Viscera Body',
-  VisceraLeg = 'Viscera Leg',
   Chart = 'Chart',
-  MercenaryWarrant = 'Mercenary Warrant'
+  MercenaryWarrant = 'Mercenary Warrant',
+  UpperLimbViscera = 'Upper Limb Viscera',
+  LowerLimbViscera = 'Lower Limb Viscera',
+  HeadViscera = 'Head Viscera',
+  TorsoViscera = 'Torso Viscera'
 }
 
 export const VISCERA = new Set([
   ItemCategory.Viscera,
-  ItemCategory.VisceraHead,
-  ItemCategory.VisceraArm,
-  ItemCategory.VisceraBody,
-  ItemCategory.VisceraLeg
+  ItemCategory.HeadViscera,
+  ItemCategory.UpperLimbViscera,
+  ItemCategory.TorsoViscera,
+  ItemCategory.LowerLimbViscera
 ])
 
 export const MAP_LIKE_ITEM = new Set([
