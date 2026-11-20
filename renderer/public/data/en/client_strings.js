@@ -148,13 +148,6 @@ export default {
   RITUAL_MONSTERS: /^Monsters[:：]\s*(\d+)?$/,
   RITUAL_OTHER_MONSTERS: /^(\d+)\s*Other Monsters?$/,
   RITUAL_MONSTER_LIST_END: /^(?:Monster Level|From)[:：]/,
-  ITEM_CLASS_VISCERA: 'Viscera',
-  VISCERA_LESSER: 'Lesser ',
-  VISCERA_GREATER: 'Greater ',
-  VISCERA_ITEM_ARM: 'Upper Limb',
-  VISCERA_ITEM_LEG: 'Lower Limb',
-  VISCERA_ITEM_HEAD: 'Head',
-  VISCERA_ITEM_TORSO: 'Torso',
   // ---
   CHAT_SYSTEM: /^: (?<body>.+)$/,
   CHAT_TRADE: /^\$(?:<(?<guild_tag>.+?)> )?(?<char_name>.+?): (?<body>.+)$/,

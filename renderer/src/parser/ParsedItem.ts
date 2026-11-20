@@ -11,12 +11,6 @@ export enum ItemRarity {
   Unique = 'Unique'
 }
 
-export enum CorruptionState {
-  None = 'none',
-  Corrupted = 'corrupted',
-  TwiceCorrupted = 'twice_corrupted'
-}
-
 export enum ItemInfluence {
   Crusader = 'Crusader',
   Elder = 'Elder',
@@ -85,8 +79,7 @@ export interface ParsedItem {
   }
   stackSize?: { value: number, max: number }
   isUnidentified: boolean
-  corruptionState: CorruptionState
-  readonly isCorrupted: boolean
+  isCorrupted?: { twice?: boolean }
   isUnmodifiable?: boolean
   isMirrored?: boolean
   isSplit?: boolean
@@ -123,10 +116,6 @@ export function createVirtualItem (
   return {
     ...props,
     isUnidentified: props.isUnidentified ?? false,
-    corruptionState: props.corruptionState ?? CorruptionState.None,
-    get isCorrupted () {
-      return this.corruptionState !== CorruptionState.None
-    },
     newMods: props.newMods ?? [],
     statsByType: props.statsByType ?? [],
     unknownModifiers: props.unknownModifiers ?? [],

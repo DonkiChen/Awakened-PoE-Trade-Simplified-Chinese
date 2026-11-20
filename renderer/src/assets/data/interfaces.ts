@@ -166,7 +166,7 @@ export interface TranslationDict {
   TAG_WARD: string
   BLOCK_CHANCE: string
   CORRUPTED: string
-  TWICE_CORRUPTED?: string
+  TWICE_CORRUPTED: string
   UNIDENTIFIED: string
   ITEM_SUPERIOR: RegExp
   MAP_BLIGHTED: RegExp
@@ -274,12 +274,6 @@ export interface TranslationDict {
   RITUAL_MONSTER_LIST_END?: RegExp
   MERCENARY_BUILD: string
   ITEM_CLASS_VISCERA?: string
-  VISCERA_LESSER?: string
-  VISCERA_GREATER?: string
-  VISCERA_ITEM_ARM?: string
-  VISCERA_ITEM_LEG?: string
-  VISCERA_ITEM_HEAD?: string
-  VISCERA_ITEM_TORSO?: string
   // ---
   CHAT_SYSTEM: RegExp
   CHAT_TRADE: RegExp

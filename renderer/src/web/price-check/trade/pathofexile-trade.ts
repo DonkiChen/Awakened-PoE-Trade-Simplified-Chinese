@@ -1,4 +1,4 @@
-import { ItemInfluence, ItemCategory, CorruptionState } from '@/parser'
+import { ItemInfluence, ItemCategory } from '@/parser'
 import { ItemFilters, StatFilter, FilterOrGroup, INTERNAL_TRADE_IDS, InternalTradeId, FilterTag } from '../filters/interfaces'
 import { setProperty as propSet } from 'dot-prop'
 import { DateTime } from 'luxon'
@@ -52,12 +52,11 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Charm, 'azmeri.charm'],
   [ItemCategory.Idol, 'idol'],
   [ItemCategory.Graft, 'graft'],
-  [ItemCategory.Viscera, 'viscera'],
+  [ItemCategory.Chart, 'chart'],
   [ItemCategory.HeadViscera, 'viscera.head'],
-  [ItemCategory.UpperLimbViscera, 'viscera.arm'],
   [ItemCategory.TorsoViscera, 'viscera.body'],
   [ItemCategory.LowerLimbViscera, 'viscera.leg'],
-  [ItemCategory.Chart, 'chart']
+  [ItemCategory.UpperLimbViscera, 'viscera.arm']
 ])
 
 const TOTAL_MODS_TEXT = {
@@ -343,13 +342,11 @@ export function createTradeRequest (filters: ItemFilters, stats: FilterOrGroup[]
     }
   }
 
-  if (filters.corrupted) {
-    const state = filters.corrupted.value
-    const key = state === CorruptionState.TwiceCorrupted ? 'twice_corrupted' : 'corrupted'
-    propSet(query.filters, `misc_filters.filters.${key}.option`, String(state !== CorruptionState.None))
-    if (state === CorruptionState.Corrupted) {
-      propSet(query.filters, 'misc_filters.filters.twice_corrupted.option', 'false')
-    }
+  if (filters.corrupted?.value === false || filters.corrupted?.exact) {
+    propSet(query.filters, 'misc_filters.filters.corrupted.option', String(filters.corrupted.value))
+  }
+  if (filters.corrupted?.value === true && filters.corrupted.twice === false) {
+    propSet(query.filters, 'misc_filters.filters.twice_corrupted.option', String(filters.corrupted.twice))
   }
   if (filters.fractured?.value === false) {
     propSet(query.filters, 'misc_filters.filters.fractured_item.option', String(false))

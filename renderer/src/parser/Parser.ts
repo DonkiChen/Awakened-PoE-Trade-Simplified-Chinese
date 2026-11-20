@@ -12,7 +12,7 @@ import {
 import { ModifierType, ModifierMechanic, sumStatsByModType } from './modifiers'
 import { linesToStatStrings, tryParseTranslation, getRollOrMinmaxAvg, ParsedStat } from './stat-translations'
 import { ItemCategory, JEWELLERY } from './meta'
-import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity, CorruptionState } from './ParsedItem'
+import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedItem'
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
@@ -34,7 +34,6 @@ interface ParserState extends ParsedItem {
 
 const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, 便于调试 */ name: string }> = [
   parseUnidentified,
-  { virtual: parseViscera, name: 'parseViscera' },
   { virtual: parseSuperior, name: 'parseSuperior' },
   { virtual: parseFoulborn, name: 'parseFoulborn' },
   { virtual: parseVestigial, name: 'parseVestigial' },
@@ -73,7 +72,7 @@ const parsers: Array<ParserFn | { virtual: VirtualParserFn, /** 加个名称, �
   parseSentinelCharge,
   parseScryingOrb,
   parseMercenary,
-  parseVisceraPart,
+  parseViscera,
   parseLogbookArea,
   parseLogbookArea,
   parseLogbookArea,
@@ -257,9 +256,6 @@ function findInDatabase (item: ParserState) {
 export function makeIdentifiedUnique (uniqueInfo: BaseType, unidentified: ParsedItem): ParsedItem {
   const newItem: ParsedItem = {
     ...unidentified,
-    get isCorrupted () {
-      return this.corruptionState !== CorruptionState.None
-    },
     info: uniqueInfo,
     uniqueBase: unidentified.info
   }
@@ -443,10 +439,6 @@ function parseNamePlate (section: string[]) {
     name: name,
     baseType: baseType,
     isUnidentified: false,
-    corruptionState: CorruptionState.None,
-    get isCorrupted () {
-      return this.corruptionState !== CorruptionState.None
-    },
     newMods: [],
     statsByType: [],
     unknownModifiers: [],
@@ -475,39 +467,14 @@ function parseNamePlate (section: string[]) {
   }
 
   if (_$.ITEM_CLASS_VISCERA && itemClass === _$.ITEM_CLASS_VISCERA) {
+    // 简中剪贴板的部位也可能出现在名称下方，而不是独立段落。
     item.rarity = ItemRarity.Normal
-    item.category = ItemCategory.Viscera
+    item.category = visceraCategory(item.baseType)
+    item.name = 'Viscera'
+    item.baseType = undefined
   }
 
   return ok(item)
-}
-
-function parseViscera (item: ParserState) {
-  if (item.category !== ItemCategory.Viscera) return
-
-  item.category = parseVisceraCategory(item.baseType)
-  item.name = normalizeVisceraName(item.name)
-  // 第二行是部位标签，而非真实底材名称。
-  item.baseType = undefined
-}
-
-function parseVisceraCategory (baseType: string | undefined): ItemCategory {
-  if (!baseType) return ItemCategory.Viscera
-
-  if (baseType === _$.VISCERA_ITEM_HEAD || baseType === _$.VISCERA_HEAD) return ItemCategory.HeadViscera
-  if (baseType === _$.VISCERA_ITEM_ARM || baseType === _$.VISCERA_UPPER_LIMB) return ItemCategory.UpperLimbViscera
-  if (baseType === _$.VISCERA_ITEM_TORSO || baseType === _$.VISCERA_TORSO) return ItemCategory.TorsoViscera
-  if (baseType === _$.VISCERA_ITEM_LEG || baseType === _$.VISCERA_LOWER_LIMB) return ItemCategory.LowerLimbViscera
-  return ItemCategory.Viscera
-}
-
-function normalizeVisceraName (name: string): string {
-  for (const prefix of [_$.VISCERA_LESSER, _$.VISCERA_GREATER]) {
-    if (prefix && name.startsWith(prefix)) {
-      return name.slice(prefix.length)
-    }
-  }
-  return name
 }
 
 function parseInfluence (section: string[], item: ParsedItem) {
@@ -545,14 +512,14 @@ function parseInfluence (section: string[], item: ParsedItem) {
 }
 
 function parseCorrupted (section: string[], item: ParsedItem) {
-  if (_$.TWICE_CORRUPTED && section[0] === _$.TWICE_CORRUPTED) {
-    item.corruptionState = CorruptionState.TwiceCorrupted
+  if (section[0] === _$.CORRUPTED) {
+    item.isCorrupted = {}
     return 'SECTION_PARSED'
-  } else if (section[0] === _$.CORRUPTED) {
-    item.corruptionState = CorruptionState.Corrupted
+  } else if (section[0] === _$.TWICE_CORRUPTED) {
+    item.isCorrupted = { twice: true }
     return 'SECTION_PARSED'
   } else if (section[0] === _$.UNMODIFIABLE) {
-    item.corruptionState = CorruptionState.Corrupted
+    item.isCorrupted = {}
     item.isUnmodifiable = true
     return 'SECTION_PARSED'
   }
@@ -813,11 +780,21 @@ function parseAccessory (section: string[], item: ParsedItem) {
   return isParsed
 }
 
-function parseVisceraPart (section: string[], item: ParsedItem) {
+function visceraCategory (part: string | undefined): ItemCategory | undefined {
+  if (!part) return
+  switch (part) {
+    case _$.VISCERA_HEAD: return ItemCategory.HeadViscera
+    case _$.VISCERA_LOWER_LIMB: return ItemCategory.LowerLimbViscera
+    case _$.VISCERA_UPPER_LIMB: return ItemCategory.UpperLimbViscera
+    case _$.VISCERA_TORSO: return ItemCategory.TorsoViscera
+  }
+}
+
+function parseViscera (section: string[], item: ParsedItem) {
   if (item.info.refName !== 'Viscera') return 'PARSER_SKIPPED'
   if (section.length === 1) {
-    const category = parseVisceraCategory(section[0])
-    if (category !== ItemCategory.Viscera) {
+    const category = visceraCategory(section[0])
+    if (category) {
       item.category = category
       return 'SECTION_PARSED'
     }
