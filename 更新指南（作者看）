@@ -1,6 +1,8 @@
 （国服没开的时候）：从A大补丁里抓词缀文件用，从原本的国服文件里抓物品文件用
 （国服开了的时候）：从国服文件里抓词缀和物品文件用
 
+简中数据生成步骤见 CN_TRANSLATOR.md。重新导出游戏数据后，运行 Helper 的 generate_translations.bat；它也会更新 zh_CN/client_strings.js 中的 *_MODS 区块，不需要手动对译词缀名。
+
 自己编译测试代码：
 cd ./renderer
 yarn --frozen-lockfile

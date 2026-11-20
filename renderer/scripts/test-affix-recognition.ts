@@ -1,7 +1,10 @@
+import { strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { CLIENT_STRINGS } from '../src/assets/data'
 import { initForNode } from '../src/assets/data/node'
 import { parseClipboard } from '../src/parser'
+import { parseModInfoLine } from '../src/parser/advanced-mod-desc'
+import { ModifierMechanic } from '../src/parser/modifiers'
 
 interface ItemFixture {
   content: string
@@ -45,6 +48,17 @@ function parseForAffixRecognition (content: string) {
 
 async function main () {
   await initForNode('zh_CN', { realm: 'pc-tencent' })
+
+  const mechanicCases = [
+    ['尊崇裂界者之', ModifierMechanic.Elder],
+    ['高阶裂界者之', ModifierMechanic.Elder],
+    ['秩序之', ModifierMechanic.Unveiled],
+    ['精华之', ModifierMechanic.Essence],
+    ['恶名的', ModifierMechanic.Infamous]
+  ] as const
+  for (const [name, mechanic] of mechanicCases) {
+    strictEqual(parseModInfoLine(`{ 后缀属性 "${name}" }`).mechanic, mechanic, name)
+  }
 
   const fixtures = JSON.parse(
     await readFile(new URL('../../test_data.json', import.meta.url), 'utf8')
