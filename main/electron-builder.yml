@@ -15,8 +15,11 @@ files:
 extraMetadata:
   main: "main.js"
 nsis:
+  artifactName: "Awakened PoE Trade CN Setup ${version}.${ext}"
   oneClick: false
   allowToChangeInstallationDirectory: true
+portable:
+  artifactName: "Awakened PoE Trade CN ${version}.${ext}"
 win:
   target:
   - "nsis"
