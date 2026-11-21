@@ -1,10 +1,11 @@
-import { strictEqual } from 'node:assert'
+import { deepStrictEqual, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { CLIENT_STRINGS } from '../src/assets/data'
 import { initForNode } from '../src/assets/data/node'
 import { parseClipboard } from '../src/parser'
 import { parseModInfoLine } from '../src/parser/advanced-mod-desc'
 import { ModifierMechanic } from '../src/parser/modifiers'
+import { createExactStatFilters } from '../src/web/price-check/filters/create-stat-filters'
 
 interface ItemFixture {
   content: string
@@ -48,6 +49,30 @@ function parseForAffixRecognition (content: string) {
 
 async function main () {
   await initForNode('zh_CN', { realm: 'pc-tencent' })
+
+  const guardianMap = parseClipboard([
+    '物品类别: 异界地图',
+    '稀 有 度: 稀有',
+    '地图（16阶）',
+    '--------',
+    '物品等级: 83',
+    '--------',
+    '怪物等级: 83',
+    '--------',
+    '{ 基底词缀 }',
+    '该区域被裂界者影响 — 数值不可估量',
+    '地图被 裂界守卫：奴役(...) 占据 — 数值不可估量',
+    '--------',
+    '未鉴定',
+    '--------',
+    '在私人地图装置中使用该物品，前往该等阶或更低等阶的地图。只能被使用一次。'
+  ].join('\n'))
+  if (guardianMap.isErr()) throw new Error(`Guardian map parsing failed: ${guardianMap.error}`)
+  const map = guardianMap.value
+  const guardianFilter = createExactStatFilters(map, map.statsByType, { searchStatRange: 0, mode: 'bulk' })
+    .find(filter => filter.statRef === 'Map is occupied by The Enslaver')
+  strictEqual(guardianFilter?.text, '地图被 裂界守卫：奴役 占据')
+  deepStrictEqual(guardianFilter.tradeId, ['implicit.stat_3624393862|1'])
 
   const mechanicCases = [
     ['尊崇裂界者之', ModifierMechanic.Elder],
