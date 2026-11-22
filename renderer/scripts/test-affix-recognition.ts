@@ -4,19 +4,23 @@ import { CLIENT_STRINGS } from '../src/assets/data'
 import { initForNode } from '../src/assets/data/node'
 import { parseClipboard, type ParsedItem } from '../src/parser'
 import { parseModInfoLine } from '../src/parser/advanced-mod-desc'
-import { ModifierMechanic } from '../src/parser/modifiers'
+import { ModifierMechanic, type ModifierType } from '../src/parser/modifiers'
 import { createExactStatFilters, initUiModFilters } from '../src/web/price-check/filters/create-stat-filters'
 
 interface ItemFixture {
   content: string
   name?: string
-  expected?: {
-    statCount?: number
-    statRef: string
-    roll?: { value: number, unscalable?: boolean }
-    explicitTradeIds?: string[]
-    filter?: { mode: 'bulk' | 'ui', tradeIds: string[], text?: string }
-  }
+  expected?: StatExpectation | StatExpectation[]
+}
+
+interface StatExpectation {
+  statCount?: number
+  statRef: string
+  type?: ModifierType
+  tradeIds?: string[]
+  roll?: { value: number, min?: number, max?: number, unscalable?: boolean }
+  explicitTradeIds?: string[]
+  filter?: { mode: 'bulk' | 'ui', tradeIds: string[], text?: string }
 }
 
 interface MechanicFixture {
@@ -60,17 +64,20 @@ function parseForAffixRecognition (content: string) {
   }
 }
 
-function assertExpected (item: ParsedItem, expected: NonNullable<ItemFixture['expected']>) {
-  const { statCount, statRef, roll, explicitTradeIds, filter } = expected
+function assertExpected (item: ParsedItem, expected: StatExpectation) {
+  const { statCount, statRef, type, tradeIds, roll, explicitTradeIds, filter } = expected
   if (statCount !== undefined) {
     strictEqual(item.statsByType.length, statCount, 'stat count')
   }
-  const stat = item.statsByType.find(({ stat }) => stat.ref === statRef)
+  const stat = item.statsByType.find(calc => calc.stat.ref === statRef && (type === undefined || calc.type === type))
   const actualRoll = stat?.sources[0]?.stat.roll
   if (roll) {
     strictEqual(actualRoll?.value, roll.value)
+    if (roll.min !== undefined) strictEqual(actualRoll?.min, roll.min)
+    if (roll.max !== undefined) strictEqual(actualRoll?.max, roll.max)
     if (roll.unscalable !== undefined) strictEqual(actualRoll?.unscalable, roll.unscalable)
   }
+  if (tradeIds) deepStrictEqual(stat?.stat.trade.ids[stat.type], tradeIds)
   if (explicitTradeIds) deepStrictEqual(stat?.stat.trade.ids.explicit, explicitTradeIds)
   if (filter) {
     const filters = filter.mode === 'bulk'
@@ -130,14 +137,16 @@ async function main () {
     }
 
     const item = parsed.value
-    if (fixture.expected) {
+    const expectations = Array.isArray(fixture.expected) ? fixture.expected : [fixture.expected]
+    for (const expected of expectations) {
+      if (!expected) continue
       try {
-        assertExpected(item, fixture.expected)
+        assertExpected(item, expected)
       } catch (error) {
         failures.push({
           itemNumber,
           itemName,
-          message: `${fixture.expected.statRef}: ${error instanceof Error ? error.message : String(error)}`
+          message: `${expected.statRef}${expected.type ? ` (${expected.type})` : ''}: ${error instanceof Error ? error.message : String(error)}`
         })
       }
     }
