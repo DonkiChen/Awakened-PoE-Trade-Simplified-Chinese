@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { CLIENT_STRINGS } from '../src/assets/data'
 import { initForNode } from '../src/assets/data/node'
-import { parseClipboard, type ParsedItem } from '../src/parser'
+import { ItemCategory, parseClipboard, type ParsedItem } from '../src/parser'
 import { parseModInfoLine } from '../src/parser/advanced-mod-desc'
 import { ModifierMechanic, type ModifierType } from '../src/parser/modifiers'
 import { createExactStatFilters, initUiModFilters } from '../src/web/price-check/filters/create-stat-filters'
@@ -11,6 +11,10 @@ interface ItemFixture {
   content: string
   name?: string
   expected?: StatExpectation | StatExpectation[]
+  expectedCurrency?: {
+    tradeTag: string
+    stackSize: NonNullable<ParsedItem['stackSize']>
+  }
 }
 
 interface StatExpectation {
@@ -137,6 +141,19 @@ async function main () {
     }
 
     const item = parsed.value
+    if (fixture.expectedCurrency) {
+      try {
+        strictEqual(item.category, ItemCategory.Currency, 'item category')
+        strictEqual(item.info.tradeTag, fixture.expectedCurrency.tradeTag, 'trade tag')
+        deepStrictEqual(item.stackSize, fixture.expectedCurrency.stackSize, 'stack size')
+      } catch (error) {
+        failures.push({
+          itemNumber,
+          itemName,
+          message: error instanceof Error ? error.message : String(error)
+        })
+      }
+    }
     const expectations = Array.isArray(fixture.expected) ? fixture.expected : [fixture.expected]
     for (const expected of expectations) {
       if (!expected) continue
