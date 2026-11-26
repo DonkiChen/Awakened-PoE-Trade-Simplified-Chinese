@@ -228,11 +228,14 @@ export function calculatedStatToFilter (
     (item.info.refName === 'Mirrored Tablet') ? 'max' : 'sum'
   )
   const translation = translateStatWithRoll(calc, roll)
+  const matchedTranslation = !roll
+    ? sources.find(source => source.stat.stat.ref === stat.ref)?.stat.translation
+    : undefined
 
   filter ??= {
     tradeId: stat.trade.ids[type],
     statRef: stat.ref,
-    text: translation.string,
+    text: matchedTranslation?.string ?? translation.string,
     tag: type,
     oils: decodeOils(calc),
     reminderText: sources.find(({ stat }) => stat.stat.reminderText != null)?.stat.stat.reminderText,

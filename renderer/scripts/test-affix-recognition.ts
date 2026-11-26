@@ -1,13 +1,35 @@
-import { strictEqual } from 'node:assert'
+import { deepStrictEqual, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import { CLIENT_STRINGS } from '../src/assets/data'
 import { initForNode } from '../src/assets/data/node'
-import { parseClipboard } from '../src/parser'
+import { ItemCategory, parseClipboard, type ParsedItem } from '../src/parser'
 import { parseModInfoLine } from '../src/parser/advanced-mod-desc'
-import { ModifierMechanic } from '../src/parser/modifiers'
+import { ModifierMechanic, type ModifierType } from '../src/parser/modifiers'
+import { createExactStatFilters, initUiModFilters } from '../src/web/price-check/filters/create-stat-filters'
 
 interface ItemFixture {
   content: string
+  name?: string
+  expected?: StatExpectation | StatExpectation[]
+  expectedCurrency?: {
+    tradeTag: string
+    stackSize: NonNullable<ParsedItem['stackSize']>
+  }
+}
+
+interface StatExpectation {
+  statCount?: number
+  statRef: string
+  type?: ModifierType
+  tradeIds?: string[]
+  roll?: { value: number, min?: number, max?: number, unscalable?: boolean }
+  explicitTradeIds?: string[]
+  filter?: { mode: 'bulk' | 'ui', tradeIds: string[], text?: string }
+}
+
+interface MechanicFixture {
+  modifierHeader: string
+  mechanic: keyof typeof ModifierMechanic
 }
 
 interface TestFailure {
@@ -46,37 +68,64 @@ function parseForAffixRecognition (content: string) {
   }
 }
 
+function assertExpected (item: ParsedItem, expected: StatExpectation) {
+  const { statCount, statRef, type, tradeIds, roll, explicitTradeIds, filter } = expected
+  if (statCount !== undefined) {
+    strictEqual(item.statsByType.length, statCount, 'stat count')
+  }
+  const stat = item.statsByType.find(calc => calc.stat.ref === statRef && (type === undefined || calc.type === type))
+  const actualRoll = stat?.sources[0]?.stat.roll
+  if (roll) {
+    strictEqual(actualRoll?.value, roll.value)
+    if (roll.min !== undefined) strictEqual(actualRoll?.min, roll.min)
+    if (roll.max !== undefined) strictEqual(actualRoll?.max, roll.max)
+    if (roll.unscalable !== undefined) strictEqual(actualRoll?.unscalable, roll.unscalable)
+  }
+  if (tradeIds) deepStrictEqual(stat?.stat.trade.ids[stat.type], tradeIds)
+  if (explicitTradeIds) deepStrictEqual(stat?.stat.trade.ids.explicit, explicitTradeIds)
+  if (filter) {
+    const filters = filter.mode === 'bulk'
+      ? createExactStatFilters(item, item.statsByType, { searchStatRange: 0, mode: 'bulk' })
+      : initUiModFilters(item, { searchStatRange: 0 })
+    const actual = filters.find(result => 'statRef' in result && result.statRef === statRef)
+    deepStrictEqual(actual && 'tradeId' in actual ? actual.tradeId : undefined, filter.tradeIds)
+    if (filter.text !== undefined) {
+      strictEqual(actual && 'text' in actual ? actual.text : undefined, filter.text)
+    }
+  }
+}
+
 async function main () {
   await initForNode('zh_CN', { realm: 'pc-tencent' })
 
-  const mechanicCases = [
-    ['尊崇裂界者之', ModifierMechanic.Elder],
-    ['高阶裂界者之', ModifierMechanic.Elder],
-    ['秩序之', ModifierMechanic.Unveiled],
-    ['精华之', ModifierMechanic.Essence],
-    ['恶名的', ModifierMechanic.Infamous]
-  ] as const
-  for (const [name, mechanic] of mechanicCases) {
-    strictEqual(parseModInfoLine(`{ 后缀属性 "${name}" }`).mechanic, mechanic, name)
-  }
-
   const fixtures = JSON.parse(
     await readFile(new URL('../../test_data.json', import.meta.url), 'utf8')
-  ) as ItemFixture[]
+  ) as Array<ItemFixture | MechanicFixture>
 
-  if (!Array.isArray(fixtures) || fixtures.some(fixture => typeof fixture?.content !== 'string')) {
-    throw new Error('test_data.json must be an array of objects with a string content field')
+  if (!Array.isArray(fixtures) || fixtures.some(fixture =>
+    !fixture || typeof fixture !== 'object' || ('content' in fixture
+      ? typeof fixture.content !== 'string'
+      : typeof fixture.modifierHeader !== 'string' || !Object.hasOwn(ModifierMechanic, fixture.mechanic)))) {
+    throw new Error('test_data.json must contain item or modifier header fixtures')
   }
 
+  const items = fixtures.filter((fixture): fixture is ItemFixture => 'content' in fixture)
+  for (const fixture of fixtures) {
+    if ('modifierHeader' in fixture) {
+      strictEqual(parseModInfoLine(fixture.modifierHeader).mechanic, ModifierMechanic[fixture.mechanic], fixture.modifierHeader)
+    }
+  }
   const failures: TestFailure[] = []
   const baseTypeFallbacks: string[] = []
   let recognizedModifiers = 0
   let recognizedStats = 0
 
-  for (const [index, fixture] of fixtures.entries()) {
+  for (const [index, fixture] of items.entries()) {
     const itemNumber = index + 1
-    const itemName = itemNameFromText(fixture.content, itemNumber)
-    const { parsed, usedBaseTypeFallback } = parseForAffixRecognition(fixture.content)
+    const itemName = fixture.name ?? itemNameFromText(fixture.content, itemNumber)
+    const { parsed, usedBaseTypeFallback } = fixture.expected
+      ? { parsed: parseClipboard(fixture.content.trim()), usedBaseTypeFallback: false }
+      : parseForAffixRecognition(fixture.content)
 
     if (usedBaseTypeFallback) {
       baseTypeFallbacks.push(itemName)
@@ -92,6 +141,32 @@ async function main () {
     }
 
     const item = parsed.value
+    if (fixture.expectedCurrency) {
+      try {
+        strictEqual(item.category, ItemCategory.Currency, 'item category')
+        strictEqual(item.info.tradeTag, fixture.expectedCurrency.tradeTag, 'trade tag')
+        deepStrictEqual(item.stackSize, fixture.expectedCurrency.stackSize, 'stack size')
+      } catch (error) {
+        failures.push({
+          itemNumber,
+          itemName,
+          message: error instanceof Error ? error.message : String(error)
+        })
+      }
+    }
+    const expectations = Array.isArray(fixture.expected) ? fixture.expected : [fixture.expected]
+    for (const expected of expectations) {
+      if (!expected) continue
+      try {
+        assertExpected(item, expected)
+      } catch (error) {
+        failures.push({
+          itemNumber,
+          itemName,
+          message: `${expected.statRef}${expected.type ? ` (${expected.type})` : ''}: ${error instanceof Error ? error.message : String(error)}`
+        })
+      }
+    }
     const annotatedModifierCount = fixture.content
       .split(/\r?\n/)
       .filter(line => line.startsWith('{') && line.endsWith('}'))
@@ -138,7 +213,7 @@ async function main () {
   }
 
   console.log(
-    `Affix recognition passed: ${fixtures.length} items, ${recognizedModifiers} parsed modifiers, ${recognizedStats} recognized stats.`
+    `Affix recognition passed: ${items.length} items, ${fixtures.length - items.length} modifier headers, ${recognizedModifiers} parsed modifiers, ${recognizedStats} recognized stats.`
   )
 
   if (baseTypeFallbacks.length) {

@@ -123,7 +123,7 @@ export function createFilters (
     }
     if (item.info.refName === 'Chronicle of Atzoatl') {
       filters.areaLevel = {
-        value: floorToBracket(item.areaLevel!, [1, 68, 73, 75, 78, 80]),
+        value: floorToBracket(item.areaLevel!, [1, 68, 73, 75, 78, 80, 83, 84]),
         disabled: false
       }
     } else if (item.info.refName === 'Mirrored Tablet') {
